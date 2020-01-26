@@ -1,2 +1,2 @@
 # cpm-hub
-CPM Hub
+CPM Hub is the CPM package repository application. 
