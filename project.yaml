@@ -1,0 +1,6 @@
+project_name: cpm-hub
+description: CPM Hub open source server for hosting CPM software
+packages:
+    - api
+plugins:
+    cest: "1.0"
