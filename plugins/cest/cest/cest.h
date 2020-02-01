@@ -251,5 +251,7 @@ int main(void)
         delete test_case;
     }
 
-    return 0;
+    return std::any_of(test_cases.begin(), test_cases.end(), [](cest::TestCase *test_case) {
+        return test_case->test_failed;
+    });
 }
