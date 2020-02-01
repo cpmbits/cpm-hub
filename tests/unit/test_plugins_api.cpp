@@ -15,12 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
+#include <cest/cest.h>
 
+using namespace cest;
 
-int main()
-{
-    std::cout << "Hello World! Again" << std::endl;
-    
-    return 0;
-}
+describe("Plugins API", []() {
+    beforeEach([&]() {
+    });
+
+    afterEach([&]() {
+    });
+
+    it("registers a plugin", [&]() {
+    });
+});

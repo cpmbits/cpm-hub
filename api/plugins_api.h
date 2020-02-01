@@ -15,12 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
+#pragma once
 
+#include <api/http.h>
 
-int main()
-{
-    std::cout << "Hello World! Again" << std::endl;
-    
-    return 0;
+namespace api {
+    struct http_response registerPlugin(struct http_request);
 }

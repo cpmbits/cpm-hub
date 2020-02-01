@@ -17,26 +17,32 @@
  */
 #include <cest/cest.h>
 
+#include <api/plugins_api.h>
 
-describe("CPM Hub lists available plugins", []() {
+using namespace cest;
+
+Assertion<struct http_response> expectFunction(const char *file, int line, struct http_response actual)
+{
+    return Assertion<struct http_response>(file, line, actual);
+}
+
+
+describe("CPM Hub registers plugins", []() {
     beforeEach([&]() {
     });
 
     afterEach([&]() {
     });
 
-    it("lists available plugins", [&]() {
-        //registerPlugin("cest");
-        //registerPlugin("chromos");
+    it("registers a plugin", [&]() {
+        struct http_request request(
+            "{\"name\": \"cest\"}"
+        );
+        struct http_response response;
 
-        //client().
-        //    get("/plugins").
-        //expect().
-        //    statusCode(200).
-        //    body(
-        //    "["
-        //     "  {\"cest\": {}},"
-        //     "  {\"chromos\": {}},"
-        //    "]");
+        response = api::registerPlugin(request);
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("");
     });
 });

@@ -15,12 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+
 #include <iostream>
 
+struct http_request {
+    std::string body;
 
-int not_main()
-{
-    std::cout << "Hello World!" << std::endl;
-    
-    return 0;
-}
+    http_request(std::string _body)
+    {
+        body = _body;
+    }
+};
+
+
+struct http_response {
+    int status_code;
+    std::string body;
+};
