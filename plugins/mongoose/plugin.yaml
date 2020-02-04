@@ -1,0 +1,5 @@
+plugin_name: mongoose
+description: Mongoose embedded web server
+version: "6.16"
+packages:
+    - mongoose

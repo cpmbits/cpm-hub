@@ -15,32 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <api/plugins_api.h>
-#include <domain/plugins_service.h>
-
-using namespace cest;
-
-class MockPluginsService : PluginsService {
+class PluginsService {
+    
 };
-
-describe("Plugins API", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
-    it("uses the plugin service to register a plugin", [&]() {
-        struct http_request request(
-            "{\"name\": \"cest\"}"
-        );
-        struct http_response response;
-
-        response = api::registerPlugin(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("");
-    });
-});

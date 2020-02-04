@@ -3,3 +3,5 @@ description: Cest testing framework for C++
 version: "1.0"
 cflags:
     - -std=c++11
+packages:
+    - cest

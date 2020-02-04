@@ -2,5 +2,7 @@ project_name: cpm-hub
 description: CPM Hub open source server for hosting CPM software
 packages:
     - api
+    - domain
 plugins:
     cest: "1.0"
+    mongoose: "6.16"
