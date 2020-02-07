@@ -15,19 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <json/json.hpp>
-#include <api/plugins_api.h>
 #include <domain/plugins_service.h>
 
-struct http_response PluginsApi::registerPlugin(struct http_request request)
+Plugin PluginsService::registerPlugin(std::string name)
 {
-    struct http_response response = {
-        200, ""
-    };
-    auto json = nlohmann::json::parse(request.body);
-    Plugin plugin;
-
-    plugin = this->plugins_service->registerPlugin(json.at("name"));
-
-    return response;
+    return Plugin();
 }

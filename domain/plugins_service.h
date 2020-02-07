@@ -17,6 +17,10 @@
  */
 #pragma once
 
+#include <string>
+#include <domain/plugin.h>
+
 class PluginsService {
-    
+public:
+    virtual Plugin registerPlugin(std::string name);
 };

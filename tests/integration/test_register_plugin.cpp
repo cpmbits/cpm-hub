@@ -21,11 +21,6 @@
 
 using namespace cest;
 
-Assertion<struct http_response> expectFunction(const char *file, int line, struct http_response actual)
-{
-    return Assertion<struct http_response>(file, line, actual);
-}
-
 
 describe("CPM Hub registers plugins", []() {
     beforeEach([&]() {
@@ -39,8 +34,10 @@ describe("CPM Hub registers plugins", []() {
             "{\"name\": \"cest\"}"
         );
         struct http_response response;
+        PluginsService service;
+        PluginsApi api(&service);
 
-        response = api::registerPlugin(request);
+        response = api.registerPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");

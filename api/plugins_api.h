@@ -18,7 +18,16 @@
 #pragma once
 
 #include <api/http.h>
+#include <domain/plugins_service.h>
 
-namespace api {
-    struct http_response registerPlugin(struct http_request);
-}
+class PluginsApi {
+public:
+    PluginsApi(PluginsService *plugins_service) {
+        this->plugins_service = plugins_service;
+    }
+    
+    struct http_response registerPlugin(struct http_request request);
+
+private:
+    PluginsService *plugins_service;
+};

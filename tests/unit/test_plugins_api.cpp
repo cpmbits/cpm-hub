@@ -22,8 +22,20 @@
 
 using namespace cest;
 
-class MockPluginsService : PluginsService {
+
+class MockPluginsService : public PluginsService {
+public:
+    int registerPluginCalls;
+    std::string registerPluginName;
+
+    Plugin registerPlugin(std::string name) {
+        registerPluginCalls++;
+        registerPluginName = name;
+        return Plugin();
+    }
 };
+
+
 
 describe("Plugins API", []() {
     beforeEach([&]() {
@@ -37,10 +49,14 @@ describe("Plugins API", []() {
             "{\"name\": \"cest\"}"
         );
         struct http_response response;
+        MockPluginsService mock_service;
+        PluginsApi api(&mock_service);
 
-        response = api::registerPlugin(request);
+        response = api.registerPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
+        expect(mock_service.registerPluginCalls).toBe(1);
+        expect(mock_service.registerPluginName).toBe("cest");
     });
 });
