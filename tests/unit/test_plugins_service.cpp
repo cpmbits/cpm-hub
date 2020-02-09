@@ -15,20 +15,38 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
 
-#include <string>
 #include <domain/plugins_repository.h>
-#include <domain/plugin.h>
+#include <domain/plugins_service.h>
 
-class PluginsService {
+
+class MockPluginsRepository : public PluginsRepository {
 public:
-    PluginsService(PluginsRepository *plugins_repository) {
-        this->plugins_repository = plugins_repository;
+    virtual void store(Plugin *plugin) {
+        this->stored_plugin = plugin;
     }
-
-    virtual Plugin registerPlugin(std::string name);
-
-private:
-    PluginsRepository *plugins_repository;
+    
+    Plugin *stored_plugin;
 };
+
+
+describe("Plugins Service", []() {
+    beforeEach([&]() {
+    });
+
+    afterEach([&]() {
+    });
+
+    it("stores a plugin with the given name when registering a plugin", [&]() {
+        MockPluginsRepository mock_repository;
+        PluginsService plugins_service(&mock_repository);
+        Plugin expected_plugin("cest");
+
+        plugins_service.registerPlugin("cest");
+
+        expect(*mock_repository.stored_plugin == expected_plugin).toBe(true);
+
+        delete mock_repository.stored_plugin;
+    });
+});

@@ -34,7 +34,8 @@ describe("CPM Hub registers plugins", []() {
             "{\"name\": \"cest\"}"
         );
         struct http_response response;
-        PluginsService service;
+        PluginsRepository repository;
+        PluginsService service(&repository);
         PluginsApi api(&service);
 
         response = api.registerPlugin(request);

@@ -17,6 +17,22 @@
  */
 #pragma once
 
-class Plugin {
+#include <string>
 
+class Plugin {
+public:
+    Plugin() {
+        this->name = "";
+    } 
+
+    Plugin(std::string name) {
+        this->name = name;
+    }
+
+    bool operator==(const Plugin &other) {
+        return this->name == other.name;
+    }
+
+private:
+    std::string name;
 };

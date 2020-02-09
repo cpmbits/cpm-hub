@@ -15,20 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <string>
 #include <domain/plugins_repository.h>
-#include <domain/plugin.h>
 
-class PluginsService {
-public:
-    PluginsService(PluginsRepository *plugins_repository) {
-        this->plugins_repository = plugins_repository;
-    }
 
-    virtual Plugin registerPlugin(std::string name);
-
-private:
-    PluginsRepository *plugins_repository;
-};
+void PluginsRepository::store(Plugin *plugin)
+{
+}

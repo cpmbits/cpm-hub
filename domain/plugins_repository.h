@@ -17,18 +17,10 @@
  */
 #pragma once
 
-#include <string>
-#include <domain/plugins_repository.h>
 #include <domain/plugin.h>
 
-class PluginsService {
+
+class PluginsRepository {
 public:
-    PluginsService(PluginsRepository *plugins_repository) {
-        this->plugins_repository = plugins_repository;
-    }
-
-    virtual Plugin registerPlugin(std::string name);
-
-private:
-    PluginsRepository *plugins_repository;
+    virtual void store(Plugin *plugin);
 };

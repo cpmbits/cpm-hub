@@ -19,5 +19,9 @@
 
 Plugin PluginsService::registerPlugin(std::string name)
 {
-    return Plugin();
+    Plugin *plugin = new Plugin(name);
+
+    this->plugins_repository->store(plugin);
+
+    return *plugin;
 }

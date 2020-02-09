@@ -25,12 +25,15 @@ using namespace cest;
 
 class MockPluginsService : public PluginsService {
 public:
-    int registerPluginCalls;
-    std::string registerPluginName;
+    int register_plugin_calls;
+    std::string register_plugin_name;
+
+    MockPluginsService() : PluginsService(NULL) {
+    }
 
     Plugin registerPlugin(std::string name) {
-        registerPluginCalls++;
-        registerPluginName = name;
+        register_plugin_calls++;
+        register_plugin_name = name;
         return Plugin();
     }
 };
@@ -56,7 +59,7 @@ describe("Plugins API", []() {
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        expect(mock_service.registerPluginCalls).toBe(1);
-        expect(mock_service.registerPluginName).toBe("cest");
+        expect(mock_service.register_plugin_calls).toBe(1);
+        expect(mock_service.register_plugin_name).toBe("cest");
     });
 });
