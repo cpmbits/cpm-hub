@@ -1,0 +1,5 @@
+plugin_name: fakeit
+description: FakeIt mocking framework for C++
+version: "2.0.5"
+packages:
+    fakeit:

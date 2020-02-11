@@ -16,28 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <cest/cest.h>
+#include <fakeit/fakeit.hpp>
 
 #include <api/plugins_api.h>
 #include <domain/plugins_service.h>
 
 using namespace cest;
-
-
-class MockPluginsService : public PluginsService {
-public:
-    int register_plugin_calls;
-    std::string register_plugin_name;
-
-    MockPluginsService() : PluginsService(NULL) {
-    }
-
-    Plugin registerPlugin(std::string name) {
-        register_plugin_calls++;
-        register_plugin_name = name;
-        return Plugin();
-    }
-};
-
+using namespace fakeit;
 
 
 describe("Plugins API", []() {
@@ -48,18 +33,17 @@ describe("Plugins API", []() {
     });
 
     it("uses the plugin service to register a plugin", [&]() {
-        struct http_request request(
-            "{\"name\": \"cest\"}"
-        );
+        struct http_request request("{\"name\": \"cest\"}");
         struct http_response response;
-        MockPluginsService mock_service;
-        PluginsApi api(&mock_service);
+        Mock<PluginsService> mock;
+        PluginsApi api(&mock.get());
+
+        When(Method(mock, registerPlugin)).Return(Plugin(""));
 
         response = api.registerPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        expect(mock_service.register_plugin_calls).toBe(1);
-        expect(mock_service.register_plugin_name).toBe("cest");
+        Verify(Method(mock, registerPlugin).Using("cest"));
     });
 });
