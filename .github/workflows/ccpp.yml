@@ -8,13 +8,13 @@ jobs:
 
     strategy:
         matrix:
-          python-version: [ '3.7' ]
+          python-version: [ 3.7 ]
 
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        pip3.7 install cpm-cli
+        pip3 install cpm-cli
     - name: Test with CPM
       run: |
         cpm test
