@@ -16,6 +16,7 @@ jobs:
       run: |
         pip3 install cpm-cli
         pip3 install pyyaml
+        apt install -yq ninja-build g++
     - name: Test with CPM
       run: |
         cpm test
