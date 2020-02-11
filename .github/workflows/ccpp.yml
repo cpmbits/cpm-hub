@@ -15,6 +15,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install cpm-cli
+        pip3 install pyyaml
     - name: Test with CPM
       run: |
         cpm test
