@@ -25,7 +25,7 @@ struct http_response PluginsApi::registerPlugin(struct http_request request)
         200, ""
     };
     auto json = nlohmann::json::parse(request.body);
-    Plugin plugin;
+    Plugin *plugin;
 
     plugin = this->plugins_service->registerPlugin(json.at("name"));
 

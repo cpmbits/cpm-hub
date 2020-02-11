@@ -17,10 +17,13 @@
  */
 #pragma once
 
+#include <string>
 #include <domain/plugin.h>
 
 
 class PluginsRepository {
 public:
-    virtual void store(Plugin *plugin);
+    virtual void store(Plugin *plugin) = 0;
+
+    virtual Plugin *find(std::string name) = 0;
 };

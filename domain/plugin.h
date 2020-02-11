@@ -33,6 +33,5 @@ public:
         return this->name == other.name;
     }
 
-private:
     std::string name;
 };

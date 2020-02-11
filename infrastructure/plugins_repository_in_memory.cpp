@@ -15,33 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
-#include <api/plugins_api.h>
 #include <infrastructure/plugins_repository_in_memory.h>
 
-using namespace cest;
+
+void PluginsRepositoryInMemory::store(Plugin *plugin)
+{
+    this->plugins.insert(std::make_pair(plugin->name, plugin));
+}
 
 
-describe("CPM Hub registers plugins", []() {
-    beforeEach([&]() {
-    });
+Plugin *PluginsRepositoryInMemory::find(std::string name)
+{
+    auto iter = this->plugins.find(name);
 
-    afterEach([&]() {
-    });
+    if (iter == this->plugins.end()){
+        return NULL;
+    }
 
-    it("registers a plugin", [&]() {
-        struct http_request request(
-            "{\"name\": \"cest\"}"
-        );
-        struct http_response response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
-
-        response = api.registerPlugin(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("");
-    });
-});
+    return iter->second;
+}

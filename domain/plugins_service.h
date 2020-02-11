@@ -27,7 +27,7 @@ public:
         this->plugins_repository = plugins_repository;
     }
 
-    virtual Plugin registerPlugin(std::string name);
+    virtual Plugin *registerPlugin(std::string name);
 
 private:
     PluginsRepository *plugins_repository;

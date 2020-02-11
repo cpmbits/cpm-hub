@@ -35,15 +35,16 @@ describe("Plugins API", []() {
     it("uses the plugin service to register a plugin", [&]() {
         struct http_request request("{\"name\": \"cest\"}");
         struct http_response response;
-        Mock<PluginsService> mock;
-        PluginsApi api(&mock.get());
+        Plugin plugin("");
+        Mock<PluginsService> mock_service;
+        PluginsApi api(&mock_service.get());
 
-        When(Method(mock, registerPlugin)).Return(Plugin(""));
+        When(Method(mock_service, registerPlugin)).Return(&plugin);
 
         response = api.registerPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock, registerPlugin).Using("cest"));
+        Verify(Method(mock_service, registerPlugin).Using("cest"));
     });
 });

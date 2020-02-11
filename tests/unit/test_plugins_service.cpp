@@ -16,19 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <cest/cest.h>
+#include <fakeit/fakeit.hpp>
 
 #include <domain/plugins_repository.h>
 #include <domain/plugins_service.h>
 
-
-class MockPluginsRepository : public PluginsRepository {
-public:
-    virtual void store(Plugin *plugin) {
-        this->stored_plugin = plugin;
-    }
-    
-    Plugin *stored_plugin;
-};
+using namespace cest;
+using namespace fakeit;
 
 
 describe("Plugins Service", []() {
@@ -39,14 +33,14 @@ describe("Plugins Service", []() {
     });
 
     it("stores a plugin with the given name when registering a plugin", [&]() {
-        MockPluginsRepository mock_repository;
-        PluginsService plugins_service(&mock_repository);
+        Mock<PluginsRepository> mock_repository;
+        PluginsService plugins_service(&mock_repository.get());
         Plugin expected_plugin("cest");
+
+        When(Method(mock_repository, store)).AlwaysReturn();
 
         plugins_service.registerPlugin("cest");
 
-        expect(*mock_repository.stored_plugin == expected_plugin).toBe(true);
-
-        delete mock_repository.stored_plugin;
+        Verify(Method(mock_repository, store));
     });
 });

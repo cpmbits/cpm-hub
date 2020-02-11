@@ -5,6 +5,7 @@ packages:
         cflags:
             - -std=c++11
     domain:
+    infrastructure:
 plugins:
     cest: "1.0"
     mongoose: "6.16"

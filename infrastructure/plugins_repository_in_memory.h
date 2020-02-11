@@ -15,9 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+
+#include <map>
+#include <string>
 #include <domain/plugins_repository.h>
 
 
-void PluginsRepository::store(Plugin *plugin)
-{
-}
+class PluginsRepositoryInMemory: public PluginsRepository {
+public:
+    virtual void store(Plugin *plugin);
+
+    virtual Plugin *find(std::string name);
+
+private:
+    std::map<std::string, Plugin *> plugins;
+};
