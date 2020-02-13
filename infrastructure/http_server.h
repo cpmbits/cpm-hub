@@ -31,10 +31,9 @@ public:
     struct mg_serve_http_opts options;
 
     void get(std::string path, ServerCallback callback);
-
     void start(int port);
-
     void stop();
+    void serveRequest(struct mg_connection *connection, struct http_message *message);
 
 private:
     int port;
@@ -45,4 +44,5 @@ private:
     std::map<std::string, ServerCallback> gets;
 
     void serve();
+
 };

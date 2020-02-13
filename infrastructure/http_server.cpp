@@ -59,6 +59,26 @@ void HttpServer::get(std::string path, ServerCallback callback)
 }
 
 
+void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
+{
+    struct http_response response;
+    struct http_request request("");
+    ServerCallback callback;
+    auto iter = this->gets.find(message->uri.p);
+
+    callback = iter->second;
+    response = callback(request);
+
+    mg_printf(connection,
+          "HTTP/1.1 %d OK\r\n"
+          "Content-Length: %d\r\n"
+          "%s\r\n\r\n",
+          response.status_code,
+          (int)response.body.size(),
+          response.body.c_str());
+}
+
+
 static void eventHandler(struct mg_connection *connection, int event, void *data)
 {
     HttpServer *server = (HttpServer *)connection->mgr->user_data;
@@ -66,11 +86,7 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
 
     switch (event) {
     case MG_EV_HTTP_REQUEST:
-        
-        mg_printf(connection, "%s",
-              "HTTP/1.1 200 OK\r\n"
-              "Content-Length: 0\r\n\r\n");
-        //mg_serve_http(connection, hm, server->options);
+        server->serveRequest(connection, message);
         break;
 
     default:
