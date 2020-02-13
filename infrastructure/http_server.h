@@ -17,17 +17,32 @@
  */
 #pragma once
 
+#include <functional>
+#include <map>
+#include <string>
+#include <thread>
+#include <mongoose/mongoose.h>
 #include <infrastructure/http.h>
-#include <domain/plugins_service.h>
 
-class PluginsApi {
+typedef std::function<struct http_response(struct http_request)> ServerCallback;
+
+class HttpServer {
 public:
-    PluginsApi(PluginsService *plugins_service) {
-        this->plugins_service = plugins_service;
-    }
-    
-    struct http_response registerPlugin(struct http_request request);
+    struct mg_serve_http_opts options;
+
+    void get(std::string path, ServerCallback callback);
+
+    void start(int port);
+
+    void stop();
 
 private:
-    PluginsService *plugins_service;
+    int port;
+    bool running;
+    struct mg_mgr mgr;
+    struct mg_connection *connection;
+    std::thread *server_thread;
+    std::map<std::string, ServerCallback> gets;
+
+    void serve();
 };

@@ -17,17 +17,17 @@
  */
 #pragma once
 
+#include <string>
+#include <mongoose/mongoose.h>
 #include <infrastructure/http.h>
-#include <domain/plugins_service.h>
 
-class PluginsApi {
+class HttpClient {
 public:
-    PluginsApi(PluginsService *plugins_service) {
-        this->plugins_service = plugins_service;
-    }
-    
-    struct http_response registerPlugin(struct http_request request);
+    struct http_response get(std::string url, struct http_request request);
+    void responseArrived(struct http_response response);
 
 private:
-    PluginsService *plugins_service;
+    bool request_pending;
+    struct http_response response;
+    struct mg_mgr mgr;
 };

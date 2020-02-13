@@ -1,0 +1,75 @@
+/*
+ * Copyright (C) 2020  Jordi Sánchez
+ * This file is part of CPM Hub
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#include <infrastructure/http_client.h>
+
+static void eventHandler(struct mg_connection *connection, int event, void *data);
+
+
+struct http_response HttpClient::get(std::string url, struct http_request request)
+{
+    mg_mgr_init(&mgr, this);
+    mg_connect_http(&mgr, eventHandler, url.c_str(), NULL, NULL);
+
+    request_pending = true;
+    while (request_pending) {
+        mg_mgr_poll(&mgr, 100);
+    }
+
+    return this->response;
+}
+
+
+void HttpClient::responseArrived(struct http_response response)
+{
+    this->response = response;
+    this->request_pending = false;
+}
+
+
+static void eventHandler(struct mg_connection *connection, int event, void *data)
+{
+    HttpClient *client = (HttpClient *)connection->mgr->user_data;
+    struct http_message *message = (struct http_message *)data;
+    struct http_response response;
+
+    switch (event) {
+    case MG_EV_CONNECT:
+        if (*(int *)data != 0) {
+            response.status_code = 400;
+            response.body = "";
+            client->responseArrived(response);
+        }
+        break;
+
+    case MG_EV_HTTP_REPLY:
+        connection->flags |= MG_F_CLOSE_IMMEDIATELY;
+        response.status_code = message->resp_code;
+        response.body = "";
+        client->responseArrived(response);
+        break;
+
+    case MG_EV_CLOSE:
+        response.status_code = 400;
+        response.body = "";
+        client->responseArrived(response);
+        break;
+
+    default:
+        break;
+    }
+}
