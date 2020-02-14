@@ -58,7 +58,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.get("/plugins", getPlugins);
         server.start(8000);
 
-        response = client.get("http://127.0.0.1:8000", http_request(""));
+        response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");

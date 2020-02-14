@@ -64,18 +64,22 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     struct http_response response;
     struct http_request request("");
     ServerCallback callback;
-    auto iter = this->gets.find(message->uri.p);
+    std::string endpoint(message->uri.p, message->uri.len);
+    auto iter = this->gets.find(endpoint);
 
     callback = iter->second;
     response = callback(request);
 
     mg_printf(connection,
           "HTTP/1.1 %d OK\r\n"
-          "Content-Length: %d\r\n"
-          "%s\r\n\r\n",
-          response.status_code,
-          (int)response.body.size(),
+          "Transfer-Encoding: chunked\r\n\r\n",
+          response.status_code);
+
+    mg_printf_http_chunk(connection,
+          "%s",
           response.body.c_str());
+
+    mg_send_http_chunk(connection, "", 0);
 }
 
 

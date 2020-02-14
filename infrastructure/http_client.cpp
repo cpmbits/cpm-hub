@@ -22,8 +22,11 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
 
 struct http_response HttpClient::get(std::string url, struct http_request request)
 {
+    struct mg_connection *connection;
+
     mg_mgr_init(&mgr, this);
-    mg_connect_http(&mgr, eventHandler, url.c_str(), NULL, NULL);
+    connection = mg_connect_http(&mgr, eventHandler, url.c_str(), NULL, NULL);
+    mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
     while (request_pending) {
@@ -57,15 +60,13 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
         break;
 
     case MG_EV_HTTP_REPLY:
-        connection->flags |= MG_F_CLOSE_IMMEDIATELY;
         response.status_code = message->resp_code;
-        response.body = "";
+        response.body.assign(message->body.p, message->body.len);
         client->responseArrived(response);
+        connection->flags |= MG_F_SEND_AND_CLOSE;
         break;
 
     case MG_EV_CLOSE:
-        response.status_code = 400;
-        response.body = "";
         client->responseArrived(response);
         break;
 

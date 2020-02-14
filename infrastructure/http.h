@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include <iostream>
+#include <string>
 
 struct http_request {
     std::string body;
@@ -32,4 +32,16 @@ struct http_request {
 struct http_response {
     int status_code;
     std::string body;
+
+    http_response()
+    {
+        status_code = 404;
+        body = "";
+    }
+
+    http_response(int _status_code, std::string _body)
+    {
+        status_code = _status_code;
+        body = _body;
+    }
 };
