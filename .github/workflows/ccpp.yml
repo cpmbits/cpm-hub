@@ -1,4 +1,4 @@
-name: C/C++ Continuous Integration
+name: C/C++ CI
 
 on: [push]
 
@@ -20,3 +20,6 @@ jobs:
     - name: Test with CPM
       run: |
         cpm test
+    - name: Build
+      run: |
+        cpm build
