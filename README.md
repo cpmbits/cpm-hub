@@ -1,4 +1,5 @@
-# CPM Hub Plugin Repository ![C/C++ Continuous Integration](https://github.com/jorsanpe/cpm-hub/workflows/C/C++%20Continuous%20Integration/badge.svg)
+# CPM Hub Plugin Repository ![C/C++ CI](https://github.com/jorsanpe/cpm-hub/workflows/C/C++%20CI/badge.svg?branch=master)
+
 CPM is a generic manager for C and C++ projects. The CPM plugin repository contains the package index 
 used by CPM. 
 
