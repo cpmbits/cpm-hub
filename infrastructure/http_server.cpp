@@ -18,12 +18,14 @@
 #include <sstream>
 #include <infrastructure/http_server.h>
 
+using namespace std;
+
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
 void HttpServer::start(int port)
 {
-    std::ostringstream string_stream;
+    ostringstream string_stream;
 
     string_stream << "127.0.0.1:" << port;
 
@@ -33,7 +35,7 @@ void HttpServer::start(int port)
     connection = mg_bind(&mgr, string_stream.str().c_str(), eventHandler);
     mg_set_protocol_http_websocket(connection);
 
-    this->server_thread = new std::thread(&HttpServer::serve, this);
+    this->server_thread = new thread(&HttpServer::serve, this);
 }
 
 
@@ -53,9 +55,41 @@ void HttpServer::serve()
 }
 
 
-void HttpServer::get(std::string path, ServerCallback callback)
+void HttpServer::post(string path, ServerCallback callback)
 {
-    this->gets.insert(std::make_pair(path, callback));
+    this->posts.insert(make_pair(path, callback));
+}
+
+
+void HttpServer::get(string path, ServerCallback callback)
+{
+    this->gets.insert(make_pair(path, callback));
+}
+
+
+static struct http_response notFound(struct http_request request)
+{
+    return http_response(404, "");
+}
+
+
+ServerCallback HttpServer::findCallback(string method, string endpoint)
+{
+    map<string, ServerCallback> *callbacks;
+
+    if (method == "GET") {
+        callbacks = &this->gets;
+    } else if (method == "POST") {
+        callbacks = &this->posts;
+    }
+
+    auto iter = callbacks->find(endpoint);
+
+    if (iter == callbacks->end()) {
+        return notFound;
+    }
+
+    return iter->second;
 }
 
 
@@ -63,11 +97,10 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
 {
     struct http_response response;
     struct http_request request("");
-    ServerCallback callback;
-    std::string endpoint(message->uri.p, message->uri.len);
-    auto iter = this->gets.find(endpoint);
-
-    callback = iter->second;
+    ServerCallback callback = this->findCallback(
+        string(message->method.p, message->method.len),
+        string(message->uri.p, message->uri.len));
+    
     response = callback(request);
 
     mg_printf(connection,

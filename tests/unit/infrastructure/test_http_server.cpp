@@ -22,12 +22,22 @@
 
 using namespace cest;
 
+
 static struct http_response get_plugins_response;
 
 static struct http_response getPlugins(struct http_request request)
 {
     return get_plugins_response;
 }
+
+
+static struct http_response post_plugin_response;
+
+static struct http_response postPlugin(struct http_request request)
+{
+    return post_plugin_response;
+}
+
 
 describe("HTTP server based on Cesanta Mongoose", []() {
     beforeEach([&]() {
@@ -48,7 +58,21 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.get("/plugins", getPlugins);
     });
 
-    it("calls the installed callback when receiving a request", []() {
+    it("returns status code 404 when endpoint is not known", [&]() {
+        HttpServer server;
+        HttpClient client;
+        struct http_response response;
+
+        server.start(8000);
+
+        response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
+
+        expect(response.status_code).toBe(404);
+
+        server.stop();
+    });
+
+    it("calls GET method callback when receiving a request", []() {
         HttpServer server;
         HttpClient client;
         struct http_response response;
@@ -59,6 +83,24 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.start(8000);
 
         response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("hello");
+
+        server.stop();
+    });
+
+    it("calls POST method callback when receiving a request", []() {
+        HttpServer server;
+        HttpClient client;
+        struct http_response response;
+
+        post_plugin_response.body = "hello";
+        post_plugin_response.status_code = 200;
+        server.post("/plugins", postPlugin);
+        server.start(8000);
+
+        response = client.post("http://127.0.0.1:8000/plugins", http_request("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");

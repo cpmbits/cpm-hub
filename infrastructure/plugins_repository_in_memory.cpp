@@ -28,7 +28,7 @@ Plugin *PluginsRepositoryInMemory::find(std::string name)
 {
     auto iter = this->plugins.find(name);
 
-    if (iter == this->plugins.end()){
+    if (iter == this->plugins.end()) {
         return NULL;
     }
 

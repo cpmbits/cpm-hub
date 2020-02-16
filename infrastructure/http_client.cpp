@@ -20,6 +20,23 @@
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
+struct http_response HttpClient::post(std::string url, struct http_request request)
+{
+    struct mg_connection *connection;
+
+    mg_mgr_init(&mgr, this);
+    connection = mg_connect_http(&mgr, eventHandler, url.c_str(), NULL, request.body.c_str());
+    mg_set_protocol_http_websocket(connection);
+
+    request_pending = true;
+    while (request_pending) {
+        mg_mgr_poll(&mgr, 100);
+    }
+
+    return this->response;
+}
+
+
 struct http_response HttpClient::get(std::string url, struct http_request request)
 {
     struct mg_connection *connection;

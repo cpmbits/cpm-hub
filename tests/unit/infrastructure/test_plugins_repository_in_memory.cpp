@@ -59,8 +59,7 @@ describe("Plugins Repository in Memory", []() {
 
     it("finds the plugin with the same name when many plugins are stored", [&]() {
         PluginsRepositoryInMemory repository;
-        Plugin cest_plugin("cest");
-        Plugin fakeit_plugin("fakeit");
+        Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
         Plugin *stored_plugin;
 
         repository.store(&cest_plugin);
