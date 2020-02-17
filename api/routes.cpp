@@ -15,17 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <api/routes.h>
+#include <unistd.h>
+#include <iostream>
 
-static HttpServer http_server;
+#include <infrastructure/plugins_repository_in_memory.h>
+#include <infrastructure/http_server.h>
+#include <domain/plugins_service.h>
+#include <api/plugins_api.h>
 
-int main()
+
+static PluginsRepositoryInMemory plugins_repository;
+static PluginsService plugins_service(&plugins_repository);
+static PluginsApi plugins_api(&plugins_service);
+
+
+void installRoutes(HttpServer& http_server)
 {
-    installRoutes(http_server);
-
-    http_server.start(8000);
-
-    sleep(50);
-
-    return 0;
+    http_server.post("/plugins", [&](struct http_request request) -> struct http_response {
+        return plugins_api.registerPlugin(request);
+    });
 }

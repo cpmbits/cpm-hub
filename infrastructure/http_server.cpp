@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
 #include <sstream>
+
 #include <infrastructure/http_server.h>
 
 using namespace std;
@@ -96,11 +98,11 @@ ServerCallback HttpServer::findCallback(string method, string endpoint)
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     struct http_response response;
-    struct http_request request("");
-    ServerCallback callback = this->findCallback(
-        string(message->method.p, message->method.len),
-        string(message->uri.p, message->uri.len));
-    
+    struct http_request request(string(message->body.p, message->body.len));
+    string method(message->method.p, message->method.len);
+    string endpoint(message->uri.p, message->uri.len);
+    ServerCallback callback = this->findCallback(method, endpoint);
+
     response = callback(request);
 
     mg_printf(connection,
@@ -113,6 +115,8 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
           response.body.c_str());
 
     mg_send_http_chunk(connection, "", 0);
+
+    cout << method << " " << endpoint << ": " << response.status_code << endl;
 }
 
 

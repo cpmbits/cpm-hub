@@ -15,17 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <api/routes.h>
+#pragma once
 
-static HttpServer http_server;
+#include <infrastructure/http_server.h>
 
-int main()
-{
-    installRoutes(http_server);
 
-    http_server.start(8000);
-
-    sleep(50);
-
-    return 0;
-}
+void installRoutes(HttpServer& http_server);
