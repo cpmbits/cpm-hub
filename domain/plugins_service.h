@@ -18,16 +18,18 @@
 #pragma once
 
 #include <string>
+#include <list>
+
 #include <domain/plugins_repository.h>
 #include <domain/plugin.h>
 
 class PluginsService {
 public:
-    PluginsService(PluginsRepository *plugins_repository) {
-        this->plugins_repository = plugins_repository;
-    }
+    PluginsService(PluginsRepository *plugins_repository);
 
     virtual Plugin *registerPlugin(std::string name);
+
+    virtual std::list<Plugin *> allPlugins();
 
 private:
     PluginsRepository *plugins_repository;

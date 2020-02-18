@@ -28,6 +28,8 @@ public:
 
     virtual Plugin *find(std::string name);
 
+    virtual std::list<Plugin *> allPlugins();
+
 private:
     std::map<std::string, Plugin *> plugins;
 };

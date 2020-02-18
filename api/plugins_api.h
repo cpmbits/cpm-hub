@@ -22,11 +22,11 @@
 
 class PluginsApi {
 public:
-    PluginsApi(PluginsService *plugins_service) {
-        this->plugins_service = plugins_service;
-    }
+    PluginsApi(PluginsService *plugins_service);
     
     struct http_response registerPlugin(struct http_request request);
+
+    struct http_response listPlugins(struct http_request request);
 
 private:
     PluginsService *plugins_service;

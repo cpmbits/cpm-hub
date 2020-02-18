@@ -44,4 +44,21 @@ describe("CPM Hub registers plugins", []() {
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
     });
+
+    it("lists a plugin after it has been registered", [&]() {
+        struct http_request request(
+            "{\"name\": \"cest\"}"
+        );
+        struct http_response response;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service);
+
+        api.registerPlugin(request);
+
+        response = api.listPlugins(request);
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("[{\"name\":\"cest\"}]");
+    });
 });

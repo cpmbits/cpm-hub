@@ -43,4 +43,19 @@ describe("Plugins Service", []() {
 
         Verify(Method(mock_repository, store));
     });
+
+    it("returns all available plugins", [&]() {
+        Mock<PluginsRepository> mock_repository;
+        PluginsService plugins_service(&mock_repository.get());
+        Plugin plugin("cest");
+        std::list<Plugin *> plugins {&plugin};
+        std::list<Plugin *> returned_plugins;
+
+        When(Method(mock_repository, allPlugins)).Return(plugins);
+
+        returned_plugins = plugins_service.allPlugins();
+
+        expect(returned_plugins.size()).toBe(1);
+        expect(returned_plugins.front()).toBe(&plugin);
+    });
 });

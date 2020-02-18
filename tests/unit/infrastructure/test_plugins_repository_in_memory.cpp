@@ -36,6 +36,18 @@ describe("Plugins Repository in Memory", []() {
         repository.store(&plugin);
     });
 
+    it("lists stored plugins", [&]() {
+        PluginsRepositoryInMemory repository;
+        Plugin plugin("cest");
+        std::list<Plugin *> stored_plugins;
+
+        repository.store(&plugin);
+
+        stored_plugins = repository.allPlugins();
+
+        expect(stored_plugins.size()).toBe(1);
+    });
+
     it("doesn't find a plugin when it's not stored", [&]() {
         PluginsRepositoryInMemory repository;
         Plugin *plugin;

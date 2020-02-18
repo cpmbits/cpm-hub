@@ -17,11 +17,25 @@
  */
 #include <domain/plugins_service.h>
 
-Plugin *PluginsService::registerPlugin(std::string name)
+using namespace std;
+
+
+PluginsService::PluginsService(PluginsRepository *plugins_repository) {
+    this->plugins_repository = plugins_repository;
+}
+
+
+Plugin *PluginsService::registerPlugin(string name)
 {
     Plugin *plugin = new Plugin(name);
 
-    this->plugins_repository->store(plugin);
+    plugins_repository->store(plugin);
 
     return plugin;
+}
+
+
+list<Plugin *> PluginsService::allPlugins()
+{
+    return plugins_repository->allPlugins();
 }

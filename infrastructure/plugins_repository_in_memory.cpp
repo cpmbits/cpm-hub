@@ -34,3 +34,15 @@ Plugin *PluginsRepositoryInMemory::find(std::string name)
 
     return iter->second;
 }
+
+
+std::list<Plugin *> PluginsRepositoryInMemory::allPlugins()
+{
+    std::list<Plugin *> stored_plugins;
+
+    for (std::pair<std::string, Plugin *> iter : this->plugins) {
+        stored_plugins.push_back(iter.second);
+    }
+
+    return stored_plugins;
+}

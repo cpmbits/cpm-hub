@@ -19,15 +19,38 @@
 #include <api/plugins_api.h>
 #include <domain/plugins_service.h>
 
+using namespace nlohmann;
+
+
+PluginsApi::PluginsApi(PluginsService *plugins_service) {
+    this->plugins_service = plugins_service;
+}
+
 struct http_response PluginsApi::registerPlugin(struct http_request request)
 {
     struct http_response response = {
         200, ""
     };
-    auto json = nlohmann::json::parse(request.body);
+    auto json = json::parse(request.body);
     Plugin *plugin;
 
-    plugin = this->plugins_service->registerPlugin(json.at("name"));
+    plugin = plugins_service->registerPlugin(json.at("name"));
+
+    return response;
+}
+
+
+struct http_response PluginsApi::listPlugins(struct http_request request)
+{
+    struct http_response response(200, "");
+    json json_plugin_list = json::array();
+
+    for (Plugin *plugin : plugins_service->allPlugins()) {
+        json json_plugin = {{"name", plugin->name}};
+        json_plugin_list.push_back(json_plugin);
+    }
+
+    response.body = json_plugin_list.dump();
 
     return response;
 }

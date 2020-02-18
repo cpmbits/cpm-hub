@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <list>
 #include <domain/plugin.h>
 
 
@@ -26,4 +27,6 @@ public:
     virtual void store(Plugin *plugin) = 0;
 
     virtual Plugin *find(std::string name) = 0;
+
+    virtual std::list<Plugin *>allPlugins() = 0;
 };

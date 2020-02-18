@@ -15,9 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <unistd.h>
-#include <iostream>
-
 #include <infrastructure/plugins_repository_in_memory.h>
 #include <infrastructure/http_server.h>
 #include <domain/plugins_service.h>
@@ -33,5 +30,8 @@ void installRoutes(HttpServer& http_server)
 {
     http_server.post("/plugins", [&](struct http_request request) -> struct http_response {
         return plugins_api.registerPlugin(request);
+    });
+    http_server.get("/plugins", [&](struct http_request request) -> struct http_response {
+        return plugins_api.listPlugins(request);
     });
 }
