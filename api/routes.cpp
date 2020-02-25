@@ -29,7 +29,7 @@ static PluginsApi plugins_api(&plugins_service);
 void installRoutes(HttpServer& http_server)
 {
     http_server.post("/plugins", [&](struct http_request request) -> struct http_response {
-        return plugins_api.registerPlugin(request);
+        return plugins_api.publishPlugin(request);
     });
     http_server.get("/plugins", [&](struct http_request request) -> struct http_response {
         return plugins_api.listPlugins(request);

@@ -39,7 +39,7 @@ describe("Plugins Service", []() {
 
         When(Method(mock_repository, store)).AlwaysReturn();
 
-        plugins_service.registerPlugin("cest");
+        plugins_service.publishPlugin("cest");
 
         Verify(Method(mock_repository, store));
     });

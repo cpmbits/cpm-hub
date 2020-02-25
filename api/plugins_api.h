@@ -24,7 +24,7 @@ class PluginsApi {
 public:
     PluginsApi(PluginsService *plugins_service);
     
-    struct http_response registerPlugin(struct http_request request);
+    struct http_response publishPlugin(struct http_request request);
 
     struct http_response listPlugins(struct http_request request);
 

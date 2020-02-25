@@ -41,13 +41,13 @@ describe("Plugins API", []() {
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
 
-        When(Method(mock_service, registerPlugin)).Return(&plugin);
+        When(Method(mock_service, publishPlugin)).Return(&plugin);
 
-        response = api.registerPlugin(request);
+        response = api.publishPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock_service, registerPlugin).Using("cest"));
+        Verify(Method(mock_service, publishPlugin).Using("cest"));
     });
     
     it("uses the plugin service to list the available plugins", [&]() {

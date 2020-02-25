@@ -39,7 +39,7 @@ describe("CPM Hub registers plugins", []() {
         PluginsService service(&repository);
         PluginsApi api(&service);
 
-        response = api.registerPlugin(request);
+        response = api.publishPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
@@ -54,7 +54,7 @@ describe("CPM Hub registers plugins", []() {
         PluginsService service(&repository);
         PluginsApi api(&service);
 
-        api.registerPlugin(request);
+        api.publishPlugin(request);
 
         response = api.listPlugins(request);
 

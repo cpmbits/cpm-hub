@@ -25,7 +25,7 @@ PluginsService::PluginsService(PluginsRepository *plugins_repository) {
 }
 
 
-Plugin *PluginsService::registerPlugin(string name)
+Plugin *PluginsService::publishPlugin(string name)
 {
     Plugin *plugin = new Plugin(name);
 
