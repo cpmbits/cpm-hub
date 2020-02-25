@@ -26,6 +26,7 @@ PluginsApi::PluginsApi(PluginsService *plugins_service) {
     this->plugins_service = plugins_service;
 }
 
+
 struct http_response PluginsApi::publishPlugin(struct http_request request)
 {
     struct http_response response = {
@@ -34,7 +35,10 @@ struct http_response PluginsApi::publishPlugin(struct http_request request)
     auto json = json::parse(request.body);
     Plugin *plugin;
 
-    plugin = plugins_service->publishPlugin(json.at("plugin_name"));
+    plugin = plugins_service->publishPlugin(
+        json.at("plugin_name"), 
+        json.at("file_name"), 
+        json.at("payload"));
 
     return response;
 }

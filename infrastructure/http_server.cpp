@@ -31,6 +31,8 @@ void HttpServer::start(int port)
 
     string_stream << "127.0.0.1:" << port;
 
+    cout << "Started server on " << string_stream.str() << endl;
+
     this->port = port;
     this->running = true;
     mg_mgr_init(&mgr, this);
