@@ -1,0 +1,5 @@
+plugin_name: base64
+description: Base64 encoding/decoding library
+version: "1.0"
+packages:
+    base64:
