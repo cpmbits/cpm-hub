@@ -21,6 +21,7 @@
 
 #define describe(...)           std::string test_suite_name = cest::describeFunction(__VA_ARGS__)
 #define it(...)                 cest::itFunction(__FILE__, __LINE__, __VA_ARGS__)
+#define xit(...)                
 #define expect(x)               cest::expectFunction(__FILE__, __LINE__, x)
 #define beforeEach(x)           cest::beforeEachFunction(x)
 #define afterEach(x)            cest::afterEachFunction(x)
