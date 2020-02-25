@@ -5746,7 +5746,7 @@ extern "C" {
  * ```
  */
 struct mg_connection *mg_connect_http(
-    struct mg_mgr *mgr,
+    struct mg_mgr *mgr, const char *method, 
     MG_CB(mg_event_handler_t event_handler, void *user_data), const char *url,
     const char *extra_headers, const char *post_data);
 
@@ -5758,7 +5758,7 @@ struct mg_connection *mg_connect_http(
  * (for example, SSL parameters)
  */
 struct mg_connection *mg_connect_http_opt(
-    struct mg_mgr *mgr, MG_CB(mg_event_handler_t ev_handler, void *user_data),
+    struct mg_mgr *mgr, const char *method, MG_CB(mg_event_handler_t ev_handler, void *user_data),
     struct mg_connect_opts opts, const char *url, const char *extra_headers,
     const char *post_data);
 

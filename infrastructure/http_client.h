@@ -25,6 +25,7 @@ class HttpClient {
 public:
     struct http_response get(std::string url, struct http_request request);
     struct http_response post(std::string url, struct http_request request);
+    struct http_response put(std::string url, struct http_request request);
     void responseArrived(struct http_response response);
 
 private:

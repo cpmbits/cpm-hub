@@ -32,6 +32,7 @@ public:
 
     void get(std::string path, ServerCallback callback);
     void post(std::string path, ServerCallback callback);
+    void put(std::string path, ServerCallback callback);
     void start(int port);
     void stop();
     void serveRequest(struct mg_connection *connection, struct http_message *message);
@@ -44,6 +45,7 @@ private:
     std::thread *server_thread;
     std::map<std::string, ServerCallback> gets;
     std::map<std::string, ServerCallback> posts;
+    std::map<std::string, ServerCallback> puts;
 
     void serve();
     ServerCallback findCallback(std::string method, std::string endpoint);

@@ -39,6 +39,14 @@ static struct http_response postPlugin(struct http_request request)
 }
 
 
+static struct http_response put_plugin_response;
+
+static struct http_response putPlugin(struct http_request request)
+{
+    return put_plugin_response;
+}
+
+
 describe("HTTP server based on Cesanta Mongoose", []() {
     beforeEach([&]() {
     });
@@ -101,6 +109,24 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.start(8000);
 
         response = client.post("http://127.0.0.1:8000/plugins", http_request("post data"));
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("hello");
+
+        server.stop();
+    });
+
+    it("calls PUT method callback when receiving a request", []() {
+        HttpServer server;
+        HttpClient client;
+        struct http_response response;
+
+        put_plugin_response.body = "hello";
+        put_plugin_response.status_code = 200;
+        server.put("/plugins", putPlugin);
+        server.start(8000);
+
+        response = client.put("http://127.0.0.1:8000/plugins", http_request("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");

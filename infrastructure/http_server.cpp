@@ -69,6 +69,12 @@ void HttpServer::get(string path, ServerCallback callback)
 }
 
 
+void HttpServer::put(string path, ServerCallback callback)
+{
+    this->puts.insert(make_pair(path, callback));
+}
+
+
 static struct http_response notFound(struct http_request request)
 {
     return http_response(404, "");
@@ -83,6 +89,8 @@ ServerCallback HttpServer::findCallback(string method, string endpoint)
         callbacks = &this->gets;
     } else if (method == "POST") {
         callbacks = &this->posts;
+    } else if (method == "PUT") {
+        callbacks = &this->puts;
     }
 
     auto iter = callbacks->find(endpoint);
@@ -105,16 +113,8 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
 
     response = callback(request);
 
-    mg_printf(connection,
-          "HTTP/1.1 %d OK\r\n"
-          "Transfer-Encoding: chunked\r\n\r\n",
-          response.status_code);
-
-    mg_printf_http_chunk(connection,
-          "%s",
-          response.body.c_str());
-
-    mg_send_http_chunk(connection, "", 0);
+    mg_send_head(connection, response.status_code, response.body.size(), "");
+    mg_printf(connection, "%s", response.body.c_str());
 
     cout << method << " " << endpoint << ": " << response.status_code << endl;
 }

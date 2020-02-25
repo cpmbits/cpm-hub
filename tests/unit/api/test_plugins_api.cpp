@@ -35,7 +35,7 @@ describe("Plugins API", []() {
     });
 
     it("uses the plugin service to register a plugin", [&]() {
-        struct http_request request("{\"name\": \"cest\"}");
+        struct http_request request("{\"plugin_name\": \"cest\"}");
         struct http_response response;
         Plugin plugin("");
         Mock<PluginsService> mock_service;
@@ -62,6 +62,6 @@ describe("Plugins API", []() {
         response = api.listPlugins(http_request(""));
 
         expect(response.status_code).toBe(200);
-        expect(response.body).toBe("[{\"name\":\"cest\"}]");
+        expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
     });
 });
