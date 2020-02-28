@@ -44,4 +44,5 @@ public:
     std::string name;
     std::string file_name;
     std::string payload;
+    std::string version;
 };

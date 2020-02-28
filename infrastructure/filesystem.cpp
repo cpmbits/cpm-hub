@@ -18,6 +18,6 @@
 #include <infrastructure/filesystem.h>
 
 
-void Filesystem::writeFile(std::string file_name, unsigned char *contents)
+void Filesystem::writeFile(std::string file_name, std::string contents)
 {
 }

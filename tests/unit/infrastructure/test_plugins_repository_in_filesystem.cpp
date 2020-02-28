@@ -21,6 +21,7 @@
 #include <base64/base64.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 
+using namespace std;
 using namespace cest;
 using namespace fakeit;
 
@@ -34,23 +35,39 @@ describe("Plugins Repository in file system", []() {
 
     it("stores a plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), "");
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), ".");
         Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
-        std::vector<BYTE> base64_decode(std::string const&);
+        string base64_decode(string const&);
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
         repository.store(&plugin);
 
-        Verify(Method(mock_filesystem, writeFile).Matching([](std::string file_name, unsigned char *contents) {
-            return file_name == "cest.zip";
+        Verify(Method(mock_filesystem, writeFile).Matching([](string file_name, string contents) {
+            return file_name == "./public/cest.zip" &&
+            contents == "plugin payload";
         }));
+    });
+
+    xit("lists stored plugins", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), ".");
+        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        string base64_decode(string const&);
+
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        repository.store(&plugin);
+
+        Verify(Method(mock_filesystem, writeFile).Matching([](string file_name, string contents) {
+            
+            return file_name == "cest.zip";
+        })).Exactly(Once);
     });
 
     xit("lists stored plugins", [&]() {
         PluginsRepositoryInFilesystem repository;
         Plugin plugin("cest");
-        std::list<Plugin *> stored_plugins;
+        list<Plugin *> stored_plugins;
 
         repository.store(&plugin);
 

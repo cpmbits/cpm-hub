@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
-
 #include <base64/base64.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 
@@ -31,8 +29,10 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 
 void PluginsRepositoryInFilesystem::store(Plugin *plugin)
 {
-    std::vector<BYTE> binary_payload = base64_decode(plugin->payload);
-    this->filesystem->writeFile(plugin->file_name, &binary_payload.front());
+    string binary_payload = base64_decode(plugin->payload);
+    string file_path = this->directory + "/public/" + plugin->file_name;
+
+    this->filesystem->writeFile(file_path, binary_payload);
 }
 
 
