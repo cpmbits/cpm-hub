@@ -30,7 +30,7 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 void PluginsRepositoryInFilesystem::store(Plugin *plugin)
 {
     string binary_payload = base64_decode(plugin->payload);
-    string file_path = this->directory + "/public/" + plugin->metadata.file_name;
+    string file_path = this->directory + "/public/" + plugin->file_name;
 
     this->filesystem->writeFile(file_path, binary_payload);
 }

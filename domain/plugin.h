@@ -19,43 +19,30 @@
 
 #include <string>
 
-class PluginMetadata {
-public:
-    PluginMetadata() {
-        this->name = "";
-        this->file_name = "";
-        this->version = "";
-    }
-
-    PluginMetadata(std::string name, std::string file_name, std::string version) {
-        this->name = name;
-        this->file_name = file_name;
-        this->version = version;
-    }
-
-    std::string name;
-    std::string file_name;
-    std::string version;
-};
-
 class Plugin {
 public:
-    Plugin() : metadata("", "", "") {
+    Plugin() {
+        this->name = "";
+        this->file_name = "";
         this->payload = "";
     } 
 
-    Plugin(std::string name) : metadata(name, "", "")  {
-        this->payload = "";
+    Plugin(std::string name) {
+        this->name = name;
     }
 
-    Plugin(std::string name, std::string file_name, std::string payload) : metadata(name, file_name, "")  {
+    Plugin(std::string name, std::string file_name, std::string payload) {
+        this->name = name;
+        this->file_name = file_name;
         this->payload = payload;
     }
 
     bool operator==(const Plugin &other) {
-        return this->metadata.name == other.metadata.name;
+        return this->name == other.name;
     }
 
-    PluginMetadata metadata;
+    std::string name;
+    std::string file_name;
     std::string payload;
+    std::string version;
 };

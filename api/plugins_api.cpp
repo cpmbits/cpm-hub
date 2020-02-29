@@ -50,7 +50,7 @@ struct http_response PluginsApi::listPlugins(struct http_request request)
     json json_plugin_list = json::array();
 
     for (Plugin *plugin : plugins_service->allPlugins()) {
-        json json_plugin = {{"plugin_name", plugin->metadata.name}};
+        json json_plugin = {{"plugin_name", plugin->name}};
         json_plugin_list.push_back(json_plugin);
     }
 
