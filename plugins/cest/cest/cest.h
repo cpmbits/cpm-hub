@@ -21,8 +21,8 @@
 
 #define describe(...)           std::string test_suite_name = cest::describeFunction(__VA_ARGS__)
 #define it(...)                 cest::itFunction(__FILE__, __LINE__, __VA_ARGS__)
-#define xit(...)                
-#define expect(x)               cest::expectFunction(__FILE__, __LINE__, x)
+#define xit(...)
+#define expect(...)             cest::expectFunction(__FILE__, __LINE__, __VA_ARGS__)
 #define beforeEach(x)           cest::beforeEachFunction(x)
 #define afterEach(x)            cest::afterEachFunction(x)
 
@@ -85,9 +85,11 @@ namespace cest
 
     void appendAssertionFailure(std::stringstream *stream, std::string message, std::string file, int line)
     {
-        (*stream) << ASCII_RED << "    ❌ Assertion Failed:" << ASCII_RESET << " " << current_test_case->failure_message << std::endl;
+        (*stream) << ASCII_RED << "    ❌ Assertion Failed:" << ASCII_RESET << " " << message << std::endl;
         (*stream) << "                        " << file << ":" << line << std::endl;
     }
+
+    class AssertionError : public std::exception {};
 
     template<class T>
     class Assertion
@@ -106,8 +108,15 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "Expected " << expected << ", was " << actual;
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
+            }
+
+            void toEqual(T expected)
+            {
+                toBe(expected);
             }
 
             void toEqualMemory(T expected, int64_t length)
@@ -120,7 +129,9 @@ namespace cest
                         failure_message << "Memory mismatch at byte " << i << ", expected ";
                         failure_message << std::hex << std::uppercase << (int)expected[i] << " but was " << std::hex << std::uppercase << (int)actual[i];
                         current_test_case->failure_message = failure_message.str();
+
                         appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                        throw AssertionError();
                     }
                 }
             }
@@ -131,7 +142,9 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be not null";
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
             }
 
@@ -141,12 +154,104 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be null";
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
+            }
+
+            template <class E>
+            void toRaise()
+            {
+                try {
+
+                } catch (E error) {
+
+                }
+
             }
 
         private:
             T actual;
+            std::string assertion_file;
+            std::stringstream failure_message;
+            int assertion_line;
+    };
+
+    template <class T>
+    class Assertion<std::vector<T> >
+    {
+        public:
+            Assertion(const char *file, int line, std::vector<T> value)
+            {
+                actual = value;
+                assertion_file = std::string(file);
+                assertion_line = line;
+            }
+
+            void toBe(std::vector<T> expected)
+            {
+                if (expected.size() != actual.size()) {
+                    current_test_failed = true;
+                    failure_message << "Vector sizes do not match, expected " << expected.size() << " items but had " << actual.size() << " items";
+                    current_test_case->failure_message = failure_message.str();
+
+                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
+                }
+
+                for (int i=0; i<expected.size(); ++i) {
+                    if (expected[i] != actual[i]) {
+                        current_test_failed = true;
+                        failure_message << "Vector item mismatch at position " << i << ", expected " << expected[i] << " but was " << actual[i];
+                        current_test_case->failure_message = failure_message.str();
+
+                        appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                        throw AssertionError();
+                    }
+                }
+            }
+
+            void toEqual(std::vector<T> expected)
+            {
+                toBe(expected);
+            }
+
+            void toContain(T item)
+            {
+                bool found = false;
+
+                for (int i=0; i<actual.size(); ++i) {
+                    if (actual[i] == item) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    current_test_failed = true;
+                    failure_message << "Item " << item << " not found in vector";
+                    current_test_case->failure_message = failure_message.str();
+
+                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
+                }
+            }
+
+            void toHaveLength(int size)
+            {
+                if (actual.size() != size) {
+                    current_test_failed = true;
+                    failure_message << "Vector sizes does not match, expected " << size << " items but had " << actual.size() << " items";
+                    current_test_case->failure_message = failure_message.str();
+
+                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
+                }
+            }
+
+        private:
+            std::vector<T> actual;
             std::string assertion_file;
             std::stringstream failure_message;
             int assertion_line;
@@ -169,8 +274,15 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "Expected \"" << expected << "\", was \"" << actual << "\"";
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
+            }
+
+            void toEqual(std::string expected)
+            {
+                toBe(expected);
             }
 
             void toContain(std::string expected)
@@ -179,7 +291,9 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "\"" << expected << "\" not present inside \"" << actual << "\"";
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
             }
 
@@ -189,7 +303,9 @@ namespace cest
                     current_test_failed = true;
                     failure_message << "Length of \"" << actual << "\" expected to be " << length << ", was " << actual.length();
                     current_test_case->failure_message = failure_message.str();
+
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                    throw AssertionError();
                 }
             }
 
@@ -332,6 +448,22 @@ namespace cest
             return test_case->test_failed;
         });
     }
+
+    void handleFailedTest(TestCase *test_case)
+    {
+        current_test_failed = true;
+        test_case->test_failed = true;
+    }
+
+    void handleTestException(TestCase *test_case, std::exception *error)
+    {
+        std::string exception_message("Unhandled exception in test case: ");
+
+        exception_message += error->what();
+
+        appendAssertionFailure(&assertion_failures, exception_message, test_case->file, test_case->line);
+        handleFailedTest(test_case);
+    }
 }
 
 
@@ -353,7 +485,13 @@ int main(void)
             before_each();
         }
 
-        test_case->test();
+        try {
+            test_case->test();
+        } catch (AssertionError error) {
+            handleFailedTest(test_case);
+        } catch (std::exception error) {
+            handleTestException(test_case, &error);
+        }
 
         if (after_each) {
             after_each();
