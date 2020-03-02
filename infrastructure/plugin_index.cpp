@@ -15,27 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
-#include <infrastructure/filesystem.h>
 #include <infrastructure/plugin_index.h>
 
 
-class PluginsRepositoryInFilesystem: public PluginsRepository {
-public:
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory);
+void PluginIndex::indexPlugin(Plugin *plugin)
+{
+}
 
-    virtual void store(Plugin *plugin);
 
-    virtual Plugin *find(std::string name);
-
-    virtual std::list<Plugin *> allPlugins();
-
-private:
-    std::string directory;
-    Filesystem *filesystem;
-    PluginIndex *index;
-};
+std::list<Plugin *> PluginIndex::allPlugins()
+{
+    std::list<Plugin *> plugins;
+    return plugins;
+}

@@ -19,6 +19,7 @@
 #include <fakeit/fakeit.hpp>
 
 #include <base64/base64.h>
+#include <infrastructure/plugin_index.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 
 using namespace std;
@@ -35,34 +36,34 @@ describe("Plugins Repository in file system", []() {
 
     it("stores a plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), ".");
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
         Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
         string base64_decode(string const&);
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
 
         repository.store(&plugin);
 
         Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
-        Verify(Method(mock_filesystem, writeFile).Using("./public/plugin_index.json", "{}"));
+        Verify(Method(mock_plugin_index, indexPlugin).Using(&plugin));
     });
 
-    xit("lists stored plugins", [&]() {
+    it("lists indexed plugins", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), ".");
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
         Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
-        string base64_decode(string const&);
+        std::list<Plugin *> plugins = {&plugin};
+        std::list<Plugin *> stored_plugins;
 
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        repository.store(&plugin);
+        When(Method(mock_plugin_index, allPlugins)).Return(plugins);
 
-        Verify(Method(mock_filesystem, writeFile).Matching([](string file_name, string contents) {
-            return file_name == "./public/cest.zip" &&
-                   contents == "plugin payload";
-        })).Exactly(Once);
-    });
+        stored_plugins = repository.allPlugins();
 
-    xit("lists stored plugins", [&]() {
+        expect(stored_plugins.size()).toBe(plugins.size());
+        expect(stored_plugins.front()).toBe(plugins.front());
     });
 
     xit("doesn't find a plugin when it's not stored", [&]() {

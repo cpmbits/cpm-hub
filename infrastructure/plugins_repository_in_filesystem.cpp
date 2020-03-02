@@ -20,10 +20,11 @@
 
 using namespace std;
 
-PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, std::string directory)
+PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory)
 {
     this->filesystem = filesystem;
     this->directory = directory;
+    this->index = index;
 }
 
 
@@ -33,6 +34,7 @@ void PluginsRepositoryInFilesystem::store(Plugin *plugin)
     string file_path = this->directory + "/public/" + plugin->file_name;
 
     this->filesystem->writeFile(file_path, binary_payload);
+    this->index->indexPlugin(plugin);
 }
 
 
@@ -44,6 +46,5 @@ Plugin *PluginsRepositoryInFilesystem::find(std::string name)
 
 std::list<Plugin *> PluginsRepositoryInFilesystem::allPlugins()
 {
-    std::list<Plugin *> stored_plugins;
-    return stored_plugins;
+    return this->index->allPlugins();
 }

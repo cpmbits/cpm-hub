@@ -17,25 +17,18 @@
  */
 #pragma once
 
-#include <map>
 #include <string>
-#include <domain/plugins_repository.h>
-#include <infrastructure/filesystem.h>
-#include <infrastructure/plugin_index.h>
 
 
-class PluginsRepositoryInFilesystem: public PluginsRepository {
+class PluginMetadata {
 public:
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory);
+    PluginMetadata: (std::string name, std::string file_path, std::string version) {
+        this->name = name;
+        this->file_path = file_path;
+        this->version = version;
+    }
 
-    virtual void store(Plugin *plugin);
-
-    virtual Plugin *find(std::string name);
-
-    virtual std::list<Plugin *> allPlugins();
-
-private:
-    std::string directory;
-    Filesystem *filesystem;
-    PluginIndex *index;
-};
+    std::string name;
+    std::string file_path;
+    std::string version;
+}
