@@ -43,10 +43,8 @@ describe("Plugins Repository in file system", []() {
 
         repository.store(&plugin);
 
-        Verify(Method(mock_filesystem, writeFile).Matching([](string file_name, string contents) {
-            return file_name == "./public/cest.zip" &&
-            contents == "plugin payload";
-        }));
+        Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, writeFile).Using("./public/plugin_index.json", "{}"));
     });
 
     xit("lists stored plugins", [&]() {
@@ -59,54 +57,20 @@ describe("Plugins Repository in file system", []() {
         repository.store(&plugin);
 
         Verify(Method(mock_filesystem, writeFile).Matching([](string file_name, string contents) {
-            
-            return file_name == "cest.zip";
+            return file_name == "./public/cest.zip" &&
+                   contents == "plugin payload";
         })).Exactly(Once);
     });
 
     xit("lists stored plugins", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin plugin("cest");
-        list<Plugin *> stored_plugins;
-
-        repository.store(&plugin);
-
-        stored_plugins = repository.allPlugins();
-
-        expect(stored_plugins.size()).toBe(1);
     });
 
     xit("doesn't find a plugin when it's not stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin *plugin;
-
-        plugin = repository.find("cest");
-
-        expect(plugin).toBeNull();
     });
 
     xit("finds the plugin with the same name when one plugin is stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin plugin("cest");
-        Plugin *stored_plugin;
-
-        repository.store(&plugin);
-
-        stored_plugin = repository.find("cest");
-
-        expect(stored_plugin).toBe(&plugin);
     });
 
     xit("finds the plugin with the same name when many plugins are stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
-        Plugin *stored_plugin;
-
-        repository.store(&cest_plugin);
-        repository.store(&fakeit_plugin);
-
-        stored_plugin = repository.find("fakeit");
-
-        expect(stored_plugin).toBe(&fakeit_plugin);
     });
 });
