@@ -37,7 +37,6 @@ struct http_response PluginsApi::publishPlugin(struct http_request request)
 
     plugin = plugins_service->publishPlugin(
         json.at("plugin_name"), 
-        json.at("file_name"), 
         json.at("payload"));
 
     return response;

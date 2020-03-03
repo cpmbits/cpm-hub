@@ -37,7 +37,6 @@ describe("Plugins API", []() {
     it("uses the plugin service to publish a plugin", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","
-            "\"file_name\": \"cest.zip\","
             "\"payload\": \"ABCDEabcde\""
         "}");
         struct http_response response;
@@ -51,7 +50,7 @@ describe("Plugins API", []() {
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock_service, publishPlugin).Using("cest", "cest.zip", "ABCDEabcde"));
+        Verify(Method(mock_service, publishPlugin).Using("cest", "ABCDEabcde"));
     });
     
     it("uses the plugin service to list the available plugins", [&]() {

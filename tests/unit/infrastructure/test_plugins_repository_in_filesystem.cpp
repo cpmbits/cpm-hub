@@ -38,7 +38,7 @@ describe("Plugins Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
         string base64_decode(string const&);
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
@@ -53,7 +53,7 @@ describe("Plugins Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
         string base64_decode(string const&);
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
@@ -69,7 +69,7 @@ describe("Plugins Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
         std::list<Plugin *> plugins = {&plugin};
         std::list<Plugin *> stored_plugins;
 

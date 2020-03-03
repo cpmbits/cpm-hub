@@ -23,7 +23,6 @@ class Plugin {
 public:
     Plugin() {
         this->name = "";
-        this->file_name = "";
         this->payload = "";
     } 
 
@@ -31,9 +30,8 @@ public:
         this->name = name;
     }
 
-    Plugin(std::string name, std::string file_name, std::string payload) {
+    Plugin(std::string name, std::string payload) {
         this->name = name;
-        this->file_name = file_name;
         this->payload = payload;
     }
 
@@ -43,7 +41,6 @@ public:
 
     std::string name;
     std::string user;
-    std::string file_name;
-    std::string payload;
     std::string version;
+    std::string payload;
 };

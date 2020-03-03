@@ -27,7 +27,7 @@ class PluginsService {
 public:
     PluginsService(PluginsRepository *plugins_repository);
 
-    virtual Plugin *publishPlugin(std::string plugin_name, std::string file_name, std::string file_payload);
+    virtual Plugin *publishPlugin(std::string plugin_name, std::string file_payload);
 
     virtual std::list<Plugin *> allPlugins();
 

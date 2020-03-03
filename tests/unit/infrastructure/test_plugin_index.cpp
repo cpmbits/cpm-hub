@@ -34,7 +34,7 @@ describe("Plugins Repository in file system", []() {
     it("indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index(&mock_filesystem.get(), ".");
-        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 

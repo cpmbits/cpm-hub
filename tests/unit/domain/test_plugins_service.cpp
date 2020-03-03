@@ -35,11 +35,11 @@ describe("Plugins Service", []() {
     it("stores a plugin with the given name when registering a plugin", [&]() {
         Mock<PluginsRepository> mock_repository;
         PluginsService plugins_service(&mock_repository.get());
-        Plugin expected_plugin("cest", "cest.zip", "ABCDEedcba");
+        Plugin expected_plugin("cest", "ABCDEedcba");
 
         When(Method(mock_repository, store)).AlwaysReturn();
 
-        plugins_service.publishPlugin("cest", "cest.zip", "ABCDEedcba");
+        plugins_service.publishPlugin("cest", "ABCDEedcba");
 
         Verify(Method(mock_repository, store));
     });
