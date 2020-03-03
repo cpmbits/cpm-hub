@@ -36,4 +36,7 @@ public:
 private:
     Filesystem *filesystem;
     std::string directory;
+    std::list<std::pair<PluginMetadata, std::string>> plugins;
+
+    std::string serialize();
 };

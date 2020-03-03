@@ -38,11 +38,17 @@ describe("Plugins Repository in file system", []() {
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        plugin_index.indexPlugin(metadata, "cest.zip");
+        plugin_index.indexPlugin(metadata, "./cest.zip");
 
         Verify(Method(mock_filesystem, writeFile).Using(
             "./plugin_index.json", 
-            "{\"cest\":\"cest.zip\"}"
+            "{"
+                "\"cest\":{"
+                    "\"1.0\":{"
+                        "\"./cest.zip\""
+                    "}"
+                "}"
+            "}"
         ));
     });
 });

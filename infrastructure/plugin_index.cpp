@@ -17,22 +17,34 @@
  */
 #include <infrastructure/plugin_index.h>
 
+using namespace std;
 
-PluginIndex::PluginIndex(Filesystem *filesystem, std::string directory)
+
+PluginIndex::PluginIndex(Filesystem *filesystem, string directory)
 {
     this->filesystem = filesystem;
     this->directory = directory;
 }
 
 
-void PluginIndex::indexPlugin(PluginMetadata &metadata, std::string file_name)
+void PluginIndex::indexPlugin(PluginMetadata &metadata, string file_name)
 {
-    
+    this->plugins.push_back(make_pair(metadata, file_name));
+    this->filesystem->writeFile(
+        this->directory + "plugin_index.json", 
+        this->serialize()
+    );
 }
 
 
-std::list<PluginMetadata> PluginIndex::find(std::string pattern)
+list<PluginMetadata> PluginIndex::find(string pattern)
 {
-    std::list<PluginMetadata> plugins;
+    list<PluginMetadata> plugins;
     return plugins;
+}
+
+
+string PluginIndex::serialize()
+{
+    return "";
 }
