@@ -22,11 +22,11 @@
 
 class PluginMetadata {
 public:
-    PluginMetadata: (std::string name, std::string file_path, std::string version) {
+    PluginMetadata(std::string name, std::string file_path, std::string version) {
         this->name = name;
         this->file_path = file_path;
         this->version = version;
-    }
+    };
 
     std::string name;
     std::string file_path;

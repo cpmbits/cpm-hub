@@ -47,6 +47,21 @@ describe("Plugins Repository in file system", []() {
         repository.store(&plugin);
 
         Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
+    });
+
+    it("indexes a stored plugin based on the file location and plugin metadata", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
+        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
+        string base64_decode(string const&);
+
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
+
+        repository.store(&plugin);
+
+        Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
         Verify(Method(mock_plugin_index, indexPlugin).Using(&plugin));
     });
 

@@ -15,25 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
+#include <fakeit/fakeit.hpp>
 
-#include <list>
-#include <string>
+#include <infrastructure/plugin_index.h>
 
-#include <infrastructure/filesystem.h>
-#include <domain/plugin.h>
+using namespace cest;
+using namespace fakeit;
 
-class PluginIndex {
-public:
-    PluginIndex() {};
 
-    PluginIndex(Filesystem *filesystem, std::string directory);
+describe("Plugins Repository in file system", []() {
+    beforeEach([&]() {
+    });
 
-    virtual void indexPlugin(Plugin *plugin);
+    afterEach([&]() {
+    });
 
-    virtual std::list<Plugin *> allPlugins();
+    it("indexes one plugin", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index(&mock_filesystem.get(), ".");
+        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
 
-private:
-    Filesystem *filesystem;
-    std::string directory;
-};
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+
+        plugin_index.indexPlugin(&plugin);
+
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./plugin_index.json", 
+            "{\"cest\":\"cest.zip\"}"
+        ));
+    });
+});

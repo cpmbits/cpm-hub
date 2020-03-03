@@ -18,8 +18,16 @@
 #include <infrastructure/plugin_index.h>
 
 
+PluginIndex::PluginIndex(Filesystem *filesystem, std::string directory)
+{
+    this->filesystem = filesystem;
+    this->directory = directory;
+}
+
+
 void PluginIndex::indexPlugin(Plugin *plugin)
 {
+    
 }
 
 
