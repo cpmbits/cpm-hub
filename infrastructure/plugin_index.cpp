@@ -25,14 +25,14 @@ PluginIndex::PluginIndex(Filesystem *filesystem, std::string directory)
 }
 
 
-void PluginIndex::indexPlugin(Plugin *plugin)
+void PluginIndex::indexPlugin(PluginMetadata &metadata, std::string file_name)
 {
     
 }
 
 
-std::list<Plugin *> PluginIndex::allPlugins()
+std::list<PluginMetadata> PluginIndex::find(std::string pattern)
 {
-    std::list<Plugin *> plugins;
+    std::list<PluginMetadata> plugins;
     return plugins;
 }

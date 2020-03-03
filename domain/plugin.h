@@ -19,28 +19,28 @@
 
 #include <string>
 
+#include <infrastructure/plugin_metadata.h>
+
 class Plugin {
 public:
-    Plugin() {
-        this->name = "";
-        this->payload = "";
+    Plugin() : Plugin("") {
     } 
 
-    Plugin(std::string name) {
-        this->name = name;
+    Plugin(std::string name) : Plugin("", "") {
+        this->metadata.name = name;
     }
 
     Plugin(std::string name, std::string payload) {
-        this->name = name;
+        this->metadata.name = name;
+        this->metadata.user_name = "";
+        this->metadata.version = "";
         this->payload = payload;
     }
 
     bool operator==(const Plugin &other) {
-        return this->name == other.name;
+        return this->metadata.name == other.metadata.name;
     }
 
-    std::string name;
-    std::string user;
-    std::string version;
+    PluginMetadata metadata;
     std::string payload;
 };

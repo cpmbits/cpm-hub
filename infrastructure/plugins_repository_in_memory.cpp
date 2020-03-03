@@ -20,7 +20,7 @@
 
 void PluginsRepositoryInMemory::store(Plugin *plugin)
 {
-    this->plugins.insert(std::make_pair(plugin->name, plugin));
+    this->plugins.insert(std::make_pair(plugin->metadata.name, plugin));
 }
 
 

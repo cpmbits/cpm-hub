@@ -34,11 +34,11 @@ describe("Plugins Repository in file system", []() {
     it("indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index(&mock_filesystem.get(), ".");
-        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
+        PluginMetadata metadata("cest", "user", "1.0");
 
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        plugin_index.indexPlugin(&plugin);
+        plugin_index.indexPlugin(metadata, "cest.zip");
 
         Verify(Method(mock_filesystem, writeFile).Using(
             "./plugin_index.json", 

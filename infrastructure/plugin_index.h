@@ -21,7 +21,7 @@
 #include <string>
 
 #include <infrastructure/filesystem.h>
-#include <domain/plugin.h>
+#include <infrastructure/plugin_metadata.h>
 
 class PluginIndex {
 public:
@@ -29,9 +29,9 @@ public:
 
     PluginIndex(Filesystem *filesystem, std::string directory);
 
-    virtual void indexPlugin(Plugin *plugin);
+    virtual void indexPlugin(PluginMetadata &plugin_metadata, std::string file_name);
 
-    virtual std::list<Plugin *> allPlugins();
+    virtual std::list<PluginMetadata> find(std::string pattern);
 
 private:
     Filesystem *filesystem;

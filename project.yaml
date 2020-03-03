@@ -4,6 +4,7 @@ packages:
     api:
         cflags: [-std=c++11]
     domain:
+        cflags: [-std=c++11]
     infrastructure:
         cflags: [-std=c++11]
 plugins:

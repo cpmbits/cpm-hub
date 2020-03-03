@@ -22,13 +22,20 @@
 
 class PluginMetadata {
 public:
-    PluginMetadata(std::string name, std::string file_path, std::string version) {
+    PluginMetadata() : PluginMetadata("", "", "") {
+    }
+
+    PluginMetadata(std::string name, std::string user_name, std::string version) {
         this->name = name;
-        this->file_path = file_path;
+        this->user_name = user_name;
         this->version = version;
     };
 
+    bool operator==(const PluginMetadata &other) {
+        return this->name == other.name;
+    }
+
     std::string name;
-    std::string file_path;
+    std::string user_name;
     std::string version;
-}
+};

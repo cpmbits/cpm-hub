@@ -31,10 +31,10 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 void PluginsRepositoryInFilesystem::store(Plugin *plugin)
 {
     string binary_payload = base64_decode(plugin->payload);
-    string file_path = this->directory + "/public/" + plugin->name + ".zip";
+    string file_path = this->directory + "/public/" + plugin->metadata.name + ".zip";
 
     this->filesystem->writeFile(file_path, binary_payload);
-    this->index->indexPlugin(plugin);
+    this->index->indexPlugin(plugin->metadata, file_path);
 }
 
 
@@ -46,5 +46,6 @@ Plugin *PluginsRepositoryInFilesystem::find(std::string name)
 
 std::list<Plugin *> PluginsRepositoryInFilesystem::allPlugins()
 {
-    return this->index->allPlugins();
+    std::list<Plugin *> plugins;
+    return plugins;
 }
