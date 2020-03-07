@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <map>
 #include <list>
 #include <string>
 
@@ -36,7 +37,7 @@ public:
 private:
     Filesystem *filesystem;
     std::string directory;
-    std::list<std::pair<PluginMetadata, std::string>> plugins;
+    std::map<std::string, std::pair<PluginMetadata, std::string>> plugins;
 
     std::string serialize();
 };

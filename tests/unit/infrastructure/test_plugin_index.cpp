@@ -25,12 +25,6 @@ using namespace fakeit;
 
 
 describe("Plugins Repository in file system", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index(&mock_filesystem.get(), ".");
@@ -45,7 +39,7 @@ describe("Plugins Repository in file system", []() {
             "{"
                 "\"cest\":{"
                     "\"1.0\":{"
-                        "\"./cest.zip\""
+                        "\"file_name\":\"./cest.zip\""
                     "}"
                 "}"
             "}"

@@ -15,9 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
+#include <json/json.hpp>
 #include <infrastructure/plugin_index.h>
 
 using namespace std;
+using namespace nlohmann;
 
 
 PluginIndex::PluginIndex(Filesystem *filesystem, string directory)
@@ -29,9 +32,9 @@ PluginIndex::PluginIndex(Filesystem *filesystem, string directory)
 
 void PluginIndex::indexPlugin(PluginMetadata &metadata, string file_name)
 {
-    this->plugins.push_back(make_pair(metadata, file_name));
+    this->plugins.insert(make_pair(metadata.name, make_pair(metadata, file_name)));
     this->filesystem->writeFile(
-        this->directory + "plugin_index.json", 
+        this->directory + "/plugin_index.json", 
         this->serialize()
     );
 }
@@ -46,5 +49,16 @@ list<PluginMetadata> PluginIndex::find(string pattern)
 
 string PluginIndex::serialize()
 {
-    return "";
+    json json_index;
+    string file_name;
+    PluginMetadata metadata;
+
+    for (auto iter : this->plugins) {
+        metadata = iter.second.first;
+        file_name = iter.second.second;
+
+        json_index[iter.first][metadata.version]["file_name"] = file_name;
+    }
+
+    return json_index.dump();
 }
