@@ -20,24 +20,27 @@
 #include <map>
 #include <list>
 #include <string>
+#include <optional>
 
 #include <infrastructure/filesystem.h>
 #include <infrastructure/plugin_metadata.h>
 
+
+struct plugin_index_entry {
+    PluginMetadata metadata;
+};
+
+
 class PluginIndex {
 public:
-    PluginIndex() {};
+    virtual void indexPlugin(std::string name, std::string directory);
 
-    PluginIndex(Filesystem *filesystem, std::string directory);
+    virtual std::string find(std::string name);
 
-    virtual void indexPlugin(PluginMetadata &plugin_metadata, std::string file_name);
-
-    virtual std::list<PluginMetadata> find(std::string pattern);
+    virtual std::string serialize();
 
 private:
     Filesystem *filesystem;
     std::string directory;
-    std::map<std::string, std::pair<PluginMetadata, std::string>> plugins;
-
-    std::string serialize();
+    std::map<std::string, std::string> plugins;
 };

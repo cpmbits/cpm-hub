@@ -26,23 +26,46 @@ using namespace fakeit;
 
 describe("Plugins Repository in file system", []() {
     it("indexes one plugin", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index(&mock_filesystem.get(), ".");
-        PluginMetadata metadata("cest", "user", "1.0");
+        PluginIndex plugin_index;
 
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        plugin_index.indexPlugin("cest", "user/cest/1.0");
 
-        plugin_index.indexPlugin(metadata, "./cest.zip");
-
-        Verify(Method(mock_filesystem, writeFile).Using(
-            "./plugin_index.json", 
+        expect(plugin_index.serialize()).toBe(
             "{"
-                "\"cest\":{"
-                    "\"1.0\":{"
-                        "\"file_name\":\"./cest.zip\""
-                    "}"
-                "}"
+                "\"cest\":\"user/cest/1.0\""
             "}"
-        ));
+        );
+    });
+
+    it("indexes many plugins", [&]() {
+        PluginIndex plugin_index;
+
+        plugin_index.indexPlugin("cest", "user/cest/1.0");
+        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+
+        expect(plugin_index.serialize()).toBe(
+            "{"
+                "\"cest\":\"user/cest/1.0\","
+                "\"fakeit\":\"user/fakeit/3.1\""
+            "}"
+        );
+    });
+
+    it("fails to find a plugin when it's not indexed", [&]() {
+        PluginIndex plugin_index;
+
+        std::string entry = plugin_index.find("cest");
+
+        expect(entry).toBe("");
+    });
+
+    it("finds an indexed plugin", [&]() {
+        PluginIndex plugin_index;
+
+        plugin_index.indexPlugin("cest", "user/cest/1.0");
+        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+
+        expect(plugin_index.find("cest")).toBe("user/cest/1.0");
+        expect(plugin_index.find("fakeit")).toBe("user/fakeit/3.1");
     });
 });

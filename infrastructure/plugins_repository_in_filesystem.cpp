@@ -34,7 +34,7 @@ void PluginsRepositoryInFilesystem::store(Plugin *plugin)
     string file_path = this->directory + "/public/" + plugin->metadata.name + ".zip";
 
     this->filesystem->writeFile(file_path, binary_payload);
-    this->index->indexPlugin(plugin->metadata, file_path);
+    //this->index->indexPlugin(plugin->metadata, file_path);
 }
 
 

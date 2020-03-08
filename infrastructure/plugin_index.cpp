@@ -23,41 +23,34 @@ using namespace std;
 using namespace nlohmann;
 
 
-PluginIndex::PluginIndex(Filesystem *filesystem, string directory)
+void PluginIndex::indexPlugin(std::string name, std::string directory)
 {
-    this->filesystem = filesystem;
-    this->directory = directory;
+    this->plugins.insert(make_pair(name, directory));
 }
 
 
-void PluginIndex::indexPlugin(PluginMetadata &metadata, string file_name)
+std::string PluginIndex::find(string name)
 {
-    this->plugins.insert(make_pair(metadata.name, make_pair(metadata, file_name)));
-    this->filesystem->writeFile(
-        this->directory + "/plugin_index.json", 
-        this->serialize()
-    );
-}
+    auto iter = this->plugins.find(name);
 
+    if (iter == this->plugins.end()) {
+        return {};
+    }
 
-list<PluginMetadata> PluginIndex::find(string pattern)
-{
-    list<PluginMetadata> plugins;
-    return plugins;
+    return iter->second;
 }
 
 
 string PluginIndex::serialize()
 {
     json json_index;
-    string file_name;
-    PluginMetadata metadata;
+    string plugin_name;
+    string directory;
 
     for (auto iter : this->plugins) {
-        metadata = iter.second.first;
-        file_name = iter.second.second;
-
-        json_index[iter.first][metadata.version]["file_name"] = file_name;
+        plugin_name = iter.first;
+        directory = iter.second;
+        json_index[plugin_name] = directory;
     }
 
     return json_index.dump();
