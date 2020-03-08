@@ -37,6 +37,13 @@ public:
         this->payload = payload;
     }
 
+    Plugin(std::string name, std::string version, std::string user_name, std::string payload) {
+        this->metadata.name = name;
+        this->metadata.user_name = user_name;
+        this->metadata.version = version;
+        this->payload = payload;
+    }
+
     bool operator==(const Plugin &other) {
         return this->metadata.name == other.metadata.name;
     }

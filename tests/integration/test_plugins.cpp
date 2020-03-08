@@ -33,7 +33,7 @@ describe("CPM Hub registers plugins", []() {
     it("registers a plugin", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","
-            "\"file_name\": \"cest.zip\","
+            "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
         struct http_response response;
@@ -50,7 +50,7 @@ describe("CPM Hub registers plugins", []() {
     it("lists a plugin after it has been registered", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","
-            "\"file_name\": \"cest.zip\","
+            "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
         struct http_response response;

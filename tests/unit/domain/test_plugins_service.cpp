@@ -35,11 +35,14 @@ describe("Plugins Service", []() {
     it("stores a plugin with the given name when registering a plugin", [&]() {
         Mock<PluginsRepository> mock_repository;
         PluginsService plugins_service(&mock_repository.get());
-        Plugin expected_plugin("cest", "ABCDEedcba");
+        Plugin expected_plugin("cest", "1.0", "john_doe", "ABCDEedcba");
+        struct plugin_publication_data publication_data = {
+            "cest", "1.0", "john_doe", "ABCDEedcba"
+        };
 
         When(Method(mock_repository, store)).AlwaysReturn();
 
-        plugins_service.publishPlugin("cest", "ABCDEedcba");
+        plugins_service.publishPlugin(publication_data);
 
         Verify(Method(mock_repository, store));
     });
@@ -48,14 +51,14 @@ describe("Plugins Service", []() {
         Mock<PluginsRepository> mock_repository;
         PluginsService plugins_service(&mock_repository.get());
         Plugin plugin("cest");
-        std::list<Plugin *> plugins {&plugin};
-        std::list<Plugin *> returned_plugins;
+        std::list<Plugin> plugins {plugin};
+        std::list<Plugin> returned_plugins;
 
         When(Method(mock_repository, allPlugins)).Return(plugins);
 
         returned_plugins = plugins_service.allPlugins();
 
         expect(returned_plugins.size()).toBe(1);
-        expect(returned_plugins.front()).toBe(&plugin);
+        expect(returned_plugins.front().metadata.name).toBe(plugin.metadata.name);
     });
 });

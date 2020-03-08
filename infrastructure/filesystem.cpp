@@ -15,9 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
+#include <fstream>
+#include <boost/filesystem.hpp>
 #include <infrastructure/filesystem.h>
 
+using namespace std;
 
 void Filesystem::writeFile(std::string file_name, std::string contents)
 {
+    ofstream file;
+
+    file.open(file_name);
+    file.write(contents.c_str(), contents.size());
+    file.close();
+}
+
+
+void Filesystem::createDirectory(std::string path)
+{
+    boost::filesystem::create_directories(path);
 }

@@ -15,12 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <json/json.hpp>
 #include <base64/base64.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 
 using namespace std;
+using namespace nlohmann;
 
-PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory)
+PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, string directory)
 {
     this->filesystem = filesystem;
     this->directory = directory;
@@ -28,24 +30,45 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 }
 
 
-void PluginsRepositoryInFilesystem::store(Plugin *plugin)
+void PluginsRepositoryInFilesystem::store(Plugin &plugin)
 {
-    string binary_payload = base64_decode(plugin->payload);
-    string file_path = this->directory + "/public/" + plugin->metadata.name + ".zip";
+    string plugin_directory = this->directory + "/" + plugin.metadata.user_name + "/" + plugin.metadata.version;
 
-    this->filesystem->writeFile(file_path, binary_payload);
-    //this->index->indexPlugin(plugin->metadata, file_path);
+    this->filesystem->createDirectory(plugin_directory);
+    this->savePayload(plugin.metadata.name, plugin_directory, plugin.payload);
+    this->saveMetadata(plugin.metadata.name, plugin_directory, plugin.metadata);
+    this->index->indexPlugin(plugin.metadata.name, plugin_directory);
 }
 
 
-Plugin *PluginsRepositoryInFilesystem::find(std::string name)
+void PluginsRepositoryInFilesystem::savePayload(string name, string plugin_directory, string base64_payload)
 {
-    return NULL;
+    string payload_file_path = plugin_directory + "/" + name + ".zip";
+    string binary_payload = base64_decode(base64_payload);
+    this->filesystem->writeFile(payload_file_path, binary_payload);
 }
 
 
-std::list<Plugin *> PluginsRepositoryInFilesystem::allPlugins()
+void PluginsRepositoryInFilesystem::saveMetadata(string name, string plugin_directory, PluginMetadata metadata)
 {
-    std::list<Plugin *> plugins;
+    string metadata_file_path = plugin_directory + "/" + name + ".json";
+    json metadata_json = {
+        {"name", metadata.name},
+        {"user_name", metadata.user_name},
+        {"version", metadata.version},
+    };
+    this->filesystem->writeFile(metadata_file_path, metadata_json.dump());
+}
+
+
+Plugin PluginsRepositoryInFilesystem::find(string name)
+{
+    return Plugin();
+}
+
+
+list<Plugin> PluginsRepositoryInFilesystem::allPlugins()
+{
+    list<Plugin> plugins;
     return plugins;
 }

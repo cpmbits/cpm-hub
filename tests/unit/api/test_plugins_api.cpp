@@ -37,6 +37,7 @@ describe("Plugins API", []() {
     it("uses the plugin service to publish a plugin", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","
+            "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
         struct http_response response;
@@ -44,19 +45,24 @@ describe("Plugins API", []() {
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
 
-        When(Method(mock_service, publishPlugin)).Return(&plugin);
+        When(Method(mock_service, publishPlugin)).Return(plugin);
 
         response = api.publishPlugin(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock_service, publishPlugin).Using("cest", "ABCDEabcde"));
+        Verify(Method(mock_service, publishPlugin).Matching([](struct plugin_publication_data data) {
+            return data.plugin_name == "cest" &&
+                   data.version == "1.0" &&
+                   data.user_name == "john_doe" &&
+                   data.payload == "ABCDEabcde";
+        }));
     });
     
     it("uses the plugin service to list the available plugins", [&]() {
         struct http_response response;
         Plugin plugin("cest");
-        std::list<Plugin *> plugins {&plugin};
+        std::list<Plugin> plugins {plugin};
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
 

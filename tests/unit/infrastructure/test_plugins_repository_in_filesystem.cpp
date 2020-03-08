@@ -36,22 +36,31 @@ describe("Plugins Repository in file system", []() {
     afterEach([&]() {
     });
 
-    it("stores a plugin", [&]() {
+    it("stores and indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
         Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
         string base64_decode(string const&);
 
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
+        plugin.metadata.user_name = "user";
+        plugin.metadata.version = "1.0";
 
-        repository.store(&plugin);
+        repository.store(plugin);
 
-        Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, createDirectory).Using("./user/1.0"));
+        Verify(Method(mock_filesystem, writeFile).Using("./user/1.0/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./user/1.0/cest.json", 
+            "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
+            ));
+        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata.name, "./user/1.0"));
     });
 
-    xit("indexes a stored plugin based on the file location and plugin metadata", [&]() {
+    xit("indexes a stored plugin using the base plugin directory", [&]() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
@@ -61,10 +70,8 @@ describe("Plugins Repository in file system", []() {
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
 
-        repository.store(&plugin);
+        repository.store(plugin);
 
-        Verify(Method(mock_filesystem, writeFile).Using("./public/cest.zip", "plugin payload"));
-        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata, "./public/cest.zip"));
     });
 
     xit("finds an indexed plugin", [&]() {

@@ -15,34 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <infrastructure/plugins_repository_in_memory.h>
+#pragma once
 
+#include <string>
 
-void PluginsRepositoryInMemory::store(Plugin &plugin)
-{
-    this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
-}
-
-
-Plugin PluginsRepositoryInMemory::find(std::string name)
-{
-    auto iter = this->plugins.find(name);
-
-    if (iter == this->plugins.end()) {
-        return Plugin();
-    }
-
-    return iter->second;
-}
-
-
-std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
-{
-    std::list<Plugin> stored_plugins;
-
-    for (std::pair<std::string, Plugin> iter : this->plugins) {
-        stored_plugins.push_back(iter.second);
-    }
-
-    return stored_plugins;
-}
+struct plugin_publication_data {
+    std::string plugin_name;
+    std::string version;
+    std::string user_name;
+    std::string payload;
+};
