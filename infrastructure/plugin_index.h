@@ -15,34 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <infrastructure/plugins_repository_in_memory.h>
+#pragma once
+
+#include <map>
+#include <list>
+#include <string>
+#include <optional>
+
+#include <infrastructure/filesystem.h>
+#include <infrastructure/plugin_metadata.h>
 
 
-void PluginsRepositoryInMemory::store(Plugin &plugin)
-{
-    this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
-}
+struct plugin_index_entry {
+    PluginMetadata metadata;
+};
 
 
-Plugin PluginsRepositoryInMemory::find(std::string name)
-{
-    auto iter = this->plugins.find(name);
+class PluginIndex {
+public:
+    virtual void indexPlugin(std::string name, std::string directory);
 
-    if (iter == this->plugins.end()) {
-        return Plugin();
-    }
+    virtual std::string find(std::string name);
 
-    return iter->second;
-}
+    virtual std::string serialize();
 
-
-std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
-{
-    std::list<Plugin> stored_plugins;
-
-    for (std::pair<std::string, Plugin> iter : this->plugins) {
-        stored_plugins.push_back(iter.second);
-    }
-
-    return stored_plugins;
-}
+private:
+    Filesystem *filesystem;
+    std::string directory;
+    std::map<std::string, std::string> plugins;
+};

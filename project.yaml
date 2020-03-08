@@ -4,6 +4,7 @@ packages:
     api:
         cflags: [-std=c++11]
     domain:
+        cflags: [-std=c++11]
     infrastructure:
         cflags: [-std=c++11]
 plugins:
@@ -13,4 +14,4 @@ plugins:
     fakeit: "2.0.5"
     base64: "1.0"
 link_options:
-    libraries: ['pthread']
+    libraries: ['boost_filesystem', 'boost_system', 'pthread']

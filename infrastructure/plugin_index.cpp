@@ -15,34 +15,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <infrastructure/plugins_repository_in_memory.h>
+#include <iostream>
+#include <json/json.hpp>
+#include <infrastructure/plugin_index.h>
+
+using namespace std;
+using namespace nlohmann;
 
 
-void PluginsRepositoryInMemory::store(Plugin &plugin)
+void PluginIndex::indexPlugin(std::string name, std::string directory)
 {
-    this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
+    this->plugins.insert(make_pair(name, directory));
 }
 
 
-Plugin PluginsRepositoryInMemory::find(std::string name)
+std::string PluginIndex::find(string name)
 {
     auto iter = this->plugins.find(name);
 
     if (iter == this->plugins.end()) {
-        return Plugin();
+        return {};
     }
 
     return iter->second;
 }
 
 
-std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
+string PluginIndex::serialize()
 {
-    std::list<Plugin> stored_plugins;
+    json json_index;
+    string plugin_name;
+    string directory;
 
-    for (std::pair<std::string, Plugin> iter : this->plugins) {
-        stored_plugins.push_back(iter.second);
+    for (auto iter : this->plugins) {
+        plugin_name = iter.first;
+        directory = iter.second;
+        json_index[plugin_name] = directory;
     }
 
-    return stored_plugins;
+    return json_index.dump();
 }

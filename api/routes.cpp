@@ -15,13 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <infrastructure/plugins_repository_in_memory.h>
+#include <infrastructure/plugins_repository_in_filesystem.h>
 #include <infrastructure/http_server.h>
 #include <domain/plugins_service.h>
 #include <api/plugins_api.h>
 
 
-static PluginsRepositoryInMemory plugins_repository;
+static PluginIndex plugin_index;
+static Filesystem filesystem;
+static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_index, ".");
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);
 

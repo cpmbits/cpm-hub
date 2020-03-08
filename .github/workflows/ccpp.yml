@@ -16,7 +16,7 @@ jobs:
       run: |
         pip3 install cpm-cli
         pip3 install pyyaml
-        sudo apt install -yq ninja-build g++
+        sudo apt install -yq ninja-build g++ libboost-all-dev
     - name: Test with CPM
       run: |
         cpm test

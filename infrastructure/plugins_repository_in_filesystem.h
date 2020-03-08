@@ -21,19 +21,25 @@
 #include <string>
 #include <domain/plugins_repository.h>
 #include <infrastructure/filesystem.h>
+#include <infrastructure/plugin_index.h>
 
 
 class PluginsRepositoryInFilesystem: public PluginsRepository {
 public:
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, std::string directory);
+    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory);
 
-    virtual void store(Plugin *plugin);
+    virtual void store(Plugin &plugin);
 
-    virtual Plugin *find(std::string name);
+    virtual Plugin find(std::string name);
 
-    virtual std::list<Plugin *> allPlugins();
+    virtual std::list<Plugin> allPlugins();
 
 private:
     std::string directory;
     Filesystem *filesystem;
+    PluginIndex *index;
+
+    void savePayload(std::string name, std::string plugin_directory, std::string base64_payload);
+
+    void saveMetadata(std::string name, std::string plugin_directory, PluginMetadata metadata);
 };

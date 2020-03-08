@@ -19,77 +19,83 @@
 #include <fakeit/fakeit.hpp>
 
 #include <base64/base64.h>
+#include <infrastructure/plugin_index.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 
+using namespace std;
 using namespace cest;
 using namespace fakeit;
 
 
 describe("Plugins Repository in file system", []() {
+    
+
     beforeEach([&]() {
     });
 
     afterEach([&]() {
     });
 
-    it("stores a plugin", [&]() {
+    it("stores and indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), "");
-        Plugin plugin("cest", "cest.zip", "cGx1Z2luIHBheWxvYWQ=");
-        std::vector<BYTE> base64_decode(std::string const&);
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
+        string base64_decode(string const&);
 
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
+        plugin.metadata.user_name = "user";
+        plugin.metadata.version = "1.0";
 
-        repository.store(&plugin);
+        repository.store(plugin);
 
-        Verify(Method(mock_filesystem, writeFile).Matching([](std::string file_name, unsigned char *contents) {
-            return file_name == "cest.zip";
-        }));
+        Verify(Method(mock_filesystem, createDirectory).Using("./user/1.0"));
+        Verify(Method(mock_filesystem, writeFile).Using("./user/1.0/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./user/1.0/cest.json", 
+            "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
+            ));
+        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata.name, "./user/1.0"));
     });
 
-    xit("lists stored plugins", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin plugin("cest");
-        std::list<Plugin *> stored_plugins;
+    xit("indexes a stored plugin using the base plugin directory", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
+        string base64_decode(string const&);
 
-        repository.store(&plugin);
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
 
-        stored_plugins = repository.allPlugins();
+        repository.store(plugin);
 
-        expect(stored_plugins.size()).toBe(1);
+    });
+
+    xit("finds an indexed plugin", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        Mock<PluginIndex> mock_plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
+        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
+        std::list<Plugin> plugins = {plugin};
+        std::list<Plugin> stored_plugins;
+
+        When(Method(mock_plugin_index, find)).Return(plugins);
+
+        stored_plugins = repository.find("cest");
+
+        expect(stored_plugins.size()).toBe(plugins.size());
+        expect(stored_plugins.front()).toBe(plugins.front());
     });
 
     xit("doesn't find a plugin when it's not stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin *plugin;
-
-        plugin = repository.find("cest");
-
-        expect(plugin).toBeNull();
     });
 
     xit("finds the plugin with the same name when one plugin is stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin plugin("cest");
-        Plugin *stored_plugin;
-
-        repository.store(&plugin);
-
-        stored_plugin = repository.find("cest");
-
-        expect(stored_plugin).toBe(&plugin);
     });
 
     xit("finds the plugin with the same name when many plugins are stored", [&]() {
-        PluginsRepositoryInFilesystem repository;
-        Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
-        Plugin *stored_plugin;
-
-        repository.store(&cest_plugin);
-        repository.store(&fakeit_plugin);
-
-        stored_plugin = repository.find("fakeit");
-
-        expect(stored_plugin).toBe(&fakeit_plugin);
     });
 });

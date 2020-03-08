@@ -33,12 +33,14 @@ struct http_response PluginsApi::publishPlugin(struct http_request request)
         200, ""
     };
     auto json = json::parse(request.body);
-    Plugin *plugin;
-
-    plugin = plugins_service->publishPlugin(
+    struct plugin_publication_data data = {
         json.at("plugin_name"), 
-        json.at("file_name"), 
-        json.at("payload"));
+        json.at("version"), 
+        "john_doe" ,
+        json.at("payload"),
+    };
+
+    plugins_service->publishPlugin(data);
 
     return response;
 }
@@ -49,8 +51,8 @@ struct http_response PluginsApi::listPlugins(struct http_request request)
     struct http_response response(200, "");
     json json_plugin_list = json::array();
 
-    for (Plugin *plugin : plugins_service->allPlugins()) {
-        json json_plugin = {{"plugin_name", plugin->name}};
+    for (Plugin plugin : plugins_service->allPlugins()) {
+        json json_plugin = {{"plugin_name", plugin.metadata.name}};
         json_plugin_list.push_back(json_plugin);
     }
 

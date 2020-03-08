@@ -24,12 +24,12 @@
 
 class PluginsRepositoryInMemory: public PluginsRepository {
 public:
-    virtual void store(Plugin *plugin);
+    virtual void store(Plugin &plugin);
 
-    virtual Plugin *find(std::string name);
+    virtual Plugin find(std::string name);
 
-    virtual std::list<Plugin *> allPlugins();
+    virtual std::list<Plugin> allPlugins();
 
 private:
-    std::map<std::string, Plugin *> plugins;
+    std::map<std::string, Plugin> plugins;
 };

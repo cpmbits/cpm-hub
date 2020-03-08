@@ -20,6 +20,7 @@
 #include <string>
 #include <list>
 
+#include <domain/plugin_publication_data.h>
 #include <domain/plugins_repository.h>
 #include <domain/plugin.h>
 
@@ -27,9 +28,9 @@ class PluginsService {
 public:
     PluginsService(PluginsRepository *plugins_repository);
 
-    virtual Plugin *publishPlugin(std::string plugin_name, std::string file_name, std::string file_payload);
+    virtual Plugin publishPlugin(struct plugin_publication_data publication_data);
 
-    virtual std::list<Plugin *> allPlugins();
+    virtual std::list<Plugin> allPlugins();
 
 private:
     PluginsRepository *plugins_repository;

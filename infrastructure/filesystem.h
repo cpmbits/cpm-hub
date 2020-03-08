@@ -21,5 +21,7 @@
 
 class Filesystem {
 public:
-    virtual void writeFile(std::string file_name, unsigned char *contents);
+    virtual void writeFile(std::string file_name, std::string contents);
+
+    virtual void createDirectory(std::string path);
 };
