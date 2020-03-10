@@ -32,7 +32,7 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 
 void PluginsRepositoryInFilesystem::store(Plugin &plugin)
 {
-    string plugin_directory = this->directory + "/" + plugin.metadata.user_name + "/" + plugin.metadata.version;
+    string plugin_directory = this->directory + "/" + plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;
 
     this->filesystem->createDirectory(plugin_directory);
     this->savePayload(plugin.metadata.name, plugin_directory, plugin.payload);

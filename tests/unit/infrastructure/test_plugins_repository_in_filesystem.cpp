@@ -51,13 +51,13 @@ describe("Plugins Repository in file system", []() {
 
         repository.store(plugin);
 
-        Verify(Method(mock_filesystem, createDirectory).Using("./user/1.0"));
-        Verify(Method(mock_filesystem, writeFile).Using("./user/1.0/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, createDirectory).Using("./user/cest/1.0"));
+        Verify(Method(mock_filesystem, writeFile).Using("./user/cest/1.0/cest.zip", "plugin payload"));
         Verify(Method(mock_filesystem, writeFile).Using(
-            "./user/1.0/cest.json", 
+            "./user/cest/1.0/cest.json", 
             "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
             ));
-        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata.name, "./user/1.0"));
+        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata.name, "./user/cest/1.0"));
     });
 
     xit("indexes a stored plugin using the base plugin directory", [&]() {
