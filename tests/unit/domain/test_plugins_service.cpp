@@ -26,12 +26,6 @@ using namespace fakeit;
 
 
 describe("Plugins Service", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("stores a plugin with the given name when registering a plugin", [&]() {
         Mock<PluginsRepository> mock_repository;
         PluginsService plugins_service(&mock_repository.get());

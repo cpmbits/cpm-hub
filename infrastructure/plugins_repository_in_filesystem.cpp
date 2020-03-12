@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
+
 #include <json/json.hpp>
 #include <base64/base64.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
@@ -61,9 +63,25 @@ void PluginsRepositoryInFilesystem::saveMetadata(string name, string plugin_dire
 }
 
 
-Plugin PluginsRepositoryInFilesystem::find(string name)
+Optional<Plugin> PluginsRepositoryInFilesystem::find(string name)
 {
-    return Plugin();
+    Optional<Plugin> plugin;
+    Optional<string> directory;
+
+    directory = this->index->find(name);
+    if (directory.isPresent()) {
+        string metadata_file_path = directory.value() + "/" + name + ".json";
+        string payload_file_path = directory.value() + "/" + name + ".zip";
+        string metadata = this->filesystem->readFile(metadata_file_path);
+        string payload = this->filesystem->readFile(payload_file_path);
+        auto metadata_json = json::parse(metadata);
+        plugin = Plugin(name, 
+                        metadata_json.at("version"),
+                        metadata_json.at("user_name"),
+                        base64_encode((const unsigned char *)payload.c_str(), payload.size()));
+    }
+
+    return plugin;
 }
 
 

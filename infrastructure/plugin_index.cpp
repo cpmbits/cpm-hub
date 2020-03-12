@@ -29,15 +29,18 @@ void PluginIndex::indexPlugin(std::string name, std::string directory)
 }
 
 
-std::string PluginIndex::find(string name)
+Optional<string> PluginIndex::find(string name)
 {
     auto iter = this->plugins.find(name);
+    Optional<string> directory;
 
     if (iter == this->plugins.end()) {
-        return {};
+        return directory;
     }
 
-    return iter->second;
+    directory = iter->second;
+
+    return directory;
 }
 
 

@@ -26,7 +26,7 @@ class PluginsRepositoryInMemory: public PluginsRepository {
 public:
     virtual void store(Plugin &plugin);
 
-    virtual Plugin find(std::string name);
+    virtual Optional<Plugin> find(std::string name);
 
     virtual std::list<Plugin> allPlugins();
 

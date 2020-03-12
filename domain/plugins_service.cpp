@@ -25,16 +25,6 @@ PluginsService::PluginsService(PluginsRepository *plugins_repository) {
 }
 
 
-//Plugin PluginsService::publishPlugin(string plugin_name, string file_payload)
-//{
-//    Plugin *plugin = new Plugin(plugin_name);
-//
-//    plugins_repository->store(plugin);
-//
-//    return plugin;
-//}
-
-
 Plugin PluginsService::publishPlugin(struct plugin_publication_data publication_data)
 {
     Plugin plugin(publication_data.plugin_name,

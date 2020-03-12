@@ -19,6 +19,8 @@
 
 #include <string>
 #include <list>
+
+#include <domain/optional.h>
 #include <domain/plugin.h>
 
 
@@ -26,7 +28,7 @@ class PluginsRepository {
 public:
     virtual void store(Plugin &plugin) = 0;
 
-    virtual Plugin find(std::string name) = 0;
+    virtual Optional<Plugin> find(std::string name) = 0;
 
     virtual std::list<Plugin>allPlugins() = 0;
 };

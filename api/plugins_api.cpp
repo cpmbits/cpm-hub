@@ -33,14 +33,14 @@ struct http_response PluginsApi::publishPlugin(struct http_request request)
         200, ""
     };
     auto json = json::parse(request.body);
-    struct plugin_publication_data data = {
+    struct plugin_publication_data registration_data = {
         json.at("plugin_name"), 
         json.at("version"), 
         "john_doe" ,
         json.at("payload"),
     };
 
-    plugins_service->publishPlugin(data);
+    plugins_service->publishPlugin(registration_data);
 
     return response;
 }

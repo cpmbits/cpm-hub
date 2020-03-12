@@ -22,6 +22,7 @@
 
 using namespace cest;
 using namespace fakeit;
+using namespace std;
 
 
 describe("Plugins Repository in file system", []() {
@@ -53,19 +54,21 @@ describe("Plugins Repository in file system", []() {
 
     it("fails to find a plugin when it's not indexed", [&]() {
         PluginIndex plugin_index;
+        Optional<string> directory;
 
-        std::string entry = plugin_index.find("cest");
+        directory = plugin_index.find("cest");
 
-        expect(entry).toBe("");
+        expect(directory.isPresent()).toBe(false);
     });
 
     it("finds an indexed plugin", [&]() {
         PluginIndex plugin_index;
+        Optional<string> directory;
 
         plugin_index.indexPlugin("cest", "user/cest/1.0");
         plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
 
-        expect(plugin_index.find("cest")).toBe("user/cest/1.0");
-        expect(plugin_index.find("fakeit")).toBe("user/fakeit/3.1");
+        expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
+        expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
     });
 });

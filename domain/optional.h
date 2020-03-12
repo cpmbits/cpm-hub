@@ -17,30 +17,29 @@
  */
 #pragma once
 
-#include <map>
-#include <list>
-#include <string>
 
-#include <domain/optional.h>
-#include <infrastructure/filesystem.h>
-#include <infrastructure/plugin_metadata.h>
-
-
-struct plugin_index_entry {
-    PluginMetadata metadata;
-};
-
-
-class PluginIndex {
+template<class T> class Optional {
 public:
-    virtual void indexPlugin(std::string name, std::string directory);
+    Optional<T>() {
+        this->contains_value = false;
+    }
+    bool isPresent() {
+        return this->contains_value;
+    }
 
-    virtual Optional<std::string> find(std::string name);
+    T& value() {
+        if (!this->contains_value) {
+            throw "Optional has no value";
+        }
+        return this->stored_value;
+    }
 
-    virtual std::string serialize();
-
+    Optional<T>& operator =(const T &value) {
+        this->stored_value = value;
+        this->contains_value = true;
+        return *this;
+    }
 private:
-    Filesystem *filesystem;
-    std::string directory;
-    std::map<std::string, std::string> plugins;
+    bool contains_value;
+    T stored_value;
 };

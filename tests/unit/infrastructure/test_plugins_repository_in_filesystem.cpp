@@ -38,16 +38,12 @@ describe("Plugins Repository in file system", []() {
 
     it("stores and indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
-        Mock<PluginIndex> mock_plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
-        string base64_decode(string const&);
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        Plugin plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
-        plugin.metadata.user_name = "user";
-        plugin.metadata.version = "1.0";
 
         repository.store(plugin);
 
@@ -56,46 +52,42 @@ describe("Plugins Repository in file system", []() {
         Verify(Method(mock_filesystem, writeFile).Using(
             "./user/cest/1.0/cest.json", 
             "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
-            ));
-        Verify(Method(mock_plugin_index, indexPlugin).Using(plugin.metadata.name, "./user/cest/1.0"));
+        ));
     });
 
-    xit("indexes a stored plugin using the base plugin directory", [&]() {
+    it("doesn't find a non existent plugin", []() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        Optional<Plugin> plugin;
+
+        plugin = repository.find("cest");
+
+        expect(plugin.isPresent()).toBe(false);
+    });
+
+    it("finds an indexed plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
-        string base64_decode(string const&);
+        Optional<Plugin> plugin;
+        Optional<string> directory;
 
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        When(Method(mock_plugin_index, indexPlugin)).AlwaysReturn();
+        directory = string("./user/cest/1.0");
+        When(Method(mock_plugin_index, find)).Return(directory);
+        When(Method(mock_filesystem, readFile))
+                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
+                .Return("plugin payload");
 
-        repository.store(plugin);
+        try {
+            plugin = repository.find("cest");
+        } catch(std::exception e) {
+            cout << e.what() << endl;
+        }
 
-    });
-
-    xit("finds an indexed plugin", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        Mock<PluginIndex> mock_plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
-        Plugin plugin("cest", "cGx1Z2luIHBheWxvYWQ=");
-        std::list<Plugin> plugins = {plugin};
-        std::list<Plugin> stored_plugins;
-
-        When(Method(mock_plugin_index, find)).Return(plugins);
-
-        stored_plugins = repository.find("cest");
-
-        expect(stored_plugins.size()).toBe(plugins.size());
-        expect(stored_plugins.front()).toBe(plugins.front());
-    });
-
-    xit("doesn't find a plugin when it's not stored", [&]() {
-    });
-
-    xit("finds the plugin with the same name when one plugin is stored", [&]() {
-    });
-
-    xit("finds the plugin with the same name when many plugins are stored", [&]() {
+        expect(plugin.value().metadata.name).toBe("cest");
+        expect(plugin.value().metadata.version).toBe("1.0");
+        expect(plugin.value().metadata.user_name).toBe("user");
+        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 });

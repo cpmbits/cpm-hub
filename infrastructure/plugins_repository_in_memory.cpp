@@ -24,15 +24,18 @@ void PluginsRepositoryInMemory::store(Plugin &plugin)
 }
 
 
-Plugin PluginsRepositoryInMemory::find(std::string name)
+Optional<Plugin> PluginsRepositoryInMemory::find(std::string name)
 {
     auto iter = this->plugins.find(name);
+    Optional<Plugin> plugin;
 
     if (iter == this->plugins.end()) {
-        return Plugin();
+        return plugin;
     }
 
-    return iter->second;
+    plugin = iter->second;
+    
+    return plugin;
 }
 
 

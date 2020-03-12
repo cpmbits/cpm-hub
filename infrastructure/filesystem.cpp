@@ -17,6 +17,7 @@
  */
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <boost/filesystem.hpp>
 #include <infrastructure/filesystem.h>
 
@@ -29,6 +30,17 @@ void Filesystem::writeFile(std::string file_name, std::string contents)
     file.open(file_name);
     file.write(contents.c_str(), contents.size());
     file.close();
+}
+
+
+std::string Filesystem::readFile(std::string file_name)
+{
+    ifstream file(file_name, ios::binary);
+    ostringstream ostream;
+
+    ostream << file.rdbuf();
+
+    return ostream.str();
 }
 
 

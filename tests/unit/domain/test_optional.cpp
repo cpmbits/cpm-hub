@@ -15,32 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <map>
-#include <list>
-#include <string>
+#include <cest/cest.h>
 
 #include <domain/optional.h>
-#include <infrastructure/filesystem.h>
-#include <infrastructure/plugin_metadata.h>
 
 
-struct plugin_index_entry {
-    PluginMetadata metadata;
-};
+describe("Optional", []() {
+    it("doesn't have value after creation", []() {
+        Optional<int> optional;
 
+        expect(optional.isPresent()).toBe(false);
+    });
 
-class PluginIndex {
-public:
-    virtual void indexPlugin(std::string name, std::string directory);
+    it("has value after assigning one", []() {
+        Optional<int> optional;
 
-    virtual Optional<std::string> find(std::string name);
+        optional = 32;
 
-    virtual std::string serialize();
+        expect(optional.isPresent()).toBe(true);
+        expect(optional.value()).toBe(32);
+    });
 
-private:
-    Filesystem *filesystem;
-    std::string directory;
-    std::map<std::string, std::string> plugins;
-};
+    it("throws an exception when requesting non stored value", []() {
+        Optional<int> optional;
+
+        try {
+            optional.value();
+            expect(true).toBe(false);
+        } catch(const char *msg) {
+        }
+    });
+});

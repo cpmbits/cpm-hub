@@ -23,12 +23,6 @@ using namespace cest;
 
 
 describe("Plugins Repository in Memory", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("stores a plugin", [&]() {
         PluginsRepositoryInMemory repository;
         Plugin plugin("cest");
@@ -50,35 +44,35 @@ describe("Plugins Repository in Memory", []() {
 
     it("doesn't find a plugin when it's not stored", [&]() {
         PluginsRepositoryInMemory repository;
-        Plugin plugin;
+        Optional<Plugin> plugin;
 
         plugin = repository.find("cest");
 
-        expect(plugin.metadata.name).toBe("");
+        expect(plugin.isPresent()).toBe(false);
     });
 
     it("finds the plugin with the same name when one plugin is stored", [&]() {
         PluginsRepositoryInMemory repository;
         Plugin plugin("cest");
-        Plugin stored_plugin;
+        Optional<Plugin> stored_plugin;
 
         repository.store(plugin);
 
         stored_plugin = repository.find("cest");
 
-        expect(stored_plugin.metadata.name).toBe(plugin.metadata.name);
+        expect(stored_plugin.value().metadata.name).toBe(plugin.metadata.name);
     });
 
     it("finds the plugin with the same name when many plugins are stored", [&]() {
         PluginsRepositoryInMemory repository;
         Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
-        Plugin stored_plugin;
+        Optional<Plugin> stored_plugin;
 
         repository.store(cest_plugin);
         repository.store(fakeit_plugin);
 
         stored_plugin = repository.find("fakeit");
 
-        expect(stored_plugin.metadata.name).toBe(fakeit_plugin.metadata.name);
+        expect(stored_plugin.value().metadata.name).toBe(fakeit_plugin.metadata.name);
     });
 });
