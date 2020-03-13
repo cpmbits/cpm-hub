@@ -25,7 +25,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Plugin'
+              $ref: '#/components/schemas/PluginDownload'
         required: true
       responses:
         200:
@@ -38,16 +38,41 @@ paths:
           description: A plugin with the same name but not owned by the user already exists
         409:
           description: A plugin with the same name and owned by the user already exists
+  /plugins/{pluginName}:
+    get:
+      tags:
+      - plugins
+      summary: Download the latest version of a plugin by name
+      operationId: downloadPlugin
+      parameters:
+        - in: path
+          name: pluginName
+          schema:
+            type: string
+          required: true
+          description: Name of the plugin to download
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PluginDownload'
+        404:
+          description: Plugin not found
 components:
   schemas:
-    Plugin:
+    PluginDownload:
       type: object
       properties:
         plugin_name:
           type: string
-        file_name:
+          example: "cest"
+          description: unique name for the plugin
+        version:
           type: string
-          description: file name
+          description: plugin version
+          example: "1.0"
         payload:
           type: string
           format: base64
