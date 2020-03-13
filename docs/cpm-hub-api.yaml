@@ -1,0 +1,85 @@
+openapi: 3.0.1
+info:
+  title: CPM Hub
+  description: 'CPM Hub API'
+  license:
+    name: GPLv3
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: "1.0"
+servers:
+- url: https://www.cpmhub.com/api/v1
+tags:
+- name: plugins
+  description: Plugin Management
+paths:
+  /plugins:
+    post:
+      tags:
+      - plugins
+      summary: Publish a plugin
+      operationId: publishPlugin
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        description: Plugin to be published including metadata
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PluginDownload'
+        required: true
+      responses:
+        200:
+          description: Plugin published
+        400:
+          description: Missing information
+        401:
+          description: Unauthorized
+        403:
+          description: A plugin with the same name but not owned by the user already exists
+        409:
+          description: A plugin with the same name and owned by the user already exists
+  /plugins/{pluginName}:
+    get:
+      tags:
+      - plugins
+      summary: Download the latest version of a plugin by name
+      operationId: downloadPlugin
+      parameters:
+        - in: path
+          name: pluginName
+          schema:
+            type: string
+          required: true
+          description: Name of the plugin to download
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PluginDownload'
+        404:
+          description: Plugin not found
+components:
+  schemas:
+    PluginDownload:
+      type: object
+      properties:
+        plugin_name:
+          type: string
+          example: "cest"
+          description: unique name for the plugin
+        version:
+          type: string
+          description: plugin version
+          example: "1.0"
+        payload:
+          type: string
+          format: base64
+          example: "U3dhZ2dlciByb2Nrcw=="
+          description: contents of the package encoded in base64
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
