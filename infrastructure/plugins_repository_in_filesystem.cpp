@@ -24,6 +24,19 @@
 using namespace std;
 using namespace nlohmann;
 
+
+static string metadataFileName(string name, string directory)
+{
+    return directory + "/" + name + ".json";
+}
+
+
+static string payloadFileName(string name, string directory)
+{
+    return directory + "/" + name + ".zip";
+}
+
+
 PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, string directory)
 {
     this->filesystem = filesystem;
@@ -45,7 +58,7 @@ void PluginsRepositoryInFilesystem::store(Plugin &plugin)
 
 void PluginsRepositoryInFilesystem::savePayload(string name, string plugin_directory, string base64_payload)
 {
-    string payload_file_path = plugin_directory + "/" + name + ".zip";
+    string payload_file_path = payloadFileName(name, plugin_directory);
     string binary_payload = base64_decode(base64_payload);
     this->filesystem->writeFile(payload_file_path, binary_payload);
 }
@@ -53,7 +66,7 @@ void PluginsRepositoryInFilesystem::savePayload(string name, string plugin_direc
 
 void PluginsRepositoryInFilesystem::saveMetadata(string name, string plugin_directory, PluginMetadata metadata)
 {
-    string metadata_file_path = plugin_directory + "/" + name + ".json";
+    string metadata_file_path = metadataFileName(name, plugin_directory);
     json metadata_json = {
         {"name", metadata.name},
         {"user_name", metadata.user_name},
@@ -70,18 +83,29 @@ Optional<Plugin> PluginsRepositoryInFilesystem::find(string name)
 
     directory = this->index->find(name);
     if (directory.isPresent()) {
-        string metadata_file_path = directory.value() + "/" + name + ".json";
-        string payload_file_path = directory.value() + "/" + name + ".zip";
-        string metadata = this->filesystem->readFile(metadata_file_path);
-        string payload = this->filesystem->readFile(payload_file_path);
-        auto metadata_json = json::parse(metadata);
-        plugin = Plugin(name, 
-                        metadata_json.at("version"),
-                        metadata_json.at("user_name"),
-                        base64_encode((const unsigned char *)payload.c_str(), payload.size()));
+        PluginMetadata metadata = this->loadMetadata(name, directory.value());
+        string payload = this->loadPayload(name, directory.value());
+        plugin = Plugin(name, metadata.version, metadata.user_name, payload);
     }
 
     return plugin;
+}
+
+
+string PluginsRepositoryInFilesystem::loadPayload(string name, string plugin_directory)
+{
+    string payload_file_path = payloadFileName(name, plugin_directory);
+    string payload = this->filesystem->readFile(payload_file_path);
+    return base64_encode((const unsigned char *)payload.c_str(), payload.size());
+}
+
+
+PluginMetadata PluginsRepositoryInFilesystem::loadMetadata(string name, string plugin_directory)
+{
+    string metadata_file_path = metadataFileName(name, plugin_directory);
+    string metadata = this->filesystem->readFile(metadata_file_path);
+    auto metadata_json = json::parse(metadata);
+    return PluginMetadata(name, metadata_json.at("user_name"), metadata_json.at("version"));
 }
 
 

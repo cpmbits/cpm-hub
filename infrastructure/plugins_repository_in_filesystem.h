@@ -42,4 +42,8 @@ private:
     void savePayload(std::string name, std::string plugin_directory, std::string base64_payload);
 
     void saveMetadata(std::string name, std::string plugin_directory, PluginMetadata metadata);
+
+    std::string loadPayload(std::string name, std::string plugin_directory);
+
+    PluginMetadata loadMetadata(std::string name, std::string plugin_directory);
 };
