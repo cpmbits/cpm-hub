@@ -20,6 +20,7 @@
 #include <domain/plugins_service.h>
 
 using namespace nlohmann;
+using namespace std;
 
 
 PluginsApi::PluginsApi(PluginsService *plugins_service) {
@@ -59,4 +60,28 @@ struct http_response PluginsApi::listPlugins(struct http_request request)
     response.body = json_plugin_list.dump();
 
     return response;
+}
+
+
+static string asJson(Plugin plugin)
+{
+    json json_plugin = {
+        {"plugin_name", plugin.metadata.name},
+        {"version", plugin.metadata.version},
+        {"payload", plugin.payload}
+    };
+    return json_plugin.dump();
+}
+
+
+struct http_response PluginsApi::downloadPlugin(struct http_request request)
+{
+    Optional<Plugin> plugin;
+
+    plugin = plugins_service->find(request.getParameter("plugin_name"));
+    if (!plugin.isPresent()) {
+        return http_response(404, "");
+    }
+
+    return http_response(200, asJson(plugin.value()));
 }

@@ -28,6 +28,8 @@ public:
 
     struct http_response listPlugins(struct http_request request);
 
+    struct http_response downloadPlugin(struct http_request request);
+
 private:
     PluginsService *plugins_service;
 };

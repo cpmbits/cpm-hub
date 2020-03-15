@@ -65,4 +65,35 @@ describe("CPM Hub registers plugins", []() {
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
     });
+
+    it("fails to download plugin when it's not found", [&]() {
+        struct http_request request;
+        struct http_response response;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service);
+
+        request.setParameter("plugin_name", "cest");
+
+        response = api.downloadPlugin(request);
+
+        expect(response.status_code).toBe(404);
+    });
+
+    it("finds a plugin after it has been registered", [&]() {
+        struct http_request publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
+        struct http_request download_request;
+        struct http_response response;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service);
+
+        api.publishPlugin(publish_request);
+
+        download_request.setParameter("plugin_name", "cest");
+        response = api.downloadPlugin(download_request);
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
+    });
 });
