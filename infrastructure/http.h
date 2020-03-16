@@ -18,11 +18,31 @@
 #pragma once
 
 #include <string>
+#include <map>
+
+
+struct http_request_parameters {
+public:
+    std::string get(std::string parameter) {
+        auto iter = parameters.find(parameter);
+        return iter->second;
+    }
+
+    void set(std::string parameter, std::string value) {
+        parameters.insert(std::make_pair(parameter, value));
+    }
+
+private:
+    std::map<std::string, std::string> parameters;
+};
+
 
 struct http_request {
+    std::string method;
     std::string body;
+    struct http_request_parameters parameters;
 
-    http_request(std::string _body)
+    http_request(std::string _body="")
     {
         body = _body;
     }

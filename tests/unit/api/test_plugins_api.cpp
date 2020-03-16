@@ -73,4 +73,42 @@ describe("Plugins API", []() {
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
     });
+        
+    it("returns error 404 when downloading a plugin that is not found", [&]() {
+        struct http_request request;
+        struct http_response response;
+        Mock<PluginsService> mock_service;
+        PluginsApi api(&mock_service.get());
+        Optional<Plugin> no_plugin;
+
+        request.parameters.set("pluginName", "cest");
+        When(Method(mock_service, find)).Return(no_plugin);
+
+        response = api.downloadPlugin(request);
+
+        Verify(Method(mock_service, find).Using("cest"));
+        expect(response.status_code).toBe(404);
+    });
+            
+    it("returns plugin when downloading an existing plugin", [&]() {
+        struct http_request request;
+        struct http_response response;
+        Mock<PluginsService> mock_service;
+        PluginsApi api(&mock_service.get());
+        Optional<Plugin> cest_plugin;
+
+        request.parameters.set("pluginName", "cest");
+        cest_plugin = Plugin("cest", "1.0", "user", "ABCDEabcde");
+        When(Method(mock_service, find)).Return(cest_plugin);
+
+        response = api.downloadPlugin(request);
+
+        Verify(Method(mock_service, find).Using("cest"));
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("{"
+            "\"payload\":\"ABCDEabcde\","
+            "\"plugin_name\":\"cest\","
+            "\"version\":\"1.0\""
+        "}");
+    });
 });

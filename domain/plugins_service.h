@@ -20,6 +20,7 @@
 #include <string>
 #include <list>
 
+#include <domain/optional.h>
 #include <domain/plugin_publication_data.h>
 #include <domain/plugins_repository.h>
 #include <domain/plugin.h>
@@ -31,6 +32,8 @@ public:
     virtual Plugin publishPlugin(struct plugin_publication_data publication_data);
 
     virtual std::list<Plugin> allPlugins();
+    
+    virtual Optional<Plugin> find(std::string plugin_name);
 
 private:
     PluginsRepository *plugins_repository;

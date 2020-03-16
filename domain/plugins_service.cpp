@@ -42,3 +42,9 @@ list<Plugin> PluginsService::allPlugins()
 {
     return plugins_repository->allPlugins();
 }
+
+
+Optional<Plugin> PluginsService::find(std::string plugin_name)
+{
+    return plugins_repository->find(plugin_name);
+}

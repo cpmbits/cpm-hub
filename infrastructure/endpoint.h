@@ -17,33 +17,27 @@
  */
 #pragma once
 
+#include <map>
+#include <regex>
+#include <string>
+#include <vector>
 
-template<class T> class Optional {
+#include <domain/optional.h>
+#include <infrastructure/http.h>
+
+
+class Endpoint {
 public:
-    Optional<T>() {
-        this->contains_value = false;
-    }
-    bool isPresent() {
-        return this->contains_value;
-    }
+    Endpoint(std::string path);
 
-    T& value() {
-        if (!this->contains_value) {
-            throw "Optional has no value";
-        }
-        return this->stored_value;
-    }
+    Optional<struct http_request_parameters> match(std::string path);
 
-    Optional<T>& operator =(const T &value) {
-        this->stored_value = value;
-        this->contains_value = true;
-        return *this;
-    }
+    bool operator <(const class Endpoint& rhs) const;
 
-    operator bool() const {
-        return isPresent();
-    }
 private:
-    bool contains_value;
-    T stored_value;
+    std::string matching_string;
+    std::regex matching_regex;
+    std::vector<std::string> parameter_names;
+    
+    void parsePath(std::string path);
 };

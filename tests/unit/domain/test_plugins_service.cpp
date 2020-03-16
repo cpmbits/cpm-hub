@@ -55,4 +55,17 @@ describe("Plugins Service", []() {
         expect(returned_plugins.size()).toBe(1);
         expect(returned_plugins.front().metadata.name).toBe(plugin.metadata.name);
     });
+    
+    it("uses the repository to find a plugin by name", [&]() {
+        Mock<PluginsRepository> mock_repository;
+        PluginsService plugins_service(&mock_repository.get());
+        Optional<Plugin> plugin;
+
+        plugin = Plugin("cest");
+        When(Method(mock_repository, find)).Return(plugin);
+
+        auto found_plugin = plugins_service.find("cest");
+
+        expect(found_plugin.value().metadata.name).toBe("cest");
+    });
 });

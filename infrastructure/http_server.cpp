@@ -61,19 +61,19 @@ void HttpServer::serve()
 
 void HttpServer::post(string path, ServerCallback callback)
 {
-    this->posts.insert(make_pair(path, callback));
+    this->posts.insert(make_pair(Endpoint(path), callback));
 }
 
 
 void HttpServer::get(string path, ServerCallback callback)
 {
-    this->gets.insert(make_pair(path, callback));
+    this->gets.insert(make_pair(Endpoint(path), callback));
 }
 
 
 void HttpServer::put(string path, ServerCallback callback)
 {
-    this->puts.insert(make_pair(path, callback));
+    this->puts.insert(make_pair(Endpoint(path), callback));
 }
 
 
@@ -83,9 +83,14 @@ static struct http_response notFound(struct http_request request)
 }
 
 
-ServerCallback HttpServer::findCallback(string method, string endpoint)
+ServerCallback HttpServer::parseRequest(struct http_message *message, struct http_request &request)
 {
-    map<string, ServerCallback> *callbacks;
+    map<Endpoint, ServerCallback> *callbacks;
+    string method(message->method.p, message->method.len);
+    string endpoint(message->uri.p, message->uri.len);
+    ServerCallback server_callback = notFound;
+
+    request.body = string(message->body.p, message->body.len);
 
     if (method == "GET") {
         callbacks = &this->gets;
@@ -95,30 +100,32 @@ ServerCallback HttpServer::findCallback(string method, string endpoint)
         callbacks = &this->puts;
     }
 
-    auto iter = callbacks->find(endpoint);
-
-    if (iter == callbacks->end()) {
-        return notFound;
+    for (pair<Endpoint, ServerCallback> iter: *callbacks) {
+        Optional<struct http_request_parameters> match;
+        match = iter.first.match(endpoint);
+        if (match.isPresent()) {
+            server_callback = iter.second;
+            request.parameters = match.value();
+            break;
+        }
     }
 
-    return iter->second;
+    return server_callback;
 }
 
 
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     struct http_response response;
-    struct http_request request(string(message->body.p, message->body.len));
-    string method(message->method.p, message->method.len);
-    string endpoint(message->uri.p, message->uri.len);
-    ServerCallback callback = this->findCallback(method, endpoint);
+    struct http_request request;
+    ServerCallback callback = this->parseRequest(message, request);
 
     response = callback(request);
 
     mg_send_head(connection, response.status_code, response.body.size(), "");
     mg_printf(connection, "%s", response.body.c_str());
 
-    cout << method << " " << endpoint << ": " << response.status_code << endl;
+    cout << string(message->method.p, message->method.len) << " " << string(message->uri.p, message->uri.len) << ": " << response.status_code << endl;
 }
 
 
