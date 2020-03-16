@@ -81,7 +81,7 @@ describe("Plugins API", []() {
         PluginsApi api(&mock_service.get());
         Optional<Plugin> no_plugin;
 
-        request.setParameter("plugin_name", "cest");
+        request.parameters.set("pluginName", "cest");
         When(Method(mock_service, find)).Return(no_plugin);
 
         response = api.downloadPlugin(request);
@@ -97,7 +97,7 @@ describe("Plugins API", []() {
         PluginsApi api(&mock_service.get());
         Optional<Plugin> cest_plugin;
 
-        request.setParameter("plugin_name", "cest");
+        request.parameters.set("pluginName", "cest");
         cest_plugin = Plugin("cest", "1.0", "user", "ABCDEabcde");
         When(Method(mock_service, find)).Return(cest_plugin);
 

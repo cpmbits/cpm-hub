@@ -78,7 +78,7 @@ struct http_response PluginsApi::downloadPlugin(struct http_request request)
 {
     Optional<Plugin> plugin;
 
-    plugin = plugins_service->find(request.getParameter("plugin_name"));
+    plugin = plugins_service->find(request.parameters.get("pluginName"));
     if (!plugin.isPresent()) {
         return http_response(404, "");
     }

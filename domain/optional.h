@@ -39,6 +39,10 @@ public:
         this->contains_value = true;
         return *this;
     }
+
+    operator bool() const {
+        return isPresent();
+    }
 private:
     bool contains_value;
     T stored_value;

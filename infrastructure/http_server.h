@@ -21,8 +21,11 @@
 #include <map>
 #include <string>
 #include <thread>
+
 #include <mongoose/mongoose.h>
+
 #include <infrastructure/http.h>
+#include <infrastructure/endpoint.h>
 
 typedef std::function<struct http_response(struct http_request)> ServerCallback;
 
@@ -43,10 +46,10 @@ private:
     struct mg_mgr mgr;
     struct mg_connection *connection;
     std::thread *server_thread;
-    std::map<std::string, ServerCallback> gets;
-    std::map<std::string, ServerCallback> posts;
-    std::map<std::string, ServerCallback> puts;
+    std::map<Endpoint, ServerCallback> gets;
+    std::map<Endpoint, ServerCallback> posts;
+    std::map<Endpoint, ServerCallback> puts;
 
     void serve();
-    ServerCallback findCallback(std::string method, std::string endpoint);
+    ServerCallback parseRequest(struct http_message *message, struct http_request &request);
 };

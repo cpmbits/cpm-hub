@@ -23,32 +23,19 @@
 #include <vector>
 
 #include <domain/optional.h>
-
-
-class EndpointMatch {
-public:
-    std::string get(std::string parameter) {
-        auto iter = parameters.find(parameter);
-        return iter->second;
-    }
-
-    void set(std::string parameter, std::string value) {
-        parameters.insert(std::make_pair(parameter, value));
-    }
-
-private:
-    std::map<std::string, std::string> parameters;
-};
+#include <infrastructure/http.h>
 
 
 class Endpoint {
 public:
     Endpoint(std::string path);
 
-    Optional<EndpointMatch> match(std::string path);
+    Optional<struct http_request_parameters> match(std::string path);
 
+    bool operator <(const class Endpoint& rhs) const;
 
 private:
+    std::string matching_string;
     std::regex matching_regex;
     std::vector<std::string> parameter_names;
     

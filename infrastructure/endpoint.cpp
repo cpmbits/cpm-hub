@@ -26,16 +26,17 @@ using namespace std;
 Endpoint::Endpoint(string path)
 {
     parsePath(path);
+    matching_string = "";
 }
 
 
-Optional<EndpointMatch> Endpoint::match(string path) 
+Optional<struct http_request_parameters> Endpoint::match(string path) 
 {
-    Optional<EndpointMatch> match;
+    Optional<struct http_request_parameters> match;
     smatch base_match;
 
     if (regex_match(path, base_match, this->matching_regex)) {
-        match = EndpointMatch();
+        match = http_request_parameters();
         for (size_t i=1; i<base_match.size(); ++i) {
             std::ssub_match sub_match = base_match[i];
             match.value().set(this->parameter_names.at(i-1), sub_match.str());
@@ -49,18 +50,23 @@ Optional<EndpointMatch> Endpoint::match(string path)
 void Endpoint::parsePath(string path) 
 {
     vector<string> tokens;
-    string regex_string("");
 
     boost::trim_if(path, boost::is_any_of("/"));
     boost::split(tokens, path, boost::is_any_of("/"));
     for(auto&& token: tokens) {
         if (token.front() == ':') {
-            regex_string += "/([\\w-]+)";
+            matching_string += "/([\\w-]+)";
             this->parameter_names.push_back(token.substr(1));
         } else {
-            regex_string += "/" + token;
+            matching_string += "/" + token;
         }
     }
 
-    this->matching_regex = regex(regex_string);
+    this->matching_regex = regex(matching_string);
+}
+
+
+bool Endpoint::operator <(const class Endpoint& rhs) const
+{
+    return matching_string < rhs.matching_string;
 }

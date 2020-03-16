@@ -21,22 +21,30 @@
 #include <map>
 
 
-struct http_request {
-    std::string body;
+struct http_request_parameters {
+public:
+    std::string get(std::string parameter) {
+        auto iter = parameters.find(parameter);
+        return iter->second;
+    }
+
+    void set(std::string parameter, std::string value) {
+        parameters.insert(std::make_pair(parameter, value));
+    }
+
+private:
     std::map<std::string, std::string> parameters;
+};
+
+
+struct http_request {
+    std::string method;
+    std::string body;
+    struct http_request_parameters parameters;
 
     http_request(std::string _body="")
     {
         body = _body;
-    }
-
-    void setParameter(std::string name, std::string value) {
-        parameters.insert(std::make_pair(name, value));
-    }
-
-    std::string getParameter(std::string name) {
-        auto iter = parameters.find(name);
-        return iter->second;
     }
 };
 

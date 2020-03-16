@@ -73,7 +73,7 @@ describe("CPM Hub registers plugins", []() {
         PluginsService service(&repository);
         PluginsApi api(&service);
 
-        request.setParameter("plugin_name", "cest");
+        request.parameters.set("pluginName", "cest");
 
         response = api.downloadPlugin(request);
 
@@ -90,7 +90,7 @@ describe("CPM Hub registers plugins", []() {
 
         api.publishPlugin(publish_request);
 
-        download_request.setParameter("plugin_name", "cest");
+        download_request.parameters.set("pluginName", "cest");
         response = api.downloadPlugin(download_request);
 
         expect(response.status_code).toBe(200);
