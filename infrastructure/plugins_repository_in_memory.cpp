@@ -18,7 +18,7 @@
 #include <infrastructure/plugins_repository_in_memory.h>
 
 
-void PluginsRepositoryInMemory::store(Plugin &plugin)
+void PluginsRepositoryInMemory::add(Plugin &plugin)
 {
     this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
 }

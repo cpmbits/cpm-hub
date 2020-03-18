@@ -32,7 +32,7 @@ Plugin PluginsService::publishPlugin(struct plugin_publication_data publication_
                   publication_data.user_name,
                   publication_data.payload);
 
-    plugins_repository->store(plugin);
+    plugins_repository->add(plugin);
 
     return plugin;
 }

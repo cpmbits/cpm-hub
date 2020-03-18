@@ -45,7 +45,7 @@ describe("Plugins Repository in file system", []() {
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        repository.store(plugin);
+        repository.add(plugin);
 
         Verify(Method(mock_filesystem, createDirectory).Using("./user/cest/1.0"));
         Verify(Method(mock_filesystem, writeFile).Using("./user/cest/1.0/cest.zip", "plugin payload"));
