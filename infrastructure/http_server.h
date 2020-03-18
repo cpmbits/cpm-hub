@@ -27,7 +27,7 @@
 #include <infrastructure/http.h>
 #include <infrastructure/endpoint.h>
 
-typedef std::function<struct http_response(struct http_request)> ServerCallback;
+typedef std::function<struct http_response(struct http_request &)> ServerCallback;
 
 class HttpServer {
 public:

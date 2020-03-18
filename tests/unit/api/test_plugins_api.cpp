@@ -60,6 +60,7 @@ describe("Plugins API", []() {
     });
     
     it("uses the plugin service to list the available plugins", [&]() {
+        struct http_request request("");
         struct http_response response;
         Plugin plugin("cest");
         std::list<Plugin> plugins {plugin};
@@ -68,7 +69,7 @@ describe("Plugins API", []() {
 
         When(Method(mock_service, allPlugins)).Return(plugins);
 
-        response = api.listPlugins(http_request(""));
+        response = api.listPlugins(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
