@@ -28,12 +28,6 @@ using namespace fakeit;
 
 
 describe("Plugins API", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("uses the plugin service to publish a plugin", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","

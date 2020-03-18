@@ -16,29 +16,37 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <cest/cest.h>
+#include <fakeit/fakeit.hpp>
 
 #include <api/users_api.h>
-#include <domain/users_service.h>
-#include <infrastructure/users_repository_in_memory.h>
-#include <infrastructure/http.h>
 
 using namespace cest;
+using namespace fakeit;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
+describe("Users API", []() {
+    it("uses the users service to register a user", []() {
         struct http_request request("{"
             "\"user_name\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
         "}");
         struct http_response response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+        struct user_registration_data registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        UsersApi api(&mock_service.get());
+
+        When(Method(mock_service, registerUser)).AlwaysDo([&](struct user_registration_data &data) {
+            registration_data = data;
+            return user;
+        });
 
         response = api.registerUser(request);
 
         expect(response.status_code).toBe(200);
+        expect(registration_data.user_name).toBe("juancho");
+        expect(registration_data.password).toBe("123456");
+        expect(registration_data.email).toBe("juancho@encho.com");
     });
 });

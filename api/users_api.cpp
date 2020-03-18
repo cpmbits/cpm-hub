@@ -15,9 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <json/json.hpp>
 #include <api/users_api.h>
+
+using namespace nlohmann;
 
 
 UsersApi::UsersApi(UsersService *users_service)
 {
+    this->users_service = users_service;
+}
+
+
+struct http_response UsersApi::registerUser(struct http_request &request)
+{
+    struct http_response response(200, "");
+    auto json = json::parse(request.body);
+    struct user_registration_data registration_data = {
+        json.at("user_name"),
+        json.at("password"),
+        json.at("email"),
+    };
+
+    this->users_service->registerUser(registration_data);
+
+    return response;
 }

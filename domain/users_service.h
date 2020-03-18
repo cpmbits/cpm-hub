@@ -18,9 +18,12 @@
 #pragma once
 
 #include <domain/users_repository.h>
+#include <domain/user_registration_data.h>
 
 
 class UsersService {
 public:
     UsersService(UsersRepository *users_repository);
+
+    virtual User registerUser(user_registration_data &registration_data);
 };

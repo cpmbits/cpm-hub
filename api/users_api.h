@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <infrastructure/http.h>
 #include <domain/users_service.h>
 
 
@@ -24,5 +25,8 @@ class UsersApi {
 public:
     UsersApi(UsersService *users_service);
 
-    void registerUser(UserRegistrationData &data);
+    struct http_response registerUser(struct http_request &request);
+
+private:
+    UsersService *users_service;
 };

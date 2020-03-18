@@ -21,3 +21,9 @@
 UsersService::UsersService(UsersRepository *users_repository)
 {
 }
+
+
+User UsersService::registerUser(user_registration_data &registration_data)
+{
+    return User("");
+}

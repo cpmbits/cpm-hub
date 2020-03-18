@@ -30,9 +30,7 @@ PluginsApi::PluginsApi(PluginsService *plugins_service) {
 
 struct http_response PluginsApi::publishPlugin(struct http_request &request)
 {
-    struct http_response response = {
-        200, ""
-    };
+    struct http_response response(200, "");
     auto json = json::parse(request.body);
     struct plugin_publication_data registration_data = {
         json.at("plugin_name"), 

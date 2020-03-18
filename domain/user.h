@@ -17,7 +17,15 @@
  */
 #pragma once
 
+#include <string>
+
 
 class User {
+public:
+    User(std::string user_name) {
+        this->user_name = user_name;
+    }
 
+private:
+    std::string user_name;
 };
