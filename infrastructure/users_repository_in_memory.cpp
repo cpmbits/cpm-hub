@@ -20,6 +20,10 @@
 
 void UsersRepositoryInMemory::add(User &user)
 {
-
 }
 
+
+ bool UsersRepositoryInMemory::exists(std::string user_name)
+{
+    return false;
+}

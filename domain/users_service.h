@@ -17,6 +17,7 @@
  */
 #pragma once
 
+#include <string.h>
 #include <domain/users_repository.h>
 #include <domain/user_registration_data.h>
 
@@ -26,4 +27,22 @@ public:
     UsersService(UsersRepository *users_repository);
 
     virtual User registerUser(user_registration_data &registration_data);
+
+private:
+    UsersRepository *users_repository;
+};
+
+
+class UsernameAlreadyInUse: public std::exception {
+public:
+    UsernameAlreadyInUse(std::string user_name) throw() {
+        sprintf(message, "username %s already in use", user_name.c_str());
+    }
+
+	const char *what() const throw () {
+    	return message;
+    }
+
+private:
+    char message[256];
 };

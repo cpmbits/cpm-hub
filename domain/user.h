@@ -26,6 +26,5 @@ public:
         this->user_name = user_name;
     }
 
-private:
     std::string user_name;
 };

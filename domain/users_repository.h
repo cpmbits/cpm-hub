@@ -23,4 +23,6 @@
 class UsersRepository {
 public:
     virtual void add(User &user) = 0;
+
+    virtual bool exists(std::string user_name) = 0;
 };

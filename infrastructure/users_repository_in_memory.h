@@ -23,4 +23,6 @@
 class UsersRepositoryInMemory: public UsersRepository {
 public:
     virtual void add(User &user);
+    
+    virtual bool exists(std::string user_name);
 };
