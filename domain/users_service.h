@@ -33,9 +33,9 @@ private:
 };
 
 
-class UsernameAlreadyInUse: public std::exception {
+class UsernameAlreadyTaken: public std::exception {
 public:
-    UsernameAlreadyInUse(std::string user_name) throw() {
+    UsernameAlreadyTaken(std::string user_name) throw() {
         sprintf(message, "username %s already in use", user_name.c_str());
     }
 

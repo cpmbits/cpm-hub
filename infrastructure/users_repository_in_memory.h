@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include <map>
+
 #include <domain/users_repository.h>
 
 
@@ -25,4 +27,9 @@ public:
     virtual void add(User &user);
     
     virtual bool exists(std::string user_name);
+
+    virtual Optional<User> find(std::string user_name);
+
+private:
+    std::map<std::string, User> users;
 };

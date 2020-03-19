@@ -18,6 +18,7 @@
 #pragma once
 
 #include <domain/user.h>
+#include <domain/optional.h>
 
 
 class UsersRepository {
@@ -25,4 +26,6 @@ public:
     virtual void add(User &user) = 0;
 
     virtual bool exists(std::string user_name) = 0;
+
+    virtual Optional<User> find(std::string user_name) = 0;
 };

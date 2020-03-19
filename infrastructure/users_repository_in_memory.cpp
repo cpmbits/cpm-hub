@@ -20,10 +20,26 @@
 
 void UsersRepositoryInMemory::add(User &user)
 {
+    this->users.insert(std::make_pair(user.name, user));
 }
 
 
- bool UsersRepositoryInMemory::exists(std::string user_name)
+bool UsersRepositoryInMemory::exists(std::string user_name)
 {
-    return false;
+    return this->users.find(user_name) != this->users.end();
+}
+
+
+Optional<User> UsersRepositoryInMemory::find(std::string user_name)
+{
+    auto iter = this->users.find(user_name);
+    Optional<User> user;
+
+    if (iter == this->users.end()) {
+        return user;
+    }
+
+    user = iter->second;
+    
+    return user;
 }

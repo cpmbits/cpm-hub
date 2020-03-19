@@ -22,9 +22,12 @@
 
 class User {
 public:
-    User(std::string user_name) {
-        this->user_name = user_name;
+    User(): User("") {    
     }
 
-    std::string user_name;
+    User(std::string user_name) {
+        this->name = user_name;
+    }
+
+    std::string name;
 };

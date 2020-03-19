@@ -29,7 +29,7 @@ User UsersService::registerUser(user_registration_data &registration_data)
     User user(registration_data.user_name);
 
     if (this->users_repository->exists(registration_data.user_name)) {
-        throw UsernameAlreadyInUse(registration_data.user_name);
+        throw UsernameAlreadyTaken(registration_data.user_name);
     }
 
     this->users_repository->add(user);

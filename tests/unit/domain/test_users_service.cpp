@@ -42,7 +42,7 @@ describe("Users Service", []() {
         users_service.registerUser(registration_data);
 
         Verify(Method(mock_repository, add));
-        expect(stored_user.user_name).toBe("sotano");
+        expect(stored_user.name).toBe("sotano");
     });
 
     it("throws an exception when registering a user whose user name is taken", [&]() {
@@ -58,7 +58,7 @@ describe("Users Service", []() {
         try {
             users_service.registerUser(registration_data);
             expect(true).toBe(false);
-        } catch(UsernameAlreadyInUse error) {
+        } catch(UsernameAlreadyTaken error) {
         }
     });
 });
