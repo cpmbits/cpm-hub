@@ -26,26 +26,37 @@ using namespace boost::program_options;
 
 static HttpServer http_server;
 static std::string plugins_directory = ".";
+static int http_server_port = 8000;
+
+
+static void parseCommandLineArgs(int argc, char *argv[])
+{
+    options_description cmdline_options("CPM Hub options");
+    variables_map args;
+
+    cmdline_options.add_options()
+            ("plugins-directory,d", value<std::string>(), "plugins directory repository location")
+            ("port,p", value<int>(), "HTTP server port");
+
+    store(parse_command_line(argc, argv, cmdline_options), args);
+    notify(args);
+
+    if (args.count("plugins-directory")) {
+        plugins_directory = args["plugins-directory"].as<std::string>();
+    }
+    if (args.count("port")) {
+        http_server_port = args["port"].as<int>();
+    }
+}
 
 
 int main(int argc, char *argv[])
 {
-    options_description cmdline_options("CPM Hub options");
-    variables_map variables_map;
-
-    cmdline_options.add_options()
-        ("plugins-directory,p", value<std::string>(), "plugins directory repository location");
-
-    store(parse_command_line(argc, argv, cmdline_options), variables_map);
-    notify(variables_map);
-
-    if (variables_map.count("plugins-directory")) {
-        plugins_directory = variables_map["plugins-directory"].as<std::string>();
-    }
+    parseCommandLineArgs(argc, argv);
 
     installRoutes(http_server, plugins_directory);
 
-    http_server.start(8000);
+    http_server.start(http_server_port);
 
     sleep(50);
 
