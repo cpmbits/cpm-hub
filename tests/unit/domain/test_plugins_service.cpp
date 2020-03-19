@@ -34,11 +34,11 @@ describe("Plugins Service", []() {
             "cest", "1.0", "john_doe", "ABCDEedcba"
         };
 
-        When(Method(mock_repository, store)).AlwaysReturn();
+        When(Method(mock_repository, add)).AlwaysReturn();
 
         plugins_service.publishPlugin(publication_data);
 
-        Verify(Method(mock_repository, store));
+        Verify(Method(mock_repository, add));
     });
 
     it("returns all available plugins", [&]() {

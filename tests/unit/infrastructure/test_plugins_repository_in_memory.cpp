@@ -27,7 +27,7 @@ describe("Plugins Repository in Memory", []() {
         PluginsRepositoryInMemory repository;
         Plugin plugin("cest");
 
-        repository.store(plugin);
+        repository.add(plugin);
     });
 
     it("lists stored plugins", [&]() {
@@ -35,7 +35,7 @@ describe("Plugins Repository in Memory", []() {
         Plugin plugin("cest");
         std::list<Plugin> stored_plugins;
 
-        repository.store(plugin);
+        repository.add(plugin);
 
         stored_plugins = repository.allPlugins();
 
@@ -56,7 +56,7 @@ describe("Plugins Repository in Memory", []() {
         Plugin plugin("cest");
         Optional<Plugin> stored_plugin;
 
-        repository.store(plugin);
+        repository.add(plugin);
 
         stored_plugin = repository.find("cest");
 
@@ -68,8 +68,8 @@ describe("Plugins Repository in Memory", []() {
         Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
         Optional<Plugin> stored_plugin;
 
-        repository.store(cest_plugin);
-        repository.store(fakeit_plugin);
+        repository.add(cest_plugin);
+        repository.add(fakeit_plugin);
 
         stored_plugin = repository.find("fakeit");
 

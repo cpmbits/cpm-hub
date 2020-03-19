@@ -15,21 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <json/json.hpp>
+#include <api/users_api.h>
 
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+using namespace nlohmann;
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
-public:
-    virtual void add(Plugin &plugin);
+UsersApi::UsersApi(UsersService *users_service)
+{
+    this->users_service = users_service;
+}
 
-    virtual Optional<Plugin> find(std::string name);
 
-    virtual std::list<Plugin> allPlugins();
+struct http_response UsersApi::registerUser(struct http_request &request)
+{
+    struct http_response response(200, "");
+    auto json = json::parse(request.body);
+    struct user_registration_data registration_data = {
+        json.at("user_name"),
+        json.at("password"),
+        json.at("email"),
+    };
 
-private:
-    std::map<std::string, Plugin> plugins;
-};
+    this->users_service->registerUser(registration_data);
+
+    return response;
+}

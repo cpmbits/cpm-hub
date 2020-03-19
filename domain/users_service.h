@@ -17,19 +17,32 @@
  */
 #pragma once
 
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+#include <string.h>
+#include <domain/users_repository.h>
+#include <domain/user_registration_data.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
+class UsersService {
 public:
-    virtual void add(Plugin &plugin);
+    UsersService(UsersRepository *users_repository);
 
-    virtual Optional<Plugin> find(std::string name);
-
-    virtual std::list<Plugin> allPlugins();
+    virtual User registerUser(user_registration_data &registration_data);
 
 private:
-    std::map<std::string, Plugin> plugins;
+    UsersRepository *users_repository;
+};
+
+
+class UsernameAlreadyTaken: public std::exception {
+public:
+    UsernameAlreadyTaken(std::string user_name) throw() {
+        sprintf(message, "username %s already in use", user_name.c_str());
+    }
+
+	const char *what() const throw () {
+    	return message;
+    }
+
+private:
+    char message[256];
 };

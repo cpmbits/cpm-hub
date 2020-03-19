@@ -15,21 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+#include <infrastructure/users_repository_in_memory.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
-public:
-    virtual void add(Plugin &plugin);
+void UsersRepositoryInMemory::add(User &user)
+{
+    this->users.insert(std::make_pair(user.name, user));
+}
 
-    virtual Optional<Plugin> find(std::string name);
 
-    virtual std::list<Plugin> allPlugins();
+bool UsersRepositoryInMemory::exists(std::string user_name)
+{
+    return this->users.find(user_name) != this->users.end();
+}
 
-private:
-    std::map<std::string, Plugin> plugins;
-};
+
+Optional<User> UsersRepositoryInMemory::find(std::string user_name)
+{
+    auto iter = this->users.find(user_name);
+    Optional<User> user;
+
+    if (iter == this->users.end()) {
+        return user;
+    }
+
+    user = iter->second;
+    
+    return user;
+}

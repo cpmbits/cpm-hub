@@ -45,7 +45,7 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 }
 
 
-void PluginsRepositoryInFilesystem::store(Plugin &plugin)
+void PluginsRepositoryInFilesystem::add(Plugin &plugin)
 {
     string plugin_directory = this->directory + "/" + plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;
 

@@ -17,19 +17,14 @@
  */
 #pragma once
 
-#include <map>
 #include <string>
-#include <domain/plugins_repository.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
-public:
-    virtual void add(Plugin &plugin);
+#define kMAX_PASSWORD_LENGTH    64
 
-    virtual Optional<Plugin> find(std::string name);
 
-    virtual std::list<Plugin> allPlugins();
-
-private:
-    std::map<std::string, Plugin> plugins;
+struct user_registration_data {
+    std::string user_name;
+    std::string password;
+    std::string email;
 };

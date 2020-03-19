@@ -15,21 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+#include <domain/users_service.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
-public:
-    virtual void add(Plugin &plugin);
+UsersService::UsersService(UsersRepository *users_repository)
+{
+    this->users_repository = users_repository;
+}
 
-    virtual Optional<Plugin> find(std::string name);
 
-    virtual std::list<Plugin> allPlugins();
+User UsersService::registerUser(user_registration_data &registration_data)
+{
+    User user(registration_data.user_name);
 
-private:
-    std::map<std::string, Plugin> plugins;
-};
+    if (this->users_repository->exists(registration_data.user_name)) {
+        throw UsernameAlreadyTaken(registration_data.user_name);
+    }
+
+    this->users_repository->add(user);
+
+    return user;
+}

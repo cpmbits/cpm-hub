@@ -17,19 +17,16 @@
  */
 #pragma once
 
-#include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+#include <infrastructure/http.h>
+#include <domain/users_service.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
+class UsersApi {
 public:
-    virtual void add(Plugin &plugin);
+    UsersApi(UsersService *users_service);
 
-    virtual Optional<Plugin> find(std::string name);
-
-    virtual std::list<Plugin> allPlugins();
+    struct http_response registerUser(struct http_request &request);
 
 private:
-    std::map<std::string, Plugin> plugins;
+    UsersService *users_service;
 };

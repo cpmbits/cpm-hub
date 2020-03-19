@@ -18,18 +18,18 @@
 #pragma once
 
 #include <map>
-#include <string>
-#include <domain/plugins_repository.h>
+
+#include <domain/users_repository.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
+class UsersRepositoryInMemory: public UsersRepository {
 public:
-    virtual void add(Plugin &plugin);
+    virtual void add(User &user);
+    
+    virtual bool exists(std::string user_name);
 
-    virtual Optional<Plugin> find(std::string name);
-
-    virtual std::list<Plugin> allPlugins();
+    virtual Optional<User> find(std::string user_name);
 
 private:
-    std::map<std::string, Plugin> plugins;
+    std::map<std::string, User> users;
 };

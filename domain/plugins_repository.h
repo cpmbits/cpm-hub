@@ -26,7 +26,7 @@
 
 class PluginsRepository {
 public:
-    virtual void store(Plugin &plugin) = 0;
+    virtual void add(Plugin &plugin) = 0;
 
     virtual Optional<Plugin> find(std::string name) = 0;
 

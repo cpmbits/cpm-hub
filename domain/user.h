@@ -17,19 +17,17 @@
  */
 #pragma once
 
-#include <map>
 #include <string>
-#include <domain/plugins_repository.h>
 
 
-class PluginsRepositoryInMemory: public PluginsRepository {
+class User {
 public:
-    virtual void add(Plugin &plugin);
+    User(): User("") {    
+    }
 
-    virtual Optional<Plugin> find(std::string name);
+    User(std::string user_name) {
+        this->name = user_name;
+    }
 
-    virtual std::list<Plugin> allPlugins();
-
-private:
-    std::map<std::string, Plugin> plugins;
+    std::string name;
 };

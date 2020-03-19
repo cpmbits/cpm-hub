@@ -23,13 +23,7 @@
 using namespace cest;
 
 
-describe("CPM Hub registers plugins", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
+describe("CPM Hub plugins management", []() {
     it("registers a plugin", [&]() {
         struct http_request request("{"
             "\"plugin_name\": \"cest\","
