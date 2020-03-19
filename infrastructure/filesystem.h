@@ -26,4 +26,6 @@ public:
     virtual std::string readFile(std::string file_name);
 
     virtual void createDirectory(std::string path);
+
+    virtual bool fileExists(std::string file_name);
 };

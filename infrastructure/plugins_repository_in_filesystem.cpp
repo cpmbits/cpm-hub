@@ -48,12 +48,13 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 
 void PluginsRepositoryInFilesystem::add(Plugin &plugin)
 {
-    string plugin_directory = this->directory + "/" + plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;
+    string relative_directory = plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;
+    string plugin_directory = this->directory + "/" + relative_directory;
 
     this->filesystem->createDirectory(plugin_directory);
     this->savePayload(plugin.metadata.name, plugin_directory, plugin.payload);
     this->saveMetadata(plugin.metadata.name, plugin_directory, plugin.metadata);
-    this->index->indexPlugin(plugin.metadata.name, plugin_directory);
+    this->index->indexPlugin(plugin.metadata.name, relative_directory);
     this->filesystem->writeFile(this->index_file, this->index->serialize());
 }
 
@@ -81,12 +82,13 @@ void PluginsRepositoryInFilesystem::saveMetadata(string name, string plugin_dire
 Optional<Plugin> PluginsRepositoryInFilesystem::find(string name)
 {
     Optional<Plugin> plugin;
-    Optional<string> directory;
+    Optional<string> relative_directory;
 
-    directory = this->index->find(name);
-    if (directory.isPresent()) {
-        PluginMetadata metadata = this->loadMetadata(name, directory.value());
-        string payload = this->loadPayload(name, directory.value());
+    relative_directory = this->index->find(name);
+    if (relative_directory.isPresent()) {
+        string directory = this->directory + "/" + relative_directory.value();
+        PluginMetadata metadata = this->loadMetadata(name, directory);
+        string payload = this->loadPayload(name, directory);
         plugin = Plugin(name, metadata.version, metadata.user_name, payload);
     }
 
@@ -122,5 +124,8 @@ void PluginsRepositoryInFilesystem::restore(string directory)
 {
     this->directory = directory;
     this->index_file = this->directory + "/index.json";
-    this->index->restore(this->filesystem->readFile(this->index_file));
+
+    if (this->filesystem->fileExists(this->index_file)) {
+        this->index->restore(this->filesystem->readFile(this->index_file));
+    }
 }

@@ -422,11 +422,12 @@ namespace cest
                 ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
                 std::endl;
         } else {
-            std::cout <<
-                ASCII_BACKGROUND_GREEN << ASCII_BLACK << ASCII_BOLD << " PASS " << ASCII_RESET <<
-                ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
-                ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
-                std::endl;
+            std::cout << ASCII_BOLD << ASCII_GREEN << ".";
+            //std::cout <<
+            //    ASCII_BACKGROUND_GREEN << ASCII_BLACK << ASCII_BOLD << " PASS " << ASCII_RESET <<
+            //    ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
+            //    ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
+            //    std::endl;
         }
 
         std::cout << assertion_failures.str();
@@ -477,6 +478,8 @@ int main(void)
     test_suite.test_suite_name = test_suite_name;
     test_suite.test_cases = test_cases;
 
+    std::cout << ASCII_RESET << ASCII_BOLD << test_suite.test_suite_name << " ";
+
     for (TestCase *test_case : test_cases) {
         current_test_failed = false;
         current_test_case = test_case;
@@ -501,6 +504,8 @@ int main(void)
 
         printTestResult(test_case);
     }
+
+    std::cout << std::endl;
 
     return_code = anyTestFailed();
 
