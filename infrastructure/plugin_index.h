@@ -39,7 +39,7 @@ public:
 
     virtual std::string serialize();
 
-    virtual void load(std::string serialized);
+    virtual void restore(std::string serialized);
 
 private:
     Filesystem *filesystem;

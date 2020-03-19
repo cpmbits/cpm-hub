@@ -36,4 +36,5 @@ void installRoutes(HttpServer& http_server)
     http_server.get("/plugins/:pluginName", [&](struct http_request &request) -> struct http_response {
         return plugins_api.downloadPlugin(request);
     });
+    plugins_repository.restore(".");
 }

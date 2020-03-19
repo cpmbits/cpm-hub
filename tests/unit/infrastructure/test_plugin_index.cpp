@@ -80,7 +80,7 @@ describe("Plugins Repository in file system", []() {
             "\"fakeit\":\"user/fakeit/3.1\""
         "}");
 
-        plugin_index.load(serialized);
+        plugin_index.restore(serialized);
 
         expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
         expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");

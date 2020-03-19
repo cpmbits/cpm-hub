@@ -60,7 +60,7 @@ string PluginIndex::serialize()
 }
 
 
-void PluginIndex::load(std::string serialized)
+void PluginIndex::restore(std::string serialized)
 {
     auto json = json::parse(serialized);
 

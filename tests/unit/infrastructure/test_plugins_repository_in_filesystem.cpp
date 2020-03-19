@@ -45,6 +45,10 @@ describe("Plugins Repository in file system", []() {
             "./user/cest/1.0/cest.json", 
             "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
         ));
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./index.json",
+            "{\"cest\":\"./user/cest/1.0\"}"
+        ));
     });
 
     it("doesn't find a non existent plugin", []() {
@@ -76,6 +80,27 @@ describe("Plugins Repository in file system", []() {
         } catch(std::exception e) {
             cout << e.what() << endl;
         }
+
+        expect(plugin.value().metadata.name).toBe("cest");
+        expect(plugin.value().metadata.version).toBe("1.0");
+        expect(plugin.value().metadata.user_name).toBe("user");
+        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+    });
+
+    it("finds an indexed plugin after index was restored from filesystem", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        Optional<Plugin> plugin;
+        Optional<string> directory;
+
+        When(Method(mock_filesystem, readFile))
+                .Return("{\"cest\":\"./user/cest/1.0\"}")
+                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
+                .Return("plugin payload");
+
+        repository.restore(".");
+        plugin = repository.find("cest");
 
         expect(plugin.value().metadata.name).toBe("cest");
         expect(plugin.value().metadata.version).toBe("1.0");
