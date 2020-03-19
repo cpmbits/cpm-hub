@@ -26,7 +26,7 @@
 
 class PluginsRepositoryInFilesystem: public PluginsRepository {
 public:
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string directory);
+    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index);
 
     virtual void add(Plugin &plugin);
 

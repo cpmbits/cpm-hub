@@ -37,10 +37,10 @@ static string payloadFileName(string name, string directory)
 }
 
 
-PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, string directory)
+PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index)
 {
     this->filesystem = filesystem;
-    this->directory = directory;
+    this->directory = ".";
     this->index = index;
     this->index_file = this->directory + "/index.json";
 }

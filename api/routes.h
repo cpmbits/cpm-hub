@@ -20,4 +20,4 @@
 #include <infrastructure/http_server.h>
 
 
-void installRoutes(HttpServer& http_server);
+void installRoutes(HttpServer& http_server, std::string plugins_directory);

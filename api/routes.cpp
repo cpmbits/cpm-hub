@@ -23,12 +23,12 @@
 
 static Filesystem filesystem;
 static PluginIndex plugin_index;
-static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_index, ".");
+static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_index);
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);
 
 
-void installRoutes(HttpServer& http_server)
+void installRoutes(HttpServer& http_server, std::string plugins_directory)
 {
     http_server.post("/plugins", [&](struct http_request &request) -> struct http_response {
         return plugins_api.publishPlugin(request);
@@ -36,5 +36,5 @@ void installRoutes(HttpServer& http_server)
     http_server.get("/plugins/:pluginName", [&](struct http_request &request) -> struct http_response {
         return plugins_api.downloadPlugin(request);
     });
-    plugins_repository.restore(".");
+    plugins_repository.restore(plugins_directory);
 }
