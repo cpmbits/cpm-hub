@@ -17,6 +17,7 @@
  */
 #include <infrastructure/http_client.h>
 
+
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 

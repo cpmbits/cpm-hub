@@ -71,4 +71,18 @@ describe("Plugins Repository in file system", []() {
         expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
         expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
     });
+
+    if("loads the index from serialized dump", []() {
+        PluginIndex plugin_index;
+        string serialized(
+        "{"
+            "\"cest\":\"user/cest/1.0\","
+            "\"fakeit\":\"user/fakeit/3.1\""
+        "}");
+
+        plugin_index.load(serialized);
+
+        expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
+        expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
+    });
 });

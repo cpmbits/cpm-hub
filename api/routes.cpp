@@ -21,8 +21,8 @@
 #include <api/plugins_api.h>
 
 
-static PluginIndex plugin_index;
 static Filesystem filesystem;
+static PluginIndex plugin_index;
 static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_index, ".");
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);

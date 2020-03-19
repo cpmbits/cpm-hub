@@ -28,14 +28,6 @@ using namespace fakeit;
 
 
 describe("Plugins Repository in file system", []() {
-    
-
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("stores and indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;
