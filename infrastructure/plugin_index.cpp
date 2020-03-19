@@ -58,3 +58,13 @@ string PluginIndex::serialize()
 
     return json_index.dump();
 }
+
+
+void PluginIndex::restore(std::string serialized)
+{
+    auto json = json::parse(serialized);
+
+    for (auto& element: json.items()) {
+        this->indexPlugin(element.key(), element.value());
+    }
+}

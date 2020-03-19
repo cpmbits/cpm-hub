@@ -34,8 +34,11 @@ public:
 
     virtual std::list<Plugin> allPlugins();
 
+    void restore(std::string directory);
+
 private:
     std::string directory;
+    std::string index_file;
     Filesystem *filesystem;
     PluginIndex *index;
 

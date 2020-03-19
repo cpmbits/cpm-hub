@@ -42,6 +42,7 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
     this->filesystem = filesystem;
     this->directory = directory;
     this->index = index;
+    this->index_file = this->directory + "/index.json";
 }
 
 
@@ -53,6 +54,7 @@ void PluginsRepositoryInFilesystem::add(Plugin &plugin)
     this->savePayload(plugin.metadata.name, plugin_directory, plugin.payload);
     this->saveMetadata(plugin.metadata.name, plugin_directory, plugin.metadata);
     this->index->indexPlugin(plugin.metadata.name, plugin_directory);
+    this->filesystem->writeFile(this->index_file, this->index->serialize());
 }
 
 
@@ -113,4 +115,12 @@ list<Plugin> PluginsRepositoryInFilesystem::allPlugins()
 {
     list<Plugin> plugins;
     return plugins;
+}
+
+
+void PluginsRepositoryInFilesystem::restore(string directory)
+{
+    this->directory = directory;
+    this->index_file = this->directory + "/index.json";
+    this->index->restore(this->filesystem->readFile(this->index_file));
 }

@@ -39,6 +39,8 @@ public:
 
     virtual std::string serialize();
 
+    virtual void restore(std::string serialized);
+
 private:
     Filesystem *filesystem;
     std::string directory;
