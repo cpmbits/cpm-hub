@@ -15,13 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
+#include <string>
+#include <boost/program_options.hpp>
+
 #include <api/routes.h>
 
-static HttpServer http_server;
+using namespace boost::program_options;
 
-int main()
+
+static HttpServer http_server;
+static std::string plugins_directory = ".";
+
+
+int main(int argc, char *argv[])
 {
-    installRoutes(http_server);
+    options_description cmdline_options("CPM Hub options");
+    variables_map variables_map;
+
+    cmdline_options.add_options()
+        ("plugins-directory,p", value<std::string>(), "plugins directory repository location");
+
+    store(parse_command_line(argc, argv, cmdline_options), variables_map);
+    notify(variables_map);
+
+    if (variables_map.count("plugins-directory")) {
+        plugins_directory = variables_map["plugins-directory"].as<std::string>();
+    }
+
+    installRoutes(http_server, plugins_directory);
 
     http_server.start(8000);
 

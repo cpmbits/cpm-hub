@@ -31,7 +31,7 @@ describe("Plugins Repository in file system", []() {
     it("stores and indexes one plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
         Plugin plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
@@ -47,14 +47,14 @@ describe("Plugins Repository in file system", []() {
         ));
         Verify(Method(mock_filesystem, writeFile).Using(
             "./index.json",
-            "{\"cest\":\"./user/cest/1.0\"}"
+            "{\"cest\":\"user/cest/1.0\"}"
         ));
     });
 
     it("doesn't find a non existent plugin", []() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
         Optional<Plugin> plugin;
 
         plugin = repository.find("cest");
@@ -65,7 +65,7 @@ describe("Plugins Repository in file system", []() {
     it("finds an indexed plugin", [&]() {
         Mock<Filesystem> mock_filesystem;
         Mock<PluginIndex> mock_plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get(), ".");
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get());
         Optional<Plugin> plugin;
         Optional<string> directory;
 
@@ -87,15 +87,28 @@ describe("Plugins Repository in file system", []() {
         expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
-    it("finds an indexed plugin after index was restored from filesystem", [&]() {
+    it("doesn't restore index when repository doesn't have an index file", [&]() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index, ".");
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
         Optional<Plugin> plugin;
         Optional<string> directory;
 
+        When(Method(mock_filesystem, fileExists)).Return(false);
+
+        repository.restore(".");
+    });
+
+    it("finds an indexed plugin after index was restored from filesystem", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
+        Optional<Plugin> plugin;
+        Optional<string> directory;
+
+        When(Method(mock_filesystem, fileExists)).Return(true);
         When(Method(mock_filesystem, readFile))
-                .Return("{\"cest\":\"./user/cest/1.0\"}")
+                .Return("{\"cest\":\"user/cest/1.0\"}")
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
                 .Return("plugin payload");
 

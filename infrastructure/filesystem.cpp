@@ -48,3 +48,9 @@ void Filesystem::createDirectory(std::string path)
 {
     boost::filesystem::create_directories(path);
 }
+
+
+bool Filesystem::fileExists(std::string path)
+{
+    return boost::filesystem::exists(path);
+}
