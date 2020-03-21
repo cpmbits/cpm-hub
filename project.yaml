@@ -1,4 +1,4 @@
-project_name: cpm-hub
+name: cpm-hub
 description: CPM Hub open source server for hosting CPM software
 packages:
     api:

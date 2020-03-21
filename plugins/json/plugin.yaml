@@ -1,4 +1,4 @@
-plugin_name: json
+name: json
 description: nlohmann JSON for modern C++
 version: "3.7.3"
 packages:
