@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iostream>
-#include <sstream>
 
 #include <infrastructure/http_server.h>
 
@@ -25,21 +24,27 @@ using namespace std;
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
-void HttpServer::start(int port)
+void HttpServer::startAsync(string address, int port)
+{
+    createConnection(address, port);
+
+    this->server_thread = new thread(&HttpServer::serve, this);
+}
+
+
+void HttpServer::createConnection(const string &address, int port)
 {
     ostringstream string_stream;
 
-    string_stream << "127.0.0.1:" << port;
+    string_stream << address << ":" << port;
 
     cout << "Started server on " << string_stream.str() << endl;
 
-    this->port = port;
-    this->running = true;
+    HttpServer::port = port;
+    running = true;
     mg_mgr_init(&mgr, this);
     connection = mg_bind(&mgr, string_stream.str().c_str(), eventHandler);
     mg_set_protocol_http_websocket(connection);
-
-    this->server_thread = new thread(&HttpServer::serve, this);
 }
 
 
@@ -56,6 +61,13 @@ void HttpServer::serve()
     while (this->running) {
         mg_mgr_poll(&mgr, 100);
     }
+}
+
+
+void HttpServer::start(std::string address, int port)
+{
+    createConnection(address, port);
+    serve();
 }
 
 

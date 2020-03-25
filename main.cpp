@@ -24,9 +24,11 @@
 using namespace boost::program_options;
 
 
-static HttpServer http_server;
+static HttpServer service_http_server;
+static int http_service_port = 8000;
+static HttpServer management_http_server;
+static int http_management_port = 8001;
 static std::string plugins_directory = ".";
-static int http_server_port = 8000;
 
 
 static void parseCommandLineArgs(int argc, char *argv[])
@@ -35,18 +37,14 @@ static void parseCommandLineArgs(int argc, char *argv[])
     variables_map args;
 
     cmdline_options.add_options()
-            ("plugins-directory,d", value<std::string>(), "plugins directory repository location")
-            ("port,p", value<int>(), "HTTP server port");
+            ("plugins-directory,d", value<std::string>()->default_value("."), "plugins directory repository location")
+            ("port,p", value<int>()->default_value(8000), "HTTP service port");
 
     store(parse_command_line(argc, argv, cmdline_options), args);
     notify(args);
 
-    if (args.count("plugins-directory")) {
-        plugins_directory = args["plugins-directory"].as<std::string>();
-    }
-    if (args.count("port")) {
-        http_server_port = args["port"].as<int>();
-    }
+    plugins_directory = args["plugins-directory"].as<std::string>();
+    http_service_port = args["port"].as<int>();
 }
 
 
@@ -54,11 +52,11 @@ int main(int argc, char *argv[])
 {
     parseCommandLineArgs(argc, argv);
 
-    installRoutes(http_server, plugins_directory);
+    installRoutes(service_http_server, plugins_directory);
 
-    http_server.start(http_server_port);
+    service_http_server.startAsync("0.0.0.0", http_service_port);
 
-    sleep(50);
+    management_http_server.start("0.0.0.0", http_management_port);
 
     return 0;
 }

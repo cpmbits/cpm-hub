@@ -36,7 +36,8 @@ public:
     void get(std::string path, ServerCallback callback);
     void post(std::string path, ServerCallback callback);
     void put(std::string path, ServerCallback callback);
-    void start(int port);
+    void startAsync(std::string address, int port);
+    void start(std::string address, int port);
     void stop();
     void serveRequest(struct mg_connection *connection, struct http_message *message);
 
@@ -52,4 +53,6 @@ private:
 
     void serve();
     ServerCallback parseRequest(struct http_message *message, struct http_request &request);
+
+    void createConnection(const std::string &address, int port);
 };
