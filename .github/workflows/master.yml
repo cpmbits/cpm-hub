@@ -30,4 +30,4 @@ jobs:
       - name: Deploy
         if: success()
         run: |
-          echo "Deploy!"
+          ./scripts/deploy.py -k ${{ secrets.deploy_key }} cpm-hub ${{ secrets.deploy_url }}
