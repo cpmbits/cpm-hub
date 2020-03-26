@@ -28,6 +28,3 @@ jobs:
       - name: Build
         run: |
           cpm build
-      - name: Deploy
-        run: |
-          echo "Deploy!"
