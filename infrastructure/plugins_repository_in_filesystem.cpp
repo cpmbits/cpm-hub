@@ -25,13 +25,13 @@ using namespace std;
 using namespace nlohmann;
 
 
-static string metadataFileName(string name, string directory)
+static string metadataFileName(const string& name, const string& directory)
 {
     return directory + "/" + name + ".json";
 }
 
 
-static string payloadFileName(string name, string directory)
+static string payloadFileName(const string& name, const string& directory)
 {
     return directory + "/" + name + ".zip";
 }
@@ -59,7 +59,7 @@ void PluginsRepositoryInFilesystem::add(Plugin &plugin)
 }
 
 
-void PluginsRepositoryInFilesystem::savePayload(string name, string plugin_directory, string base64_payload)
+void PluginsRepositoryInFilesystem::savePayload(const string& name, const string& plugin_directory, const string& base64_payload)
 {
     string payload_file_path = payloadFileName(name, plugin_directory);
     string binary_payload = base64_decode(base64_payload);
@@ -67,7 +67,7 @@ void PluginsRepositoryInFilesystem::savePayload(string name, string plugin_direc
 }
 
 
-void PluginsRepositoryInFilesystem::saveMetadata(string name, string plugin_directory, PluginMetadata metadata)
+void PluginsRepositoryInFilesystem::saveMetadata(const string& name, const string& plugin_directory, PluginMetadata metadata)
 {
     string metadata_file_path = metadataFileName(name, plugin_directory);
     json metadata_json = {
@@ -104,7 +104,7 @@ string PluginsRepositoryInFilesystem::loadPayload(string name, string plugin_dir
 }
 
 
-PluginMetadata PluginsRepositoryInFilesystem::loadMetadata(string name, string plugin_directory)
+PluginMetadata PluginsRepositoryInFilesystem::loadMetadata(const string& name, string plugin_directory)
 {
     string metadata_file_path = metadataFileName(name, plugin_directory);
     string metadata = this->filesystem->readFile(metadata_file_path);

@@ -31,8 +31,8 @@ typedef std::function<struct http_response(struct http_request &)> ServerCallbac
 
 class HttpServer {
 public:
-    struct mg_serve_http_opts options;
-
+    HttpServer();
+    void configureSecurity(struct HttpSecurityOptions &options);
     void get(std::string path, ServerCallback callback);
     void post(std::string path, ServerCallback callback);
     void put(std::string path, ServerCallback callback);
@@ -50,8 +50,10 @@ private:
     std::map<Endpoint, ServerCallback> gets;
     std::map<Endpoint, ServerCallback> posts;
     std::map<Endpoint, ServerCallback> puts;
+    struct HttpSecurityOptions security_options;
 
     void serve();
+
     ServerCallback parseRequest(struct http_message *message, struct http_request &request);
 
     void createConnection(const std::string &address, int port);

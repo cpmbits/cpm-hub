@@ -24,6 +24,12 @@ using namespace std;
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
+HttpServer::HttpServer()
+{
+    security_options.security_enabled = false;
+}
+
+
 void HttpServer::startAsync(string address, int port)
 {
     createConnection(address, port);
@@ -138,6 +144,11 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     mg_printf(connection, "%s", response.body.c_str());
 
     cout << string(message->method.p, message->method.len) << " " << string(message->uri.p, message->uri.len) << ": " << response.status_code << endl;
+}
+
+void HttpServer::configureSecurity(struct HttpSecurityOptions &options)
+{
+    this->security_options = options;
 }
 
 

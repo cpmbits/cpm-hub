@@ -37,6 +37,13 @@ private:
 };
 
 
+struct HttpSecurityOptions {
+    bool security_enabled;
+    std::string certificate_file;
+    std::string key_file;
+};
+
+
 struct http_request {
     std::string method;
     std::string body;
