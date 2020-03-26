@@ -27,6 +27,11 @@ jobs:
       - name: Build
         run: |
           cpm build
+      - uses: actions/upload-artifact@v1
+        with:
+          name: cpm-hub
+          path: cpm-hub
+
       - name: Deploy
         if: success()
         run: |
