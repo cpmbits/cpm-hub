@@ -41,16 +41,37 @@ void HttpServer::startAsync(string address, int port)
 void HttpServer::createConnection(const string &address, int port)
 {
     ostringstream string_stream;
+    mg_bind_opts bind_opts = configureBindOpts();
 
     string_stream << address << ":" << port;
-
-    cout << "Started server on " << string_stream.str() << endl;
 
     HttpServer::port = port;
     running = true;
     mg_mgr_init(&mgr, this);
-    connection = mg_bind(&mgr, string_stream.str().c_str(), eventHandler);
+
+    connection = mg_bind_opt(&mgr, string_stream.str().c_str(), eventHandler, bind_opts);
+
+    if (security_options.security_enabled) {
+        cout << "Started server on https://" << string_stream.str() << endl;
+    } else {
+        cout << "Started server on http://" << string_stream.str() << endl;
+    }
+
     mg_set_protocol_http_websocket(connection);
+}
+
+
+mg_bind_opts HttpServer::configureBindOpts() const
+{
+    struct mg_bind_opts bind_opts;
+
+    memset(&bind_opts, 0, sizeof(bind_opts));
+    if (security_options.security_enabled) {
+        bind_opts.ssl_cert = security_options.certificate_file.c_str();
+        bind_opts.ssl_key = security_options.key_file.c_str();
+    }
+
+    return bind_opts;
 }
 
 

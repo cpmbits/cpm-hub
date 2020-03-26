@@ -36,14 +36,14 @@ struct ProgramOptions {
 static ProgramOptions parseIniFile(string &ini_file)
 {
     ProgramOptions program_options;
-    INIReader init_reader(ini_file);
+    INIReader ini_reader(ini_file);
 
-    program_options.plugins_directory = init_reader.Get("Service", "plugins_directory", ".");
-    program_options.http_service_port = init_reader.GetInteger("Service", "port", 8000);
-    program_options.http_management_port = init_reader.GetInteger("Management", "port", 8001);
-    program_options.management_server_security_options.security_enabled = init_reader.GetBoolean("Management", "security_enabled", true);
-    program_options.management_server_security_options.certificate_file = init_reader.Get("Management", "certificate_file", "certificate.pem");
-    program_options.management_server_security_options.key_file = init_reader.Get("Management", "certificate_file", "key.pem");
+    program_options.plugins_directory = ini_reader.Get("Service", "plugins_directory", ".");
+    program_options.http_service_port = ini_reader.GetInteger("Service", "port", 8000);
+    program_options.http_management_port = ini_reader.GetInteger("Management", "port", 8001);
+    program_options.management_server_security_options.security_enabled = ini_reader.GetBoolean("Management", "security_enabled", true);
+    program_options.management_server_security_options.certificate_file = ini_reader.Get("Management", "certificate_file", "certificate.pem");
+    program_options.management_server_security_options.key_file = ini_reader.Get("Management", "key_file", "key.pem");
 
     return program_options;
 }
@@ -56,7 +56,7 @@ static ProgramOptions parseProgramOptions(int argc, char *argv[])
     string ini_file;
 
     cmdline_options.add_options()
-            ("ini,i", value<string>()->required(), "ini file with cpm-hub configuration");
+            ("ini,i", value<string>()->default_value("cpmhub.ini"), "ini file with cpm-hub configuration");
 
     store(parse_command_line(argc, argv, cmdline_options), args);
     notify(args);

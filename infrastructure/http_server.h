@@ -57,4 +57,6 @@ private:
     ServerCallback parseRequest(struct http_message *message, struct http_request &request);
 
     void createConnection(const std::string &address, int port);
+
+    mg_bind_opts configureBindOpts() const;
 };
