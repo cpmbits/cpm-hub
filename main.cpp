@@ -67,18 +67,31 @@ static ProgramOptions parseProgramOptions(int argc, char *argv[])
 }
 
 
+static vector<string> saveCommandLine(int argc, char *argv[])
+{
+    vector<string> command_line;
+
+    for (int i=0; i<argc; i++) {
+        command_line.emplace_back(string(argv[i]));
+    }
+
+    return command_line;
+}
+
+
 int main(int argc, char *argv[])
 {
     ProgramOptions program_options;
     HttpServer service_http_server;
     HttpServer management_http_server;
+    vector<string> command_line = saveCommandLine(argc, argv);
 
     program_options = parseProgramOptions(argc, argv);
 
     installServiceRoutes(service_http_server, program_options.plugins_directory);
     service_http_server.startAsync("0.0.0.0", program_options.http_service_port);
 
-    installManagementRoutes(management_http_server);
+    installManagementRoutes(management_http_server, command_line);
     management_http_server.configureSecurity(program_options.management_server_security_options);
     management_http_server.start("0.0.0.0", program_options.http_management_port);
 

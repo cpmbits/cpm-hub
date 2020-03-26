@@ -22,4 +22,4 @@
 
 void installServiceRoutes(HttpServer& http_server, std::string plugins_directory);
 
-void installManagementRoutes(HttpServer& http_server);
+void installManagementRoutes(HttpServer &http_server, std::vector<std::string> vector);

@@ -21,9 +21,9 @@
 #include <map>
 
 
-struct http_request_parameters {
+struct HttpParameterMap {
 public:
-    std::string get(std::string parameter) {
+    std::string get(const std::string& parameter) {
         auto iter = parameters.find(parameter);
         return iter->second;
     }
@@ -47,7 +47,8 @@ struct HttpSecurityOptions {
 struct http_request {
     std::string method;
     std::string body;
-    struct http_request_parameters parameters;
+    struct HttpParameterMap parameters;
+    struct HttpParameterMap headers;
 
     http_request(std::string _body="")
     {

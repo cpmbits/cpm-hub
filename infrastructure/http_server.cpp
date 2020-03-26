@@ -140,7 +140,7 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, struct htt
     }
 
     for (pair<Endpoint, ServerCallback> iter: *callbacks) {
-        Optional<struct http_request_parameters> match;
+        Optional<struct HttpParameterMap> match;
         match = iter.first.match(endpoint);
         if (match.isPresent()) {
             server_callback = iter.second;
