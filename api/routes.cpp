@@ -17,8 +17,12 @@
  */
 #include <infrastructure/plugins_repository_in_filesystem.h>
 #include <infrastructure/http_server.h>
+#include <infrastructure/deploy_service.h>
 #include <domain/plugins_service.h>
+#include <api/management_api.h>
 #include <api/plugins_api.h>
+
+using namespace std;
 
 
 static Filesystem filesystem;
@@ -27,8 +31,11 @@ static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_ind
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);
 
+static DeployService deploy_service(&filesystem);
+static ManagementApi management_api(&deploy_service);
 
-void installRoutes(HttpServer& http_server, std::string plugins_directory)
+
+void installServiceRoutes(HttpServer& http_server, std::string plugins_directory)
 {
     http_server.post("/plugins", [&](struct http_request &request) -> struct http_response {
         return plugins_api.publishPlugin(request);
@@ -37,4 +44,14 @@ void installRoutes(HttpServer& http_server, std::string plugins_directory)
         return plugins_api.downloadPlugin(request);
     });
     plugins_repository.restore(plugins_directory);
+}
+
+
+void installManagementRoutes(HttpServer &http_server, std::vector<std::string> command_line)
+{
+    deploy_service.setCommandLine(command_line);
+
+    http_server.post("/deploy", [&](struct http_request &request) -> struct http_response {
+        return management_api.deploy(request);
+    });
 }

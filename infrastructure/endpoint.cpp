@@ -30,13 +30,13 @@ Endpoint::Endpoint(string path)
 }
 
 
-Optional<struct http_request_parameters> Endpoint::match(string path) 
+Optional<struct HttpParameterMap> Endpoint::match(string path)
 {
-    Optional<struct http_request_parameters> match;
+    Optional<struct HttpParameterMap> match;
     smatch base_match;
 
     if (regex_match(path, base_match, this->matching_regex)) {
-        match = http_request_parameters();
+        match = HttpParameterMap();
         for (size_t i=1; i<base_match.size(); ++i) {
             std::ssub_match sub_match = base_match[i];
             match.value().set(this->parameter_names.at(i-1), sub_match.str());

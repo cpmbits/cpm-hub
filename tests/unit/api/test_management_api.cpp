@@ -15,29 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
+#include <fakeit/fakeit.hpp>
 
-#include <map>
-#include <regex>
-#include <string>
-#include <vector>
+#include <api/management_api.h>
 
-#include <domain/optional.h>
-#include <infrastructure/http.h>
+using namespace cest;
+using namespace fakeit;
 
 
-class Endpoint {
-public:
-    Endpoint(std::string path);
+describe("Management API", []() {
+    it("uses the deploy service to deploy cpm-hub", []() {
+        struct http_request request("123456789");
+        struct http_response response(200, "");
+        Mock<DeployService> mock_service;
+        ManagementApi api(&mock_service.get());
 
-    Optional<struct HttpParameterMap> match(std::string path);
+        When(Method(mock_service, deploy)).AlwaysReturn();
 
-    bool operator <(const class Endpoint& rhs) const;
+        response = api.deploy(request);
 
-private:
-    std::string matching_string;
-    std::regex matching_regex;
-    std::vector<std::string> parameter_names;
-    
-    void parsePath(std::string path);
-};
+        expect(response.status_code).toBe(200);
+        Verify(Method(mock_service, deploy).Using("123456789"));
+    });
+});

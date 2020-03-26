@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iostream>
-#include <sstream>
 
 #include <infrastructure/http_server.h>
 
@@ -25,21 +24,54 @@ using namespace std;
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
-void HttpServer::start(int port)
+HttpServer::HttpServer()
 {
-    ostringstream string_stream;
+    security_options.security_enabled = false;
+}
 
-    string_stream << "127.0.0.1:" << port;
 
-    cout << "Started server on " << string_stream.str() << endl;
-
-    this->port = port;
-    this->running = true;
-    mg_mgr_init(&mgr, this);
-    connection = mg_bind(&mgr, string_stream.str().c_str(), eventHandler);
-    mg_set_protocol_http_websocket(connection);
+void HttpServer::startAsync(string address, int port)
+{
+    createConnection(address, port);
 
     this->server_thread = new thread(&HttpServer::serve, this);
+}
+
+
+void HttpServer::createConnection(const string &address, int port)
+{
+    ostringstream string_stream;
+    mg_bind_opts bind_opts = configureBindOpts();
+
+    string_stream << address << ":" << port;
+
+    HttpServer::port = port;
+    running = true;
+    mg_mgr_init(&mgr, this);
+
+    connection = mg_bind_opt(&mgr, string_stream.str().c_str(), eventHandler, bind_opts);
+
+    if (security_options.security_enabled) {
+        cout << "Started server on https://" << string_stream.str() << endl;
+    } else {
+        cout << "Started server on http://" << string_stream.str() << endl;
+    }
+
+    mg_set_protocol_http_websocket(connection);
+}
+
+
+mg_bind_opts HttpServer::configureBindOpts() const
+{
+    struct mg_bind_opts bind_opts;
+
+    memset(&bind_opts, 0, sizeof(bind_opts));
+    if (security_options.security_enabled) {
+        bind_opts.ssl_cert = security_options.certificate_file.c_str();
+        bind_opts.ssl_key = security_options.key_file.c_str();
+    }
+
+    return bind_opts;
 }
 
 
@@ -56,6 +88,13 @@ void HttpServer::serve()
     while (this->running) {
         mg_mgr_poll(&mgr, 100);
     }
+}
+
+
+void HttpServer::start(std::string address, int port)
+{
+    createConnection(address, port);
+    serve();
 }
 
 
@@ -101,7 +140,7 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, struct htt
     }
 
     for (pair<Endpoint, ServerCallback> iter: *callbacks) {
-        Optional<struct http_request_parameters> match;
+        Optional<struct HttpParameterMap> match;
         match = iter.first.match(endpoint);
         if (match.isPresent()) {
             server_callback = iter.second;
@@ -126,6 +165,11 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     mg_printf(connection, "%s", response.body.c_str());
 
     cout << string(message->method.p, message->method.len) << " " << string(message->uri.p, message->uri.len) << ": " << response.status_code << endl;
+}
+
+void HttpServer::configureSecurity(struct HttpSecurityOptions &options)
+{
+    this->security_options = options;
 }
 
 

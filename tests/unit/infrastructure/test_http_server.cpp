@@ -56,7 +56,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
 
     it("starts and stops an HTTP server", [&]() {
         HttpServer server;
-        server.start(8000);
+        server.startAsync("127.0.0.1", 8000);
         server.stop();
     });
 
@@ -71,7 +71,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         struct http_response response;
 
-        server.start(8000);
+        server.startAsync("127.0.0.1", 8000);
 
         response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
 
@@ -88,7 +88,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         get_plugins_response.body = "hello";
         get_plugins_response.status_code = 200;
         server.get("/plugins", getPlugins);
-        server.start(8000);
+        server.startAsync("127.0.0.1", 8000);
 
         response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
 
@@ -106,7 +106,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         post_plugin_response.body = "hello";
         post_plugin_response.status_code = 200;
         server.post("/plugins", postPlugin);
-        server.start(8000);
+        server.startAsync("127.0.0.1", 8000);
 
         response = client.post("http://127.0.0.1:8000/plugins", http_request("post data"));
 
@@ -124,7 +124,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         put_plugin_response.body = "hello";
         put_plugin_response.status_code = 200;
         server.put("/plugins", putPlugin);
-        server.start(8000);
+        server.startAsync("127.0.0.1", 8000);
 
         response = client.put("http://127.0.0.1:8000/plugins", http_request("post data"));
 

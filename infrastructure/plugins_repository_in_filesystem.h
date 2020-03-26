@@ -42,11 +42,11 @@ private:
     Filesystem *filesystem;
     PluginIndex *index;
 
-    void savePayload(std::string name, std::string plugin_directory, std::string base64_payload);
+    void savePayload(const std::string& name, const std::string& plugin_directory, const std::string& base64_payload);
 
-    void saveMetadata(std::string name, std::string plugin_directory, PluginMetadata metadata);
+    void saveMetadata(const std::string& name, const std::string& plugin_directory, PluginMetadata metadata);
 
     std::string loadPayload(std::string name, std::string plugin_directory);
 
-    PluginMetadata loadMetadata(std::string name, std::string plugin_directory);
+    PluginMetadata loadMetadata(const std::string& name, std::string plugin_directory);
 };

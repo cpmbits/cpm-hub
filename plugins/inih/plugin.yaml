@@ -1,0 +1,5 @@
+name: "inih"
+description: "inih (INI Not Invented Here)"
+version: "1.0"
+packages:
+    inih:
