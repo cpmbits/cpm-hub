@@ -26,12 +26,12 @@ public:
     typedef std::map<std::string, std::string>::iterator iterator;
     typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
-    std::string get(const std::string& parameter) {
+    std::string &get(const std::string& parameter) {
         auto iter = parameters.find(parameter);
         return iter->second;
     }
 
-    void set(std::string parameter, std::string value) {
+    void set(const std::string& parameter, const std::string& value) {
         parameters.insert(std::make_pair(parameter, value));
     }
 

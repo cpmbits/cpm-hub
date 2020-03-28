@@ -27,7 +27,7 @@ DeployService::DeployService(Filesystem *filesystem)
 }
 
 
-void DeployService::deploy(std::string &payload)
+void DeployService::deploy(const std::string &payload, const std::string &api_key)
 {
     std::string binary_payload = base64_decode(payload);
     this->filesystem->writeFile("cpm-hub", binary_payload);

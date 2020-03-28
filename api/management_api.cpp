@@ -25,6 +25,6 @@ ManagementApi::ManagementApi(DeployService *deploy_service)
 
 HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
-    this->deploy_service->deploy(request.body);
+    this->deploy_service->deploy(request.body, request.headers.get("API_KEY"));
     return HttpResponse(200, "");
 }

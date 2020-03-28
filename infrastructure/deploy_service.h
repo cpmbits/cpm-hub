@@ -26,7 +26,7 @@ class DeployService {
 public:
     DeployService(Filesystem *filesystem);
 
-    virtual void deploy(std::string &payload);
+    virtual void deploy(const std::string &payload, const std::string &api_key);
 
     virtual void setCommandLine(std::vector<std::string> cmdline);
 

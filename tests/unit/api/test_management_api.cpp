@@ -31,11 +31,12 @@ describe("Management API", []() {
         Mock<DeployService> mock_service;
         ManagementApi api(&mock_service.get());
 
+        request.headers.set("API_KEY", "cafecafe");
         When(Method(mock_service, deploy)).AlwaysReturn();
 
         response = api.deploy(request);
 
         expect(response.status_code).toBe(200);
-        Verify(Method(mock_service, deploy).Using("123456789"));
+        Verify(Method(mock_service, deploy).Using("123456789", "cafecafe"));
     });
 });
