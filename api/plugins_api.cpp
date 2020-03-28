@@ -28,7 +28,7 @@ PluginsApi::PluginsApi(PluginsService *plugins_service) {
 }
 
 
-HttpResponse PluginsApi::publishPlugin(struct HttpRequest &request)
+HttpResponse PluginsApi::publishPlugin(HttpRequest &request)
 {
     HttpResponse response(200, "");
     auto json = json::parse(request.body);
@@ -45,7 +45,7 @@ HttpResponse PluginsApi::publishPlugin(struct HttpRequest &request)
 }
 
 
-HttpResponse PluginsApi::listPlugins(struct HttpRequest &request)
+HttpResponse PluginsApi::listPlugins(HttpRequest &request)
 {
     HttpResponse response(200, "");
     json json_plugin_list = json::array();
@@ -72,7 +72,7 @@ static string asJson(Plugin plugin)
 }
 
 
-HttpResponse PluginsApi::downloadPlugin(struct HttpRequest &request)
+HttpResponse PluginsApi::downloadPlugin(HttpRequest &request)
 {
     Optional<Plugin> plugin;
 

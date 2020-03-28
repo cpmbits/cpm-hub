@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include <infrastructure/http_server.h>
-#include "http_headers.h"
+#include <infrastructure/http_headers.h>
 
 using namespace std;
 
@@ -117,13 +117,13 @@ void HttpServer::put(string path, ServerCallback callback)
 }
 
 
-static HttpResponse notFound(struct HttpRequest request)
+static HttpResponse notFound(HttpRequest request)
 {
     return HttpResponse(404, "");
 }
 
 
-ServerCallback HttpServer::parseRequest(struct http_message *message, struct HttpRequest &request)
+ServerCallback HttpServer::parseRequest(struct http_message *message, HttpRequest &request)
 {
     map<Endpoint, ServerCallback> *callbacks;
     ServerCallback server_callback = notFound;
@@ -156,7 +156,7 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, struct Htt
 }
 
 
-void HttpServer::decodeRequestHeaders(struct http_message *message, struct HttpRequest &request)
+void HttpServer::decodeRequestHeaders(struct http_message *message, HttpRequest &request)
 {
     for (int i=0; message->header_names[i].len > 0; ++i) {
         cout << "Decoding header " << string(message->header_names[i].p, message->header_names[i].len) << endl;
@@ -171,7 +171,7 @@ void HttpServer::decodeRequestHeaders(struct http_message *message, struct HttpR
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpResponse response;
-    struct HttpRequest request;
+    HttpRequest request;
     ServerCallback callback = this->parseRequest(message, request);
 
     response = callback(request);

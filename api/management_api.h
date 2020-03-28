@@ -26,7 +26,7 @@ class ManagementApi {
 public:
     ManagementApi(DeployService *deploy_service);
 
-    HttpResponse deploy(struct HttpRequest &request);
+    HttpResponse deploy(HttpRequest &request);
 
 private:
     DeployService *deploy_service;

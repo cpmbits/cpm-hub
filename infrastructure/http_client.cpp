@@ -22,7 +22,7 @@
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
-HttpResponse HttpClient::post(std::string url, struct HttpRequest request)
+HttpResponse HttpClient::post(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 
@@ -39,7 +39,7 @@ HttpResponse HttpClient::post(std::string url, struct HttpRequest request)
 }
 
 
-HttpResponse HttpClient::put(std::string url, struct HttpRequest request)
+HttpResponse HttpClient::put(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 
@@ -56,7 +56,7 @@ HttpResponse HttpClient::put(std::string url, struct HttpRequest request)
 }
 
 
-HttpResponse HttpClient::get(std::string url, struct HttpRequest request)
+HttpResponse HttpClient::get(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 

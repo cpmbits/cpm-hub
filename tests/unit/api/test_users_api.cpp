@@ -26,7 +26,7 @@ using namespace fakeit;
 
 describe("Users API", []() {
     it("uses the users service to register a user", []() {
-        struct HttpRequest request("{"
+        HttpRequest request("{"
             "\"user_name\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""

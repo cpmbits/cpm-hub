@@ -24,11 +24,11 @@ class PluginsApi {
 public:
     PluginsApi(PluginsService *plugins_service);
     
-    HttpResponse publishPlugin(struct HttpRequest &request);
+    HttpResponse publishPlugin(HttpRequest &request);
 
-    HttpResponse listPlugins(struct HttpRequest &request);
+    HttpResponse listPlugins(HttpRequest &request);
 
-    HttpResponse downloadPlugin(struct HttpRequest &request);
+    HttpResponse downloadPlugin(HttpRequest &request);
 
 private:
     PluginsService *plugins_service;

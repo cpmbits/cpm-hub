@@ -25,7 +25,7 @@ class UsersApi {
 public:
     UsersApi(UsersService *users_service);
 
-    HttpResponse registerUser(struct HttpRequest &request);
+    HttpResponse registerUser(HttpRequest &request);
 
 private:
     UsersService *users_service;

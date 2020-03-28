@@ -23,9 +23,9 @@
 
 class HttpClient {
 public:
-    HttpResponse get(std::string url, struct HttpRequest request);
-    HttpResponse post(std::string url, struct HttpRequest request);
-    HttpResponse put(std::string url, struct HttpRequest request);
+    HttpResponse get(std::string url, HttpRequest request);
+    HttpResponse post(std::string url, HttpRequest request);
+    HttpResponse put(std::string url, HttpRequest request);
     void responseArrived(HttpResponse response);
 
 private:

@@ -29,7 +29,7 @@ using namespace fakeit;
 
 describe("Plugins API", []() {
     it("uses the plugin service to publish a plugin", [&]() {
-        struct HttpRequest request("{"
+        HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
@@ -54,7 +54,7 @@ describe("Plugins API", []() {
     });
     
     it("uses the plugin service to list the available plugins", [&]() {
-        struct HttpRequest request("");
+        HttpRequest request("");
         HttpResponse response;
         Plugin plugin("cest");
         std::list<Plugin> plugins {plugin};
@@ -70,7 +70,7 @@ describe("Plugins API", []() {
     });
         
     it("returns error 404 when downloading a plugin that is not found", [&]() {
-        struct HttpRequest request;
+        HttpRequest request;
         HttpResponse response;
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
@@ -86,7 +86,7 @@ describe("Plugins API", []() {
     });
             
     it("returns plugin when downloading an existing plugin", [&]() {
-        struct HttpRequest request;
+        HttpRequest request;
         HttpResponse response;
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());

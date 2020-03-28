@@ -27,7 +27,7 @@ UsersApi::UsersApi(UsersService *users_service)
 }
 
 
-HttpResponse UsersApi::registerUser(struct HttpRequest &request)
+HttpResponse UsersApi::registerUser(HttpRequest &request)
 {
     HttpResponse response(200, "");
     auto json = json::parse(request.body);

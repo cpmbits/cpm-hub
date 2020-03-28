@@ -25,16 +25,16 @@ using namespace cest;
 
 static HttpResponse get_plugins_response;
 
-static HttpResponse getPlugins(struct HttpRequest request)
+static HttpResponse getPlugins(HttpRequest request)
 {
     return get_plugins_response;
 }
 
 
-static struct HttpRequest post_plugin_request;
+static HttpRequest post_plugin_request;
 static HttpResponse post_plugin_response;
 
-static HttpResponse postPlugin(struct HttpRequest request)
+static HttpResponse postPlugin(HttpRequest request)
 {
     post_plugin_request = request;
     return post_plugin_response;
@@ -43,7 +43,7 @@ static HttpResponse postPlugin(struct HttpRequest request)
 
 static HttpResponse put_plugin_response;
 
-static HttpResponse putPlugin(struct HttpRequest request)
+static HttpResponse putPlugin(HttpRequest request)
 {
     return put_plugin_response;
 }
@@ -115,7 +115,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
     it("calls POST method callback passing provided headers", []() {
         HttpServer server;
         HttpClient client;
-        struct HttpRequest request("post data");
+        HttpRequest request("post data");
         HttpResponse response;
 
         request.headers.set("header1", "value1");

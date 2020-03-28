@@ -27,7 +27,7 @@
 #include <infrastructure/http.h>
 #include <infrastructure/endpoint.h>
 
-typedef std::function<HttpResponse(struct HttpRequest &)> ServerCallback;
+typedef std::function<HttpResponse(HttpRequest &)> ServerCallback;
 
 class HttpServer {
 public:
@@ -53,8 +53,8 @@ private:
     struct HttpSecurityOptions security_options;
 
     void serve();
-    ServerCallback parseRequest(struct http_message *message, struct HttpRequest &request);
-    void decodeRequestHeaders(struct http_message *message, struct HttpRequest &request);
+    ServerCallback parseRequest(struct http_message *message, HttpRequest &request);
+    void decodeRequestHeaders(struct http_message *message, HttpRequest &request);
     void createConnection(const std::string &address, int port);
     mg_bind_opts configureBindOpts() const;
 };

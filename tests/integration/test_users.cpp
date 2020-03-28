@@ -27,7 +27,7 @@ using namespace cest;
 
 describe("CPM Hub users management", []() {
     it("registers a user", [&]() {
-        struct HttpRequest request("{"
+        HttpRequest request("{"
             "\"user_name\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""

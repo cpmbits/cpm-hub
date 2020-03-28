@@ -25,7 +25,7 @@ using namespace cest;
 
 describe("CPM Hub plugins management", []() {
     it("registers a plugin", [&]() {
-        struct HttpRequest request("{"
+        HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
@@ -42,7 +42,7 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("lists a plugin after it has been registered", [&]() {
-        struct HttpRequest request("{"
+        HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
@@ -61,7 +61,7 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("fails to download plugin when it's not found", [&]() {
-        struct HttpRequest request;
+        HttpRequest request;
         HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
@@ -75,8 +75,8 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("finds a plugin after it has been registered", [&]() {
-        struct HttpRequest publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
-        struct HttpRequest download_request;
+        HttpRequest publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
+        HttpRequest download_request;
         HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
