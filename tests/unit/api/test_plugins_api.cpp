@@ -29,12 +29,12 @@ using namespace fakeit;
 
 describe("Plugins API", []() {
     it("uses the plugin service to publish a plugin", [&]() {
-        struct http_request request("{"
+        struct HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
-        struct http_response response;
+        HttpResponse response;
         Plugin plugin("");
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
@@ -54,8 +54,8 @@ describe("Plugins API", []() {
     });
     
     it("uses the plugin service to list the available plugins", [&]() {
-        struct http_request request("");
-        struct http_response response;
+        struct HttpRequest request("");
+        HttpResponse response;
         Plugin plugin("cest");
         std::list<Plugin> plugins {plugin};
         Mock<PluginsService> mock_service;
@@ -70,8 +70,8 @@ describe("Plugins API", []() {
     });
         
     it("returns error 404 when downloading a plugin that is not found", [&]() {
-        struct http_request request;
-        struct http_response response;
+        struct HttpRequest request;
+        HttpResponse response;
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
         Optional<Plugin> no_plugin;
@@ -86,8 +86,8 @@ describe("Plugins API", []() {
     });
             
     it("returns plugin when downloading an existing plugin", [&]() {
-        struct http_request request;
-        struct http_response response;
+        struct HttpRequest request;
+        HttpResponse response;
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
         Optional<Plugin> cest_plugin;

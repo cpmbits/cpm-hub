@@ -23,8 +23,8 @@ ManagementApi::ManagementApi(DeployService *deploy_service)
     this->deploy_service = deploy_service;
 }
 
-http_response ManagementApi::deploy(struct http_request &request)
+HttpResponse ManagementApi::deploy(struct HttpRequest &request)
 {
     this->deploy_service->deploy(request.body);
-    return http_response(200, "");
+    return HttpResponse(200, "");
 }

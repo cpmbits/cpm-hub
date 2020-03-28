@@ -27,12 +27,12 @@ using namespace cest;
 
 describe("CPM Hub users management", []() {
     it("registers a user", [&]() {
-        struct http_request request("{"
+        struct HttpRequest request("{"
             "\"user_name\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
         "}");
-        struct http_response response;
+        HttpResponse response;
         UsersRepositoryInMemory repository;
         UsersService service(&repository);
         UsersApi api(&service);

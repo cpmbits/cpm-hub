@@ -27,9 +27,9 @@ UsersApi::UsersApi(UsersService *users_service)
 }
 
 
-struct http_response UsersApi::registerUser(struct http_request &request)
+HttpResponse UsersApi::registerUser(struct HttpRequest &request)
 {
-    struct http_response response(200, "");
+    HttpResponse response(200, "");
     auto json = json::parse(request.body);
     struct user_registration_data registration_data = {
         json.at("user_name"),

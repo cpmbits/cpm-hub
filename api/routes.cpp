@@ -37,10 +37,10 @@ static ManagementApi management_api(&deploy_service);
 
 void installServiceRoutes(HttpServer& http_server, std::string plugins_directory)
 {
-    http_server.post("/plugins", [&](struct http_request &request) -> struct http_response {
+    http_server.post("/plugins", [&](HttpRequest &request) -> HttpResponse {
         return plugins_api.publishPlugin(request);
     });
-    http_server.get("/plugins/:pluginName", [&](struct http_request &request) -> struct http_response {
+    http_server.get("/plugins/:pluginName", [&](HttpRequest &request) -> HttpResponse {
         return plugins_api.downloadPlugin(request);
     });
     plugins_repository.restore(plugins_directory);
@@ -51,7 +51,7 @@ void installManagementRoutes(HttpServer &http_server, std::vector<std::string> c
 {
     deploy_service.setCommandLine(command_line);
 
-    http_server.post("/deploy", [&](struct http_request &request) -> struct http_response {
+    http_server.post("/deploy", [&](HttpRequest &request) -> HttpResponse {
         return management_api.deploy(request);
     });
 }

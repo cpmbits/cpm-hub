@@ -26,8 +26,8 @@ using namespace fakeit;
 
 describe("Management API", []() {
     it("uses the deploy service to deploy cpm-hub", []() {
-        struct http_request request("123456789");
-        struct http_response response(200, "");
+        struct HttpRequest request("123456789");
+        HttpResponse response(200, "");
         Mock<DeployService> mock_service;
         ManagementApi api(&mock_service.get());
 
