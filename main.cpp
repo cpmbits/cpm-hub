@@ -37,6 +37,7 @@ static ProgramOptions parseIniFile(string &ini_file)
     program_options.management_server_security_options.security_enabled = ini_reader.GetBoolean("Management", "security_enabled", true);
     program_options.management_server_security_options.certificate_file = ini_reader.Get("Management", "certificate_file", "certificate.pem");
     program_options.management_server_security_options.key_file = ini_reader.Get("Management", "key_file", "key.pem");
+    program_options.access_file = ini_reader.Get("Management", "access_file", ".access");
 
     return program_options;
 }
