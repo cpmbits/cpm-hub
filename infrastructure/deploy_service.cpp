@@ -21,16 +21,23 @@
 #include <infrastructure/deploy_service.h>
 
 
+static NullAuthenticator unauthenticated;
+
+
 DeployService::DeployService(Filesystem *filesystem)
 {
     this->filesystem = filesystem;
+    this->authenticator = &unauthenticated;
 }
 
 
 void DeployService::deploy(const std::string &payload, const std::string &api_key)
 {
-    std::string binary_payload = base64_decode(payload);
-    this->filesystem->writeFile("cpm-hub", binary_payload);
+    if (!authenticator->authenticate(api_key.c_str())) {
+        throw AuthenticationFailure();
+    }
+
+    saveBinary(payload);
     execl(command_line.at(0).c_str(),
           command_line.at(0).c_str(),
             command_line.at(1).c_str(),
@@ -38,7 +45,21 @@ void DeployService::deploy(const std::string &payload, const std::string &api_ke
             NULL);
 }
 
+
+void DeployService::saveBinary(const std::string &payload) const
+{
+    std::string binary_payload = base64_decode(payload);
+    filesystem->writeFile("cpm-hub", binary_payload);
+}
+
+
 void DeployService::setCommandLine(std::vector<std::string> cmdline)
 {
-    this->command_line = cmdline;
+    command_line = cmdline;
+}
+
+
+void DeployService::configureAuthenticator(Authenticator *auth)
+{
+    authenticator = auth;
 }

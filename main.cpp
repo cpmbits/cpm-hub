@@ -19,17 +19,11 @@
 #include <boost/program_options.hpp>
 #include <inih/INIReader.h>
 
+#include <api/program_options.h>
 #include <api/routes.h>
 
 using namespace boost::program_options;
 using namespace std;
-
-struct ProgramOptions {
-    string plugins_directory = ".";
-    int http_service_port = 8000;
-    int http_management_port = 8001;
-    HttpSecurityOptions management_server_security_options;
-};
 
 
 static ProgramOptions parseIniFile(string &ini_file)

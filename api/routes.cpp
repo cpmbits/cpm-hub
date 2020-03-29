@@ -15,10 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <infrastructure/basic_authenticator.h>
 #include <infrastructure/plugins_repository_in_filesystem.h>
 #include <infrastructure/http_server.h>
 #include <infrastructure/deploy_service.h>
 #include <domain/plugins_service.h>
+#include <api/routes.h>
 #include <api/management_api.h>
 #include <api/plugins_api.h>
 
@@ -31,11 +33,12 @@ static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_ind
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);
 
+static BasicAuthenticator authenticator(&filesystem);
 static DeployService deploy_service(&filesystem);
 static ManagementApi management_api(&deploy_service);
 
 
-void installServiceRoutes(HttpServer& http_server, std::string plugins_directory)
+void installServiceRoutes(HttpServer& http_server, std::string plugins_directory, ProgramOptions &options)
 {
     http_server.post("/plugins", [&](HttpRequest &request) -> HttpResponse {
         return plugins_api.publishPlugin(request);
@@ -43,13 +46,15 @@ void installServiceRoutes(HttpServer& http_server, std::string plugins_directory
     http_server.get("/plugins/:pluginName", [&](HttpRequest &request) -> HttpResponse {
         return plugins_api.downloadPlugin(request);
     });
-    plugins_repository.restore(plugins_directory);
+    plugins_repository.restore(options.plugins_directory);
 }
 
 
-void installManagementRoutes(HttpServer &http_server, std::vector<std::string> command_line)
+void installManagementRoutes(HttpServer &http_server, std::vector<std::string> command_line, ProgramOptions &options)
 {
     deploy_service.setCommandLine(command_line);
+    authenticator.setAccessFile(options.access_file);
+    deploy_service.configureAuthenticator(&authenticator);
 
     http_server.post("/deploy", [&](HttpRequest &request) -> HttpResponse {
         return management_api.deploy(request);

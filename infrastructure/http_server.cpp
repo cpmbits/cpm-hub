@@ -159,7 +159,6 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, HttpReques
 void HttpServer::decodeRequestHeaders(struct http_message *message, HttpRequest &request)
 {
     for (int i=0; message->header_names[i].len > 0; ++i) {
-        cout << "Decoding header " << string(message->header_names[i].p, message->header_names[i].len) << endl;
         request.headers.set(
                 string(message->header_names[i].p, message->header_names[i].len),
                 string(message->header_values[i].p, message->header_values[i].len)
