@@ -21,16 +21,22 @@
 #include <vector>
 
 #include <infrastructure/filesystem.h>
+#include <infrastructure/authenticator.h>
 
 class DeployService {
 public:
     DeployService(Filesystem *filesystem);
 
-    virtual void deploy(std::string &payload);
+    virtual void deploy(const std::string &payload, const std::string &api_key);
 
     virtual void setCommandLine(std::vector<std::string> cmdline);
 
+    virtual void configureAuthenticator(Authenticator *auth);
+
 private:
     Filesystem *filesystem;
+    Authenticator *authenticator;
     std::vector<std::string> command_line;
+
+    void saveBinary(const std::string &payload) const;
 };

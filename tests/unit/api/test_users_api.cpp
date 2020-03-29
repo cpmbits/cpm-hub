@@ -26,12 +26,12 @@ using namespace fakeit;
 
 describe("Users API", []() {
     it("uses the users service to register a user", []() {
-        struct http_request request("{"
+        HttpRequest request("{"
             "\"user_name\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
         "}");
-        struct http_response response;
+        HttpResponse response;
         struct user_registration_data registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;

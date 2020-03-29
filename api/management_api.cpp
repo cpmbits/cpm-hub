@@ -23,8 +23,12 @@ ManagementApi::ManagementApi(DeployService *deploy_service)
     this->deploy_service = deploy_service;
 }
 
-http_response ManagementApi::deploy(struct http_request &request)
+HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
-    this->deploy_service->deploy(request.body);
-    return http_response(200, "");
+    try {
+        this->deploy_service->deploy(request.body, request.headers.get("API_KEY"));
+        return HttpResponse(200, "");
+    } catch (AuthenticationFailure &error) {
+        return HttpResponse(401, "unauthorized");
+    }
 }

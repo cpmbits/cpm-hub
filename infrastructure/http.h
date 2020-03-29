@@ -23,13 +23,28 @@
 
 struct HttpParameterMap {
 public:
-    std::string get(const std::string& parameter) {
+    typedef std::map<std::string, std::string>::iterator iterator;
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
+
+    std::string &get(const std::string& parameter) {
         auto iter = parameters.find(parameter);
         return iter->second;
     }
 
-    void set(std::string parameter, std::string value) {
+    void set(const std::string& parameter, const std::string& value) {
         parameters.insert(std::make_pair(parameter, value));
+    }
+
+    int count() {
+        return parameters.size();
+    }
+
+    iterator begin() {
+        return parameters.begin();
+    }
+
+    iterator end() {
+        return parameters.end();
     }
 
 private:
@@ -44,30 +59,29 @@ struct HttpSecurityOptions {
 };
 
 
-struct http_request {
+struct HttpRequest {
     std::string method;
     std::string body;
     struct HttpParameterMap parameters;
     struct HttpParameterMap headers;
 
-    http_request(std::string _body="")
-    {
+    HttpRequest(std::string _body="") {
         body = _body;
     }
 };
 
 
-struct http_response {
+struct HttpResponse {
     int status_code;
     std::string body;
 
-    http_response()
+    HttpResponse()
     {
         status_code = 404;
         body = "";
     }
 
-    http_response(int _status_code, std::string _body)
+    HttpResponse(int _status_code, std::string _body)
     {
         status_code = _status_code;
         body = _body;

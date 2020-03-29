@@ -25,12 +25,12 @@ using namespace cest;
 
 describe("CPM Hub plugins management", []() {
     it("registers a plugin", [&]() {
-        struct http_request request("{"
+        HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
-        struct http_response response;
+        HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);
@@ -42,12 +42,12 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("lists a plugin after it has been registered", [&]() {
-        struct http_request request("{"
+        HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\""
         "}");
-        struct http_response response;
+        HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);
@@ -61,8 +61,8 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("fails to download plugin when it's not found", [&]() {
-        struct http_request request;
-        struct http_response response;
+        HttpRequest request;
+        HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);
@@ -75,9 +75,9 @@ describe("CPM Hub plugins management", []() {
     });
 
     it("finds a plugin after it has been registered", [&]() {
-        struct http_request publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
-        struct http_request download_request;
-        struct http_response response;
+        HttpRequest publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
+        HttpRequest download_request;
+        HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);

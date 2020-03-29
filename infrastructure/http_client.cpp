@@ -16,17 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <infrastructure/http_client.h>
+#include <infrastructure/http_headers.h>
 
 
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 
 
-struct http_response HttpClient::post(std::string url, struct http_request request)
+HttpResponse HttpClient::post(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "POST", eventHandler, url.c_str(), NULL, request.body.c_str());
+    connection = mg_connect_http(&mgr, "POST", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -38,12 +39,12 @@ struct http_response HttpClient::post(std::string url, struct http_request reque
 }
 
 
-struct http_response HttpClient::put(std::string url, struct http_request request)
+HttpResponse HttpClient::put(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "PUT", eventHandler, url.c_str(), NULL, request.body.c_str());
+    connection = mg_connect_http(&mgr, "PUT", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -55,12 +56,12 @@ struct http_response HttpClient::put(std::string url, struct http_request reques
 }
 
 
-struct http_response HttpClient::get(std::string url, struct http_request request)
+HttpResponse HttpClient::get(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "GET", eventHandler, url.c_str(), NULL, NULL);
+    connection = mg_connect_http(&mgr, "GET", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), NULL);
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -72,7 +73,7 @@ struct http_response HttpClient::get(std::string url, struct http_request reques
 }
 
 
-void HttpClient::responseArrived(struct http_response response)
+void HttpClient::responseArrived(HttpResponse response)
 {
     this->response = response;
     this->request_pending = false;
@@ -83,7 +84,7 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
 {
     HttpClient *client = (HttpClient *)connection->mgr->user_data;
     struct http_message *message = (struct http_message *)data;
-    struct http_response response;
+    HttpResponse response;
 
     switch (event) {
     case MG_EV_CONNECT:

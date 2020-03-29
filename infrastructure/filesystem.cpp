@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iostream>
-#include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <infrastructure/filesystem.h>

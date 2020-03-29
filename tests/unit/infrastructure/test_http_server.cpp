@@ -23,37 +23,33 @@
 using namespace cest;
 
 
-static struct http_response get_plugins_response;
+static HttpResponse get_plugins_response;
 
-static struct http_response getPlugins(struct http_request request)
+static HttpResponse getPlugins(HttpRequest request)
 {
     return get_plugins_response;
 }
 
 
-static struct http_response post_plugin_response;
+static HttpRequest post_plugin_request;
+static HttpResponse post_plugin_response;
 
-static struct http_response postPlugin(struct http_request request)
+static HttpResponse postPlugin(HttpRequest request)
 {
+    post_plugin_request = request;
     return post_plugin_response;
 }
 
 
-static struct http_response put_plugin_response;
+static HttpResponse put_plugin_response;
 
-static struct http_response putPlugin(struct http_request request)
+static HttpResponse putPlugin(HttpRequest request)
 {
     return put_plugin_response;
 }
 
 
 describe("HTTP server based on Cesanta Mongoose", []() {
-    beforeEach([&]() {
-    });
-
-    afterEach([&]() {
-    });
-
     it("starts and stops an HTTP server", [&]() {
         HttpServer server;
         server.startAsync("127.0.0.1", 8000);
@@ -69,11 +65,11 @@ describe("HTTP server based on Cesanta Mongoose", []() {
     it("returns status code 404 when endpoint is not known", [&]() {
         HttpServer server;
         HttpClient client;
-        struct http_response response;
+        HttpResponse response;
 
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
+        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
 
         expect(response.status_code).toBe(404);
 
@@ -83,14 +79,14 @@ describe("HTTP server based on Cesanta Mongoose", []() {
     it("calls GET method callback when receiving a request", []() {
         HttpServer server;
         HttpClient client;
-        struct http_response response;
+        HttpResponse response;
 
         get_plugins_response.body = "hello";
         get_plugins_response.status_code = 200;
         server.get("/plugins", getPlugins);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.get("http://127.0.0.1:8000/plugins", http_request(""));
+        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
@@ -101,14 +97,14 @@ describe("HTTP server based on Cesanta Mongoose", []() {
     it("calls POST method callback when receiving a request", []() {
         HttpServer server;
         HttpClient client;
-        struct http_response response;
+        HttpResponse response;
 
         post_plugin_response.body = "hello";
         post_plugin_response.status_code = 200;
         server.post("/plugins", postPlugin);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.post("http://127.0.0.1:8000/plugins", http_request("post data"));
+        response = client.post("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
@@ -116,17 +112,34 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.stop();
     });
 
+    it("calls POST method callback passing provided headers", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpRequest request("post data");
+        HttpResponse response;
+
+        request.headers.set("header1", "value1");
+        server.post("/plugins", postPlugin);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.post("http://127.0.0.1:8000/plugins", request);
+
+        expect(post_plugin_request.headers.get("header1")).toBe("value1");
+
+        server.stop();
+    });
+
     it("calls PUT method callback when receiving a request", []() {
         HttpServer server;
         HttpClient client;
-        struct http_response response;
+        HttpResponse response;
 
         put_plugin_response.body = "hello";
         put_plugin_response.status_code = 200;
         server.put("/plugins", putPlugin);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.put("http://127.0.0.1:8000/plugins", http_request("post data"));
+        response = client.put("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");

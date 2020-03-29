@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include <infrastructure/http_server.h>
+#include <infrastructure/http_headers.h>
 
 using namespace std;
 
@@ -116,18 +117,18 @@ void HttpServer::put(string path, ServerCallback callback)
 }
 
 
-static struct http_response notFound(struct http_request request)
+static HttpResponse notFound(HttpRequest request)
 {
-    return http_response(404, "");
+    return HttpResponse(404, "");
 }
 
 
-ServerCallback HttpServer::parseRequest(struct http_message *message, struct http_request &request)
+ServerCallback HttpServer::parseRequest(struct http_message *message, HttpRequest &request)
 {
     map<Endpoint, ServerCallback> *callbacks;
+    ServerCallback server_callback = notFound;
     string method(message->method.p, message->method.len);
     string endpoint(message->uri.p, message->uri.len);
-    ServerCallback server_callback = notFound;
 
     request.body = string(message->body.p, message->body.len);
 
@@ -149,14 +150,27 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, struct htt
         }
     }
 
+    decodeRequestHeaders(message, request);
+
     return server_callback;
+}
+
+
+void HttpServer::decodeRequestHeaders(struct http_message *message, HttpRequest &request)
+{
+    for (int i=0; message->header_names[i].len > 0; ++i) {
+        request.headers.set(
+                string(message->header_names[i].p, message->header_names[i].len),
+                string(message->header_values[i].p, message->header_values[i].len)
+        );
+    }
 }
 
 
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
-    struct http_response response;
-    struct http_request request;
+    HttpResponse response;
+    HttpRequest request;
     ServerCallback callback = this->parseRequest(message, request);
 
     response = callback(request);

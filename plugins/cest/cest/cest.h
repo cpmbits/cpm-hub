@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <sstream>
@@ -25,6 +26,8 @@
 #define expect(...)             cest::expectFunction(__FILE__, __LINE__, __VA_ARGS__)
 #define beforeEach(x)           cest::beforeEachFunction(x)
 #define afterEach(x)            cest::afterEachFunction(x)
+#define passTest()              cest::forcedPass()
+#define failTest()              cest::forcedFailure(__FILE__, __LINE__)
 
 
 namespace cest
@@ -36,11 +39,17 @@ namespace cest
         std::function<void()> test;
         bool test_failed;
         std::string failure_message;
+        bool forced_pass;
     };
 
     struct TestSuite {
         std::vector<cest::TestCase *> test_cases;
         std::string test_suite_name;
+    };
+
+    struct CommandLineOptions {
+        bool quiet;
+        bool help;
     };
 }
 
@@ -51,10 +60,14 @@ std::function<void()> after_each;
 std::stringstream assertion_failures;
 bool current_test_failed;
 cest::TestCase *current_test_case;
+cest::CommandLineOptions command_line_options;
 
 
 namespace cest
 {
+    class AssertionError : public std::exception {};
+    class ForcedPassError : public std::exception {};
+
     std::string describeFunction(std::string test_name, std::function<void()> test)
     {
         test();
@@ -64,13 +77,34 @@ namespace cest
     void itFunction(std::string file, int line, std::string name, std::function<void()> test)
     {
         TestCase *test_case = new TestCase();
-        
+
         test_case->name = name;
         test_case->file = file;
         test_case->test = test;
         test_case->line = line;
 
         test_cases.push_back(test_case);
+    }
+
+    void forcedPass()
+    {
+        throw ForcedPassError();
+    }
+
+    void appendAssertionFailure(std::stringstream *stream, std::string message, std::string file, int line)
+    {
+        (*stream) << ASCII_RED << "    ❌ Assertion Failed:" << ASCII_RESET << " " << message << std::endl;
+        (*stream) << "                        " << file << ":" << line << std::endl;
+    }
+
+    void forcedFailure(std::string file, int line)
+    {
+        current_test_failed = true;
+        current_test_case->failure_message = "Test failure forced manually";
+
+        appendAssertionFailure(&assertion_failures, current_test_case->failure_message, file, line);
+
+        throw AssertionError();
     }
 
     void beforeEachFunction(std::function<void()> func)
@@ -83,402 +117,432 @@ namespace cest
         after_each = func;
     }
 
-    void appendAssertionFailure(std::stringstream *stream, std::string message, std::string file, int line)
-    {
-        (*stream) << ASCII_RED << "    ❌ Assertion Failed:" << ASCII_RESET << " " << message << std::endl;
-        (*stream) << "                        " << file << ":" << line << std::endl;
-    }
-
-    class AssertionError : public std::exception {};
-
     template<class T>
     class Assertion
     {
-        public:
-            Assertion(const char *file, int line, T value)
-            {
-                actual = value;
-                assertion_file = std::string(file);
-                assertion_line = line;
-            }
+    public:
+        Assertion(const char *file, int line, T value)
+        {
+            actual = value;
+            assertion_file = std::string(file);
+            assertion_line = line;
+        }
 
-            void toBe(T expected)
-            {
-                if (expected != actual) {
+        void toBe(T expected)
+        {
+            if (expected != actual) {
+                current_test_failed = true;
+                failure_message << "Expected " << expected << ", was " << actual;
+                current_test_case->failure_message = failure_message.str();
+
+                appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                throw AssertionError();
+            }
+        }
+
+        void toEqual(T expected)
+        {
+            toBe(expected);
+        }
+
+        void toEqualMemory(T expected, int64_t length)
+        {
+            int i;
+
+            for (i=0; i<length; ++i) {
+                if (expected[i] != actual[i]) {
                     current_test_failed = true;
-                    failure_message << "Expected " << expected << ", was " << actual;
+                    failure_message << "Memory mismatch at byte " << i << ", expected ";
+                    failure_message << std::hex << std::uppercase << (int)expected[i] << " but was " << std::hex << std::uppercase << (int)actual[i];
                     current_test_case->failure_message = failure_message.str();
 
                     appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
                     throw AssertionError();
                 }
             }
+        }
 
-            void toEqual(T expected)
-            {
-                toBe(expected);
+        void toBeNotNull()
+        {
+            if (actual == NULL) {
+                current_test_failed = true;
+                failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be not null";
+                current_test_case->failure_message = failure_message.str();
+
+                appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                throw AssertionError();
             }
+        }
 
-            void toEqualMemory(T expected, int64_t length)
-            {
-                int i;
+        void toBeNull()
+        {
+            if (actual != NULL) {
+                current_test_failed = true;
+                failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be null";
+                current_test_case->failure_message = failure_message.str();
 
-                for (i=0; i<length; ++i) {
-                    if (expected[i] != actual[i]) {
-                        current_test_failed = true;
-                        failure_message << "Memory mismatch at byte " << i << ", expected ";
-                        failure_message << std::hex << std::uppercase << (int)expected[i] << " but was " << std::hex << std::uppercase << (int)actual[i];
-                        current_test_case->failure_message = failure_message.str();
-
-                        appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                        throw AssertionError();
-                    }
-                }
+                appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                throw AssertionError();
             }
+        }
 
-            void toBeNotNull()
-            {
-                if (actual == NULL) {
-                    current_test_failed = true;
-                    failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be not null";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-            void toBeNull()
-            {
-                if (actual != NULL) {
-                    current_test_failed = true;
-                    failure_message << "Expected 0x" << std::hex << std::uppercase << actual << " to be null";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-            template <class E>
-            void toRaise()
-            {
-                try {
-
-                } catch (E error) {
-
-                }
-
-            }
-
-        private:
-            T actual;
-            std::string assertion_file;
-            std::stringstream failure_message;
-            int assertion_line;
+    private:
+        T actual;
+        std::string assertion_file;
+        std::stringstream failure_message;
+        int assertion_line;
     };
 
     template <class T>
     class Assertion<std::vector<T> >
+{
+    public:
+    Assertion(const char *file, int line, std::vector<T> value)
     {
-        public:
-            Assertion(const char *file, int line, std::vector<T> value)
-            {
-                actual = value;
-                assertion_file = std::string(file);
-                assertion_line = line;
-            }
-
-            void toBe(std::vector<T> expected)
-            {
-                if (expected.size() != actual.size()) {
-                    current_test_failed = true;
-                    failure_message << "Vector sizes do not match, expected " << expected.size() << " items but had " << actual.size() << " items";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-
-                for (int i=0; i<expected.size(); ++i) {
-                    if (expected[i] != actual[i]) {
-                        current_test_failed = true;
-                        failure_message << "Vector item mismatch at position " << i << ", expected " << expected[i] << " but was " << actual[i];
-                        current_test_case->failure_message = failure_message.str();
-
-                        appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                        throw AssertionError();
-                    }
-                }
-            }
-
-            void toEqual(std::vector<T> expected)
-            {
-                toBe(expected);
-            }
-
-            void toContain(T item)
-            {
-                bool found = false;
-
-                for (int i=0; i<actual.size(); ++i) {
-                    if (actual[i] == item) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    current_test_failed = true;
-                    failure_message << "Item " << item << " not found in vector";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-            void toHaveLength(int size)
-            {
-                if (actual.size() != size) {
-                    current_test_failed = true;
-                    failure_message << "Vector sizes does not match, expected " << size << " items but had " << actual.size() << " items";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-        private:
-            std::vector<T> actual;
-            std::string assertion_file;
-            std::stringstream failure_message;
-            int assertion_line;
-    };
-
-    template <>
-    class Assertion<std::string>
-    {
-        public:
-            Assertion(const char *file, int line, std::string value)
-            {
-                actual = value;
-                assertion_file = std::string(file);
-                assertion_line = line;
-            }
-
-            void toBe(std::string expected)
-            {
-                if (expected != actual) {
-                    current_test_failed = true;
-                    failure_message << "Expected \"" << expected << "\", was \"" << actual << "\"";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-            void toEqual(std::string expected)
-            {
-                toBe(expected);
-            }
-
-            void toContain(std::string expected)
-            {
-                if (actual.find(expected) == std::string::npos) {
-                    current_test_failed = true;
-                    failure_message << "\"" << expected << "\" not present inside \"" << actual << "\"";
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-            void toHaveLength(int64_t length)
-            {
-                if (actual.length() != length) {
-                    current_test_failed = true;
-                    failure_message << "Length of \"" << actual << "\" expected to be " << length << ", was " << actual.length();
-                    current_test_case->failure_message = failure_message.str();
-
-                    appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
-                    throw AssertionError();
-                }
-            }
-
-        private:
-            std::string actual;
-            std::string assertion_file;
-            std::stringstream failure_message;
-            int assertion_line;
-    };
-
-    template<class T>
-    Assertion<T> expectFunction(const char *file, int line, T actual)
-    {
-        return Assertion<T>(file, line, actual);
+        actual = value;
+        assertion_file = std::string(file);
+        assertion_line = line;
     }
 
-    Assertion<bool> expectFunction(const char *file, int line, bool actual)
+    void toBe(std::vector<T> expected)
     {
-        return Assertion<bool>(file, line, actual);
+        if (expected.size() != actual.size()) {
+            current_test_failed = true;
+            failure_message << "Vector sizes do not match, expected " << expected.size() << " items but had " << actual.size() << " items";
+            current_test_case->failure_message = failure_message.str();
+
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
+        }
+
+        for (int i=0; i<expected.size(); ++i) {
+            if (expected[i] != actual[i]) {
+                current_test_failed = true;
+                failure_message << "Vector item mismatch at position " << i << ", expected " << expected[i] << " but was " << actual[i];
+                current_test_case->failure_message = failure_message.str();
+
+                appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+                throw AssertionError();
+            }
+        }
     }
 
-    Assertion<int64_t> expectFunction(const char *file, int line, int64_t actual)
+    void toEqual(std::vector<T> expected)
     {
-        return Assertion<int64_t>(file, line, actual);
+        toBe(expected);
     }
 
-    Assertion<std::string> expectFunction(const char *file, int line, std::string actual)
+    void toContain(T item)
     {
-        return Assertion<std::string>(file, line, actual);
-    }
+        bool found = false;
 
-    Assertion<std::string> expectFunction(const char *file, int line, const char *actual)
-    {
-        return Assertion<std::string>(file, line, (std::string)actual);
-    }
-
-    void emitStringField(std::stringstream *stream, std::string key, std::string value, bool add_comma)
-    {
-        (*stream) << "\"" << key << "\":" << "\"" << value << "\"" << (add_comma? "," : "");
-    }
-
-    void emitIntegerField(std::stringstream *stream, std::string key, int value, bool add_comma)
-    {
-        (*stream) << "\"" << key << "\":" << value << (add_comma? "," : "");
-    }
-
-    int countFailedTests(std::vector<TestCase *> test_cases)
-    {
-        int failed_tests = 0;
-
-        for (TestCase *test : test_cases) {
-            if (test->test_failed) {
-                failed_tests++;
+        for (int i=0; i<actual.size(); ++i) {
+            if (actual[i] == item) {
+                found = true;
+                break;
             }
         }
 
-        return failed_tests;
-    }
+        if (!found) {
+            current_test_failed = true;
+            failure_message << "Item " << item << " not found in vector";
+            current_test_case->failure_message = failure_message.str();
 
-    std::string sanitize(std::string text)
-    {
-        int start=0;
-        std::string from("\"");
-        std::string to("\\\"");
-
-        while ((start = text.find(from, start)) != std::string::npos) {
-            text.replace(start, from.length(), to);
-            start += to.length();
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
         }
-
-        return text;
     }
 
-    std::string generateSuiteReport(TestSuite test_suite)
+    void toHaveLength(int size)
     {
-        std::stringstream suite_report;
+        if (actual.size() != size) {
+            current_test_failed = true;
+            failure_message << "Vector sizes does not match, expected " << size << " items but had " << actual.size() << " items";
+            current_test_case->failure_message = failure_message.str();
 
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
+        }
+    }
+
+    private:
+    std::vector<T> actual;
+    std::string assertion_file;
+    std::stringstream failure_message;
+    int assertion_line;
+};
+
+template <>
+class Assertion<std::string>
+{
+public:
+    Assertion(const char *file, int line, std::string value)
+    {
+        actual = value;
+        assertion_file = std::string(file);
+        assertion_line = line;
+    }
+
+    void toBe(std::string expected)
+    {
+        if (expected != actual) {
+            current_test_failed = true;
+            failure_message << "Expected \"" << expected << "\", was \"" << actual << "\"";
+            current_test_case->failure_message = failure_message.str();
+
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
+        }
+    }
+
+    void toEqual(std::string expected)
+    {
+        toBe(expected);
+    }
+
+    void toContain(std::string expected)
+    {
+        if (actual.find(expected) == std::string::npos) {
+            current_test_failed = true;
+            failure_message << "\"" << expected << "\" not present inside \"" << actual << "\"";
+            current_test_case->failure_message = failure_message.str();
+
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
+        }
+    }
+
+    void toHaveLength(int64_t length)
+    {
+        if (actual.length() != length) {
+            current_test_failed = true;
+            failure_message << "Length of \"" << actual << "\" expected to be " << length << ", was " << actual.length();
+            current_test_case->failure_message = failure_message.str();
+
+            appendAssertionFailure(&assertion_failures, current_test_case->failure_message, assertion_file, assertion_line);
+            throw AssertionError();
+        }
+    }
+
+private:
+    std::string actual;
+    std::string assertion_file;
+    std::stringstream failure_message;
+    int assertion_line;
+};
+
+template<class T>
+Assertion<T> expectFunction(const char *file, int line, T actual)
+{
+    return Assertion<T>(file, line, actual);
+}
+
+Assertion<bool> expectFunction(const char *file, int line, bool actual)
+{
+    return Assertion<bool>(file, line, actual);
+}
+
+Assertion<int64_t> expectFunction(const char *file, int line, int64_t actual)
+{
+    return Assertion<int64_t>(file, line, actual);
+}
+
+Assertion<std::string> expectFunction(const char *file, int line, std::string actual)
+{
+    return Assertion<std::string>(file, line, actual);
+}
+
+Assertion<std::string> expectFunction(const char *file, int line, const char *actual)
+{
+    return Assertion<std::string>(file, line, (std::string)actual);
+}
+
+void emitStringField(std::stringstream *stream, std::string key, std::string value, bool add_comma)
+{
+    (*stream) << "\"" << key << "\":" << "\"" << value << "\"" << (add_comma? "," : "");
+}
+
+void emitIntegerField(std::stringstream *stream, std::string key, int value, bool add_comma)
+{
+    (*stream) << "\"" << key << "\":" << value << (add_comma? "," : "");
+}
+
+int countFailedTests(std::vector<TestCase *> test_cases)
+{
+    int failed_tests = 0;
+
+    for (TestCase *test : test_cases) {
+        if (test->test_failed) {
+            failed_tests++;
+        }
+    }
+
+    return failed_tests;
+}
+
+std::string sanitize(std::string text)
+{
+    int start=0;
+    std::string from("\"");
+    std::string to("\\\"");
+
+    while ((start = text.find(from, start)) != std::string::npos) {
+        text.replace(start, from.length(), to);
+        start += to.length();
+    }
+
+    return text;
+}
+
+std::string generateSuiteReport(TestSuite test_suite)
+{
+    std::stringstream suite_report;
+
+    suite_report << "{";
+
+    emitStringField(&suite_report, "name", test_suite.test_suite_name, true);
+    emitIntegerField(&suite_report, "tests", test_suite.test_cases.size(), true);
+    emitIntegerField(&suite_report, "failures", countFailedTests(test_suite.test_cases), true);
+    emitIntegerField(&suite_report, "errors", 0, true);
+    emitIntegerField(&suite_report, "skipped", 0, true);
+    emitStringField(&suite_report, "time", "", true);
+    emitStringField(&suite_report, "timestamp", "", true);
+    emitStringField(&suite_report, "hostname", "", true);
+
+    suite_report << "\"test_cases\":[";
+
+    for (int i=0; i<test_suite.test_cases.size(); ++i) {
         suite_report << "{";
+        emitStringField(&suite_report, "name", test_suite.test_cases[i]->name, true);
+        emitStringField(&suite_report, "time", "", test_suite.test_cases[i]->test_failed);
 
-        emitStringField(&suite_report, "name", test_suite.test_suite_name, true);
-        emitIntegerField(&suite_report, "tests", test_suite.test_cases.size(), true);
-        emitIntegerField(&suite_report, "failures", countFailedTests(test_suite.test_cases), true);
-        emitIntegerField(&suite_report, "errors", 0, true);
-        emitIntegerField(&suite_report, "skipped", 0, true);
-        emitStringField(&suite_report, "time", "", true);
-        emitStringField(&suite_report, "timestamp", "", true);
-        emitStringField(&suite_report, "hostname", "", true);
+        if (test_suite.test_cases[i]->test_failed) {
+            emitStringField(&suite_report, "failure_message", sanitize(test_suite.test_cases[i]->failure_message), false);
+        }
 
-        suite_report << "\"test_cases\":[";
+        suite_report << "}" << (i==test_suite.test_cases.size()-1? "" : ",");
+    }
 
-        for (int i=0; i<test_suite.test_cases.size(); ++i) {
-            suite_report << "{";
-            emitStringField(&suite_report, "name", test_suite.test_cases[i]->name, true);
-            emitStringField(&suite_report, "time", "", test_suite.test_cases[i]->test_failed);
+    suite_report << "]}";
 
-            if (test_suite.test_cases[i]->test_failed) {
-                emitStringField(&suite_report, "failure_message", sanitize(test_suite.test_cases[i]->failure_message), false);
+    return suite_report.str();
+}
+
+void printTestResult(TestCase *test_case)
+{
+    if (command_line_options.quiet) {
+        if (test_case->test_failed) {
+            std::cout << ASCII_RED << "F" << ASCII_RESET;
+        } else {
+            std::cout << ".";
+        }
+
+        return;
+    }
+
+    if (test_case->test_failed) {
+        std::cout <<
+                  ASCII_BACKGROUND_RED << ASCII_BLACK << ASCII_BOLD << " FAIL " << ASCII_RESET <<
+                  ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
+                  ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
+                  std::endl;
+    } else {
+        std::cout <<
+                  ASCII_BACKGROUND_GREEN << ASCII_BLACK << ASCII_BOLD << " PASS " << ASCII_RESET <<
+                  ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
+                  ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
+                  std::endl;
+    }
+
+    std::cout << assertion_failures.str();
+    assertion_failures.str(std::string());
+}
+
+void writeTestSummaryToFile(TestSuite test_suite)
+{
+    std::ofstream summary_file;
+
+    summary_file.open("test_summary.jsonl", std::ios_base::app);
+    summary_file << generateSuiteReport(test_suite) << std::endl;
+    summary_file.close();
+}
+
+bool anyTestFailed()
+{
+    return std::any_of(test_cases.begin(), test_cases.end(), [](cest::TestCase *test_case) {
+        return test_case->test_failed;
+    });
+}
+
+void handleFailedTest(TestCase *test_case)
+{
+    current_test_failed = true;
+    test_case->test_failed = true;
+}
+
+void handleTestException(TestCase *test_case, std::exception *error)
+{
+    std::string exception_message("Unhandled exception in test case: ");
+
+    exception_message += error->what();
+
+    appendAssertionFailure(&assertion_failures, exception_message, test_case->file, test_case->line);
+    handleFailedTest(test_case);
+}
+
+cest::CommandLineOptions parseArgs(int argc, const char *argv[])
+{
+    cest::CommandLineOptions options = {0};
+
+    if (argc > 1) {
+        for (int i=0; i<argc; ++i) {
+            if (strcmp(argv[i], "--quiet") == 0) {
+                options.quiet = true;
             }
 
-            suite_report << "}" << (i==test_suite.test_cases.size()-1? "" : ",");
+            if (strcmp(argv[i], "-q") == 0) {
+                options.quiet = true;
+            }
+
+            if (strcmp(argv[i], "--help") == 0) {
+                options.help = true;
+            }
+
+            if (strcmp(argv[i], "-h") == 0) {
+                options.help = true;
+            }
         }
-
-        suite_report << "]}";
-
-        return suite_report.str();
     }
 
-    void printTestResult(TestCase *test_case)
-    {
-        if (test_case->test_failed) {
-            std::cout <<
-                ASCII_BACKGROUND_RED << ASCII_BLACK << ASCII_BOLD << " FAIL " << ASCII_RESET <<
-                ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
-                ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
-                std::endl;
-        } else {
-            std::cout << ASCII_BOLD << ASCII_GREEN << ".";
-            //std::cout <<
-            //    ASCII_BACKGROUND_GREEN << ASCII_BLACK << ASCII_BOLD << " PASS " << ASCII_RESET <<
-            //    ASCII_GRAY << " " << test_case->file << ":" << test_case->line << ASCII_RESET <<
-            //    ASCII_BOLD << " it " << test_case->name << ASCII_RESET <<
-            //    std::endl;
-        }
+    return options;
+}
 
-        std::cout << assertion_failures.str();
-        assertion_failures.str(std::string());
-    }
-
-    void writeTestSummaryToFile(TestSuite test_suite)
-    {
-        std::ofstream summary_file;
-
-        summary_file.open("test_summary.jsonl", std::ios_base::app);
-        summary_file << generateSuiteReport(test_suite) << std::endl;
-        summary_file.close();
-    }
-
-    bool anyTestFailed()
-    {
-        return std::any_of(test_cases.begin(), test_cases.end(), [](cest::TestCase *test_case) {
-            return test_case->test_failed;
-        });
-    }
-
-    void handleFailedTest(TestCase *test_case)
-    {
-        current_test_failed = true;
-        test_case->test_failed = true;
-    }
-
-    void handleTestException(TestCase *test_case, std::exception *error)
-    {
-        std::string exception_message("Unhandled exception in test case: ");
-
-        exception_message += error->what();
-
-        appendAssertionFailure(&assertion_failures, exception_message, test_case->file, test_case->line);
-        handleFailedTest(test_case);
-    }
+void showHelp(std::string binary)
+{
+    std::cout << "usage: " << binary << " [options]" << std::endl << std::endl;
+    std::cout << "Command line options:" << std::endl;
+    std::cout << "    -q/--quiet: Supress output (use only . and " << ASCII_RED << "F" << ASCII_RESET << " as output)";
+    std::cout << std::endl;
+}
 }
 
 
-int main(void)
+int main(int argc, const char *argv[])
 {
     using namespace cest;
 
     int return_code = 0;
     TestSuite test_suite;
 
+    command_line_options = parseArgs(argc, argv);
+
+    if (command_line_options.help) {
+        showHelp(argv[0]);
+        return 0;
+    }
+
     test_suite.test_suite_name = test_suite_name;
     test_suite.test_cases = test_cases;
-
-    std::cout << ASCII_RESET << ASCII_BOLD << test_suite.test_suite_name << " ";
 
     for (TestCase *test_case : test_cases) {
         current_test_failed = false;
@@ -492,6 +556,13 @@ int main(void)
             test_case->test();
         } catch (AssertionError error) {
             handleFailedTest(test_case);
+        } catch (ForcedPassError error) {
+            if (after_each) {
+                after_each();
+            }
+
+            printTestResult(test_case);
+            continue;
         } catch (std::exception error) {
             handleTestException(test_case, &error);
         }
@@ -505,14 +576,16 @@ int main(void)
         printTestResult(test_case);
     }
 
-    std::cout << std::endl;
-
     return_code = anyTestFailed();
 
     writeTestSummaryToFile(test_suite);
 
     for (TestCase *test_case : test_cases) {
         delete test_case;
+    }
+
+    if (command_line_options.quiet) {
+        std::cout << std::endl;
     }
 
     return return_code;

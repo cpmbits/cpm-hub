@@ -17,9 +17,10 @@
  */
 #pragma once
 
+#include <api/program_options.h>
 #include <infrastructure/http_server.h>
 
 
-void installServiceRoutes(HttpServer& http_server, std::string plugins_directory);
+void installServiceRoutes(HttpServer& http_server, ProgramOptions &options);
 
-void installManagementRoutes(HttpServer &http_server, std::vector<std::string> vector);
+void installManagementRoutes(HttpServer &http_server, std::vector<std::string> vector, ProgramOptions &options);

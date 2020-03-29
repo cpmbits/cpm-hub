@@ -19,17 +19,11 @@
 #include <boost/program_options.hpp>
 #include <inih/INIReader.h>
 
+#include <api/program_options.h>
 #include <api/routes.h>
 
 using namespace boost::program_options;
 using namespace std;
-
-struct ProgramOptions {
-    string plugins_directory = ".";
-    int http_service_port = 8000;
-    int http_management_port = 8001;
-    HttpSecurityOptions management_server_security_options;
-};
 
 
 static ProgramOptions parseIniFile(string &ini_file)
@@ -43,6 +37,7 @@ static ProgramOptions parseIniFile(string &ini_file)
     program_options.management_server_security_options.security_enabled = ini_reader.GetBoolean("Management", "security_enabled", true);
     program_options.management_server_security_options.certificate_file = ini_reader.Get("Management", "certificate_file", "certificate.pem");
     program_options.management_server_security_options.key_file = ini_reader.Get("Management", "key_file", "key.pem");
+    program_options.access_file = ini_reader.Get("Management", "access_file", ".access");
 
     return program_options;
 }
@@ -87,10 +82,10 @@ int main(int argc, char *argv[])
 
     program_options = parseProgramOptions(argc, argv);
 
-    installServiceRoutes(service_http_server, program_options.plugins_directory);
+    installServiceRoutes(service_http_server, program_options);
     service_http_server.startAsync("0.0.0.0", program_options.http_service_port);
 
-    installManagementRoutes(management_http_server, command_line);
+    installManagementRoutes(management_http_server, command_line, program_options);
     management_http_server.configureSecurity(program_options.management_server_security_options);
     management_http_server.start("0.0.0.0", program_options.http_management_port);
 

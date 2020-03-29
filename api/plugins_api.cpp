@@ -28,9 +28,9 @@ PluginsApi::PluginsApi(PluginsService *plugins_service) {
 }
 
 
-struct http_response PluginsApi::publishPlugin(struct http_request &request)
+HttpResponse PluginsApi::publishPlugin(HttpRequest &request)
 {
-    struct http_response response(200, "");
+    HttpResponse response(200, "");
     auto json = json::parse(request.body);
     struct plugin_publication_data registration_data = {
         json.at("plugin_name"), 
@@ -45,9 +45,9 @@ struct http_response PluginsApi::publishPlugin(struct http_request &request)
 }
 
 
-struct http_response PluginsApi::listPlugins(struct http_request &request)
+HttpResponse PluginsApi::listPlugins(HttpRequest &request)
 {
-    struct http_response response(200, "");
+    HttpResponse response(200, "");
     json json_plugin_list = json::array();
 
     for (Plugin plugin : plugins_service->allPlugins()) {
@@ -72,14 +72,14 @@ static string asJson(Plugin plugin)
 }
 
 
-struct http_response PluginsApi::downloadPlugin(struct http_request &request)
+HttpResponse PluginsApi::downloadPlugin(HttpRequest &request)
 {
     Optional<Plugin> plugin;
 
     plugin = plugins_service->find(request.parameters.get("pluginName"));
     if (!plugin.isPresent()) {
-        return http_response(404, "");
+        return HttpResponse(404, "");
     }
 
-    return http_response(200, asJson(plugin.value()));
+    return HttpResponse(200, asJson(plugin.value()));
 }
