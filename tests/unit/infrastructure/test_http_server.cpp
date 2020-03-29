@@ -48,6 +48,11 @@ static HttpResponse putPlugin(HttpRequest request)
     return put_plugin_response;
 }
 
+static HttpResponse throwsException(HttpRequest request)
+{
+    throw std::exception();
+}
+
 
 describe("HTTP server based on Cesanta Mongoose", []() {
     it("starts and stops an HTTP server", [&]() {
@@ -143,6 +148,23 @@ describe("HTTP server based on Cesanta Mongoose", []() {
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
+
+        server.stop();
+    });
+
+    it("returns error 500 when callback throws an exception", [&]() {
+        HttpServer server;
+        HttpClient client;
+        HttpResponse response;
+
+        get_plugins_response.body = "hello";
+        get_plugins_response.status_code = 200;
+        server.get("/plugins", throwsException);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
+
+        expect(response.status_code).toBe(500);
 
         server.stop();
     });

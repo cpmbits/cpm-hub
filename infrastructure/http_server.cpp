@@ -173,7 +173,11 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     HttpRequest request;
     ServerCallback callback = this->parseRequest(message, request);
 
-    response = callback(request);
+    try {
+        response = callback(request);
+    } catch (exception &e) {
+        response = HttpResponse(500, "");
+    }
 
     mg_send_head(connection, response.status_code, response.body.size(), "");
     mg_printf(connection, "%s", response.body.c_str());
