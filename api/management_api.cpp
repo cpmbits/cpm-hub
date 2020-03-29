@@ -25,6 +25,10 @@ ManagementApi::ManagementApi(DeployService *deploy_service)
 
 HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
-    this->deploy_service->deploy(request.body, request.headers.get("API_KEY"));
-    return HttpResponse(200, "");
+    try {
+        this->deploy_service->deploy(request.body, request.headers.get("API_KEY"));
+        return HttpResponse(200, "");
+    } catch (AuthenticationFailure &error) {
+        return HttpResponse(401, "unauthorized");
+    }
 }

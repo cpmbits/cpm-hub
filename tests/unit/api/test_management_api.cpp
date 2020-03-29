@@ -39,4 +39,18 @@ describe("Management API", []() {
         expect(response.status_code).toBe(200);
         Verify(Method(mock_service, deploy).Using("123456789", "cafecafe"));
     });
+
+    it("deploy returns error 401 on authentication failure", []() {
+        HttpRequest request("123456789");
+        HttpResponse response(200, "");
+        Mock<DeployService> mock_service;
+        ManagementApi api(&mock_service.get());
+
+        request.headers.set("API_KEY", "cafecafe");
+        When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
+
+        response = api.deploy(request);
+
+        expect(response.status_code).toBe(401);
+    });
 });

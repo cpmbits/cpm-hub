@@ -38,7 +38,7 @@ static DeployService deploy_service(&filesystem);
 static ManagementApi management_api(&deploy_service);
 
 
-void installServiceRoutes(HttpServer& http_server, std::string plugins_directory, ProgramOptions &options)
+void installServiceRoutes(HttpServer& http_server, ProgramOptions &options)
 {
     http_server.post("/plugins", [&](HttpRequest &request) -> HttpResponse {
         return plugins_api.publishPlugin(request);

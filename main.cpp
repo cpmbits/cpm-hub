@@ -81,10 +81,10 @@ int main(int argc, char *argv[])
 
     program_options = parseProgramOptions(argc, argv);
 
-    installServiceRoutes(service_http_server, program_options.plugins_directory);
+    installServiceRoutes(service_http_server, program_options);
     service_http_server.startAsync("0.0.0.0", program_options.http_service_port);
 
-    installManagementRoutes(management_http_server, command_line);
+    installManagementRoutes(management_http_server, command_line, program_options);
     management_http_server.configureSecurity(program_options.management_server_security_options);
     management_http_server.start("0.0.0.0", program_options.http_management_port);
 
