@@ -19,6 +19,7 @@
 
 #include <base64/base64.h>
 #include <infrastructure/deploy_service.h>
+#include <cstring>
 
 using namespace std;
 
@@ -33,25 +34,30 @@ DeployService::DeployService(Filesystem *filesystem)
 }
 
 
-void DeployService::deploy(const string &payload, const string &api_key)
+void DeployService::deploy(const string &payload, const string &version, const string &api_key)
 {
+    string file_name;
+
     if (!authenticator->authenticate(api_key.c_str())) {
         throw AuthenticationFailure();
     }
 
-    saveBinary(payload);
-    execl(command_line.at(0).c_str(),
-          command_line.at(0).c_str(),
-            command_line.at(1).c_str(),
-            command_line.at(2).c_str(),
-            NULL);
+    file_name = "cpm-hub-" + version;
+    saveBinary(payload, file_name);
+    filesystem->changePermissions(file_name, FILESYSTEM_PERMISSION_READ|FILESYSTEM_PERMISSION_WRITE|FILESYSTEM_PERMISSION_EXEC);
+    filesystem->deleteFile(command_line.at(0));
+    execl(file_name.c_str(),
+          file_name.c_str(),
+          command_line.at(1).c_str(),
+          command_line.at(2).c_str(),
+          NULL);
 }
 
 
-void DeployService::saveBinary(const string &payload) const
+void DeployService::saveBinary(const string &payload, const string &file_name) const
 {
     string binary_payload = base64_decode(payload);
-    filesystem->writeFile("cpm-hub", binary_payload);
+    filesystem->writeFile(file_name, binary_payload);
 }
 
 
