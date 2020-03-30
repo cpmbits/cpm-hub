@@ -22,6 +22,7 @@
 
 using namespace std;
 
+
 void Filesystem::writeFile(std::string file_name, std::string contents)
 {
     ofstream file;
@@ -52,4 +53,29 @@ void Filesystem::createDirectory(std::string path)
 bool Filesystem::fileExists(std::string path)
 {
     return boost::filesystem::exists(path);
+}
+
+
+void Filesystem::deleteFile(std::string file_name)
+{
+    remove(file_name.c_str());
+}
+
+void Filesystem::changePermissions(std::string file_name, unsigned int mask)
+{
+    using namespace boost::filesystem;
+    perms boost_permissions(no_perms);
+    wpath path = file_name;
+
+    if (mask & FILESYSTEM_PERMISSION_READ) {
+        boost_permissions |= owner_read|group_read;
+    }
+    if (mask & FILESYSTEM_PERMISSION_WRITE) {
+        boost_permissions |= owner_write|group_write;
+    }
+    if (mask & FILESYSTEM_PERMISSION_EXEC) {
+        boost_permissions |= owner_exe|group_exe;
+    }
+
+    permissions(path, boost_permissions);
 }

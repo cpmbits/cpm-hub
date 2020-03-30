@@ -19,6 +19,10 @@
 
 #include <string>
 
+#define FILESYSTEM_PERMISSION_READ  (1U)
+#define FILESYSTEM_PERMISSION_WRITE (2U)
+#define FILESYSTEM_PERMISSION_EXEC  (4U)
+
 class Filesystem {
 public:
     virtual void writeFile(std::string file_name, std::string contents);
@@ -28,4 +32,8 @@ public:
     virtual void createDirectory(std::string path);
 
     virtual bool fileExists(std::string file_name);
+
+    virtual void deleteFile(std::string file_name);
+
+    virtual void changePermissions(std::string file_name, unsigned int mask);
 };

@@ -27,25 +27,26 @@ using namespace cest;
 using namespace fakeit;
 using namespace std;
 
-static const char *execl_args[8];
+//static const char *execl_args[8];
+static string execl_args[8];
 
 
 describe("Deploy Service", []() {
-    beforeEach([]() {
-        memset(execl_args, 0, sizeof(execl_args));
-    });
-
     it("decodes payload and runs new received binary", []() {
         Mock<Filesystem> mock_filesystem;
         DeployService deploy_service(&mock_filesystem.get());
         vector<string> command_line {"cpm-hub", "-i", "cpmhub.ini"};
+        string unique_filename("cpm-hub-version");
 
         deploy_service.setCommandLine(command_line);
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_filesystem, changePermissions)).AlwaysReturn();
+        When(Method(mock_filesystem, deleteFile)).AlwaysReturn();
 
-        deploy_service.deploy("payload", "api_key");
+        deploy_service.deploy("payload", "version", "api_key");
 
-        expect(execl_args[0]).toBe(command_line.at(0));
+        expect(execl_args[0]).toBe("cpm-hub-version");
+        Verify(Method(mock_filesystem, deleteFile).Using("cpm-hub"));
     });
 
     it("fails to deploy received binary when security verification fails", []() {
@@ -55,13 +56,12 @@ describe("Deploy Service", []() {
         vector<string> command_line {"cpm-hub", "-i", "cpmhub.ini"};
         string access_file("access_file.txt");
 
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_authenticator, authenticate)).Return(false);
         deploy_service.setCommandLine(command_line);
         deploy_service.configureAuthenticator(&mock_authenticator.get());
 
         try {
-            deploy_service.deploy("payload", "api_key");
+            deploy_service.deploy("payload", "version", "api_key");
             failTest();
         } catch (AuthenticationFailure &error) {
         }
@@ -79,8 +79,6 @@ int execl(const char *__path, const char *__arg, ...)
     va_start(ap, __arg);
     execl_args[1] = va_arg(ap, char *);
     execl_args[2] = va_arg(ap, char *);
-    execl_args[3] = va_arg(ap, char *);
-    execl_args[4] = va_arg(ap, char *);
     va_end(ap);
 
     return 0;

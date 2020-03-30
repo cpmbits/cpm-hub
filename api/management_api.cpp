@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <json/json.hpp>
 #include <api/management_api.h>
+
+using namespace nlohmann;
 
 
 ManagementApi::ManagementApi(DeployService *deploy_service)
@@ -25,8 +28,13 @@ ManagementApi::ManagementApi(DeployService *deploy_service)
 
 HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
+    auto json = json::parse(request.body);
+
     try {
-        this->deploy_service->deploy(request.body, request.headers.get("API_KEY"));
+        this->deploy_service->deploy(
+                json.at("payload"),
+                json.at("version"),
+                request.headers.get("API_KEY"));
         return HttpResponse(200, "");
     } catch (AuthenticationFailure &error) {
         return HttpResponse(401, "unauthorized");
