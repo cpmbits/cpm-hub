@@ -32,13 +32,21 @@ typedef std::function<HttpResponse(HttpRequest &)> ServerCallback;
 class HttpServer {
 public:
     HttpServer();
+
     void configureSecurity(struct HttpSecurityOptions &options);
+
     void get(std::string path, ServerCallback callback);
+
     void post(std::string path, ServerCallback callback);
+
     void put(std::string path, ServerCallback callback);
+
     void startAsync(std::string address, int port);
+
     void start(std::string address, int port);
+
     void stop();
+
     void serveRequest(struct mg_connection *connection, struct http_message *message);
 
 private:
@@ -53,8 +61,14 @@ private:
     struct HttpSecurityOptions security_options;
 
     void serve();
+
     ServerCallback parseRequest(struct http_message *message, HttpRequest &request);
+
     void decodeRequestHeaders(struct http_message *message, HttpRequest &request);
+
     void createConnection(const std::string &address, int port);
+
     mg_bind_opts configureBindOpts() const;
+
+    void logRequest(struct mg_connection *connection, const http_message *message, const HttpResponse &response) const;
 };

@@ -182,8 +182,36 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     mg_send_head(connection, response.status_code, response.body.size(), "");
     mg_printf(connection, "%s", response.body.c_str());
 
-    cout << string(message->method.p, message->method.len) << " " << string(message->uri.p, message->uri.len) << ": " << response.status_code << endl;
+    logRequest(connection, message, response);
 }
+
+
+void HttpServer::logRequest(struct mg_connection *connection, const http_message *message, const HttpResponse &response) const
+{
+    char client_address[INET6_ADDRSTRLEN];
+    time_t rawtime;
+    struct tm *local_time;
+    char current_time_string[128];
+
+    mg_conn_addr_to_str(connection, client_address, sizeof(client_address), MG_SOCK_STRINGIFY_IP);
+    time(&rawtime);
+    local_time = localtime(&rawtime);
+    strftime(current_time_string, sizeof(current_time_string), "%d/%b/%Y:%H:%M:%S %z", local_time);
+
+    cout
+        << client_address
+        << " -"
+        << " -"
+        << " [" << current_time_string << "]"
+        << " \"" << string(message->method.p, message->method.len)
+        << " " << string(message->uri.p, message->uri.len)
+        << " " << string(message->proto.p, message->proto.len)
+        << "\""
+        << " " << response.status_code
+        << " " << response.body.size()
+        << endl;
+}
+
 
 void HttpServer::configureSecurity(struct HttpSecurityOptions &options)
 {
