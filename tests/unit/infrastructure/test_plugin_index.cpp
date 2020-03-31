@@ -38,6 +38,20 @@ describe("Plugins Repository in file system", []() {
         );
     });
 
+    it("updates plugin version when plugin is already inserted", [&]() {
+        PluginIndex plugin_index;
+
+        plugin_index.indexPlugin("cest", "user/cest/0.1");
+
+        plugin_index.indexPlugin("cest", "user/cest/1.0");
+
+        expect(plugin_index.serialize()).toBe(
+            "{"
+                "\"cest\":\"user/cest/1.0\""
+            "}"
+        );
+    });
+
     it("indexes many plugins", [&]() {
         PluginIndex plugin_index;
 
