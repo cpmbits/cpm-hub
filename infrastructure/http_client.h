@@ -26,6 +26,7 @@ public:
     HttpResponse get(std::string url, HttpRequest request);
     HttpResponse post(std::string url, HttpRequest request);
     HttpResponse put(std::string url, HttpRequest request);
+    HttpResponse method(std::string url, HttpRequest request, std::string method);
     void responseArrived(HttpResponse response);
 
 private:

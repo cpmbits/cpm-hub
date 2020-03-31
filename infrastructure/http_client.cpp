@@ -56,6 +56,23 @@ HttpResponse HttpClient::put(std::string url, HttpRequest request)
 }
 
 
+HttpResponse HttpClient::method(std::string url, HttpRequest request, std::string method)
+{
+    struct mg_connection *connection;
+
+    mg_mgr_init(&mgr, this);
+    connection = mg_connect_http(&mgr, method.c_str(), eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
+    mg_set_protocol_http_websocket(connection);
+
+    request_pending = true;
+    while (request_pending) {
+        mg_mgr_poll(&mgr, 100);
+    }
+
+    return this->response;
+}
+
+
 HttpResponse HttpClient::get(std::string url, HttpRequest request)
 {
     struct mg_connection *connection;

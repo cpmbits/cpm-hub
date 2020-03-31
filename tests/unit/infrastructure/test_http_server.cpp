@@ -152,6 +152,39 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         server.stop();
     });
 
+    it("returns 400 when method is not valid", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpResponse response;
+
+        put_plugin_response.body = "hello";
+        put_plugin_response.status_code = 200;
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.method("http://127.0.0.1:8000/plugins", HttpRequest("post data"), "CONNECT");
+
+        expect(response.status_code).toBe(400);
+
+        server.stop();
+    });
+
+    it("returns 404 when method is not registered for endpoint", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpResponse response;
+
+        put_plugin_response.body = "hello";
+        put_plugin_response.status_code = 200;
+        server.put("/plugins", putPlugin);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.post("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
+
+        expect(response.status_code).toBe(404);
+
+        server.stop();
+    });
+
     it("returns error 500 when callback throws an exception", [&]() {
         HttpServer server;
         HttpClient client;
