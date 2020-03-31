@@ -123,6 +123,12 @@ static HttpResponse notFound(HttpRequest request)
 }
 
 
+static HttpResponse badRequest(HttpRequest request)
+{
+    return HttpResponse(400, "");
+}
+
+
 ServerCallback HttpServer::parseRequest(struct http_message *message, HttpRequest &request)
 {
     map<Endpoint, ServerCallback> *callbacks;
@@ -138,6 +144,8 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, HttpReques
         callbacks = &this->posts;
     } else if (method == "PUT") {
         callbacks = &this->puts;
+    } else {
+        return badRequest;
     }
 
     for (pair<Endpoint, ServerCallback> iter: *callbacks) {
