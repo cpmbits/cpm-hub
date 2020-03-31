@@ -51,6 +51,29 @@ describe("Plugins Repository in file system", []() {
         ));
     });
 
+    it("stores a new version of a given plugin", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
+        Plugin plugin("cest", "0.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        repository.add(plugin);
+        plugin = Plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+
+        repository.add(plugin);
+
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./index.json",
+            "{\"cest\":\"user/cest/0.1\"}"
+        )).AtLeastOnce();
+        Verify(Method(mock_filesystem, writeFile).Using(
+            "./index.json",
+            "{\"cest\":\"user/cest/1.0\"}"
+        )).AtLeastOnce();
+    });
+
     it("doesn't find a non existent plugin", []() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;

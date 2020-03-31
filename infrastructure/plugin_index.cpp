@@ -25,7 +25,13 @@ using namespace nlohmann;
 
 void PluginIndex::indexPlugin(std::string name, std::string directory)
 {
-    this->plugins.insert(make_pair(name, directory));
+    auto iter = this->plugins.find(name);
+
+    if (iter != this->plugins.end()) {
+        iter->second = directory;
+    } else {
+        this->plugins.insert(make_pair(name, directory));
+    }
 }
 
 
