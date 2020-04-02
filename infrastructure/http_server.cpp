@@ -201,7 +201,7 @@ void HttpServer::logRequest(struct mg_connection *connection, const http_message
     struct tm *local_time;
     char current_time_string[128];
 
-    mg_conn_addr_to_str(connection, client_address, sizeof(client_address), MG_SOCK_STRINGIFY_REMOTE);
+    mg_conn_addr_to_str(connection, client_address, sizeof(client_address), MG_SOCK_STRINGIFY_REMOTE|MG_SOCK_STRINGIFY_IP);
     time(&rawtime);
     local_time = localtime(&rawtime);
     strftime(current_time_string, sizeof(current_time_string), "%d/%b/%Y:%H:%M:%S %z", local_time);

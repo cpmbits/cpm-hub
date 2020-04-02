@@ -25,5 +25,5 @@ struct ProgramOptions {
     std::string access_file = ".access";
     int http_service_port = 8000;
     int http_management_port = 8001;
-    HttpSecurityOptions management_server_security_options;
+    HttpSecurityOptions security_options;
 };
