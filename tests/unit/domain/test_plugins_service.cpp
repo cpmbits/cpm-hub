@@ -18,8 +18,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <domain/plugins_repository.h>
-#include <domain/plugins_service.h>
+#include <domain/plugins/plugins_repository.h>
+#include <domain/plugins/plugins_service.h>
 
 using namespace cest;
 using namespace fakeit;

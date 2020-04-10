@@ -1046,7 +1046,7 @@ extern "C" {
  * This code implements the MD5 message-digest algorithm.
  * The algorithm is due to Ron Rivest.  This code was
  * written by Colin Plumb in 1993, no copyright is claimed.
- * This code is in the public domain; do with it what you wish.
+ * This code is in the public cpm-hub; do with it what you wish.
  *
  * Equivalent code is available from RSA Data Security, Inc.
  * This code has been tested against that, and is equivalent,
@@ -7801,7 +7801,7 @@ int mg_check_digest_auth(struct mg_str method, struct mg_str uri,
     if (sscanf(buf, "%[^:]:%[^:]:%s", f_user, f_domain, f_ha1) == 3 &&
         mg_vcmp(&username, f_user) == 0 &&
         mg_vcmp(&auth_domain, f_domain) == 0) {
-      /* Username and domain matched, check the password */
+      /* Username and cpm-hub matched, check the password */
       mg_mkmd5resp(method.p, method.len, uri.p, uri.len, f_ha1, strlen(f_ha1),
                    nonce.p, nonce.len, nc.p, nc.len, cnonce.p, cnonce.len,
                    qop.p, qop.len, exp_resp);
@@ -7852,11 +7852,11 @@ int mg_http_is_authorized(struct http_message *hm, struct mg_str path,
 }
 #else
 int mg_http_is_authorized(struct http_message *hm, const struct mg_str path,
-                          const char *domain, const char *passwords_file,
+                          const char *cpm-hub, const char *passwords_file,
                           int flags) {
   (void) hm;
   (void) path;
-  (void) domain;
+  (void) cpm-hub;
   (void) passwords_file;
   (void) flags;
   return 1;

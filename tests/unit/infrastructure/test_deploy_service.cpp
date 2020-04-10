@@ -20,8 +20,8 @@
 
 #include <cstdarg>
 #include <memory.h>
-#include <infrastructure/deploy_service.h>
-#include <infrastructure/authenticator.h>
+#include <domain/management/deploy_service.h>
+#include <domain/users/authenticator.h>
 
 using namespace cest;
 using namespace fakeit;

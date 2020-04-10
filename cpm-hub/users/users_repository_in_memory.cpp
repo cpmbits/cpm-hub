@@ -15,30 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
-#include <domain/users/api/users_api.h>
-#include <domain/users/users_service.h>
-#include <domain/users/users_repository_in_memory.h>
-#include <domain/http/http.h>
-
-using namespace cest;
+#include <users/users_repository_in_memory.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+void UsersRepositoryInMemory::add(User &user)
+{
+    this->users.insert(std::make_pair(user.name, user));
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+bool UsersRepositoryInMemory::exists(std::string user_name)
+{
+    return this->users.find(user_name) != this->users.end();
+}
+
+
+Optional<User> UsersRepositoryInMemory::find(std::string user_name)
+{
+    auto iter = this->users.find(user_name);
+    Optional<User> user;
+
+    if (iter == this->users.end()) {
+        return user;
+    }
+
+    user = iter->second;
+    
+    return user;
+}

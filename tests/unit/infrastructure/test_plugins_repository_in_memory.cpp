@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <infrastructure/plugins_repository_in_memory.h>
+#include <domain/plugins/plugins_repository_in_memory.h>
 
 using namespace cest;
 

@@ -4408,7 +4408,7 @@ int mg_socketpair(sock_t[2], int sock_type);
 
 #if MG_ENABLE_SYNC_RESOLVER
 /*
- * Convert domain name into IP address.
+ * Convert cpm-hub name into IP address.
  *
  * This is a utility function. If compilation flags have
  * `-DMG_ENABLE_GETADDRINFO`, then `getaddrinfo()` call is used for name
@@ -5120,9 +5120,9 @@ extern void mg_hash_sha1_v(size_t num_msgs, const uint8_t *msgs[],
 #define MG_AUTH_FLAG_ALLOW_MISSING_FILE (1 << 2)
 
 /*
- * Checks whether an http request is authorized. `domain` is the authentication
+ * Checks whether an http request is authorized. `cpm-hub` is the authentication
  * realm, `passwords_file` is a htdigest file (can be created e.g. with
- * `htdigest` utility). If either `domain` or `passwords_file` is NULL, this
+ * `htdigest` utility). If either `cpm-hub` or `passwords_file` is NULL, this
  * function always returns 1; otherwise checks the authentication in the
  * http request and returns 1 only if there is a match; 0 otherwise.
  */
@@ -5305,11 +5305,11 @@ struct mg_serve_http_opts {
    * it with digest authentication.
    * Use `mongoose` web server binary, or `htdigest` Apache utility to
    * create/manipulate passwords file.
-   * Make sure `auth_domain` is set to a valid domain name.
+   * Make sure `auth_domain` is set to a valid cpm-hub name.
    */
   const char *per_directory_auth_file;
 
-  /* Authorization domain (domain name of this web server) */
+  /* Authorization cpm-hub (cpm-hub name of this web server) */
   const char *auth_domain;
 
   /*
@@ -5570,7 +5570,7 @@ void mg_register_http_endpoint(struct mg_connection *nc, const char *uri_path,
 
 struct mg_http_endpoint_opts {
   void *user_data;
-  /* Authorization domain (realm) */
+  /* Authorization cpm-hub (realm) */
   const char *auth_domain;
   const char *auth_file;
 };
@@ -6137,7 +6137,7 @@ extern "C" {
 #define MG_DNS_TXT_RECORD 0x10   /* Lookup TXT */
 #define MG_DNS_AAAA_RECORD 0x1c  /* Lookup IPv6 address */
 #define MG_DNS_SRV_RECORD 0x21   /* Lookup SRV */
-#define MG_DNS_MX_RECORD 0x0f    /* Lookup mail server for domain */
+#define MG_DNS_MX_RECORD 0x0f    /* Lookup mail server for cpm-hub */
 #define MG_DNS_ANY_RECORD 0xff
 #define MG_DNS_NSEC_RECORD 0x2f
 

@@ -15,30 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <domain/users/api/users_api.h>
-#include <domain/users/users_service.h>
-#include <domain/users/users_repository_in_memory.h>
-#include <domain/http/http.h>
-
-using namespace cest;
+#include <http/http.h>
+#include <users/users_service.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+class UsersApi {
+public:
+    UsersApi(UsersService *users_service);
 
-        response = api.registerUser(request);
+    HttpResponse registerUser(HttpRequest &request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+private:
+    UsersService *users_service;
+};
