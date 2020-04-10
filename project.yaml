@@ -1,11 +1,15 @@
 name: cpm-hub
 description: CPM Hub open source server for hosting CPM software
 packages:
-    api:
+    cpm-hub/http:
         cflags: [-std=c++11, -g]
-    domain:
+    cpm-hub/infrastructure:
         cflags: [-std=c++11, -g]
-    infrastructure:
+    cpm-hub/management:
+        cflags: [-std=c++11, -g]
+    cpm-hub/plugins:
+        cflags: [-std=c++11, -g]
+    cpm-hub/users:
         cflags: [-std=c++11, -g]
 plugins:
     cest: 1.0

@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <infrastructure/endpoint.h>
+#include <http/endpoint.h>
 
 
 describe("Endpoint", []() {

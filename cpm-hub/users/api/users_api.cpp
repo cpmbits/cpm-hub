@@ -15,30 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
+#include <json/json.hpp>
 #include <users/api/users_api.h>
-#include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
-#include <http/http.h>
 
-using namespace cest;
+using namespace nlohmann;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+UsersApi::UsersApi(UsersService *users_service)
+{
+    this->users_service = users_service;
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+HttpResponse UsersApi::registerUser(HttpRequest &request)
+{
+    HttpResponse response(200, "");
+    auto json = json::parse(request.body);
+    struct user_registration_data registration_data = {
+        json.at("user_name"),
+        json.at("password"),
+        json.at("email"),
+    };
+
+    this->users_service->registerUser(registration_data);
+
+    return response;
+}

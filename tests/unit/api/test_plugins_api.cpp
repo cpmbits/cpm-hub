@@ -20,8 +20,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <api/plugins_api.h>
-#include <domain/plugins_service.h>
+#include <plugins/api/plugins_api.h>
+#include <plugins/plugins_service.h>
 
 using namespace cest;
 using namespace fakeit;

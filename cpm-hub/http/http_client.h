@@ -15,30 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/users_api.h>
-#include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
+#include <string>
+#include <mongoose/mongoose.h>
 #include <http/http.h>
 
-using namespace cest;
+class HttpClient {
+public:
+    HttpResponse get(std::string url, HttpRequest request);
+    HttpResponse post(std::string url, HttpRequest request);
+    HttpResponse put(std::string url, HttpRequest request);
+    HttpResponse method(std::string url, HttpRequest request, std::string method);
+    void responseArrived(HttpResponse response);
 
-
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
-
-        response = api.registerUser(request);
-
-        expect(response.status_code).toBe(200);
-    });
-});
+private:
+    bool request_pending;
+    HttpResponse response;
+    struct mg_mgr mgr;
+};

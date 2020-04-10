@@ -15,34 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <plugins/plugins_service.h>
 
-#include <infrastructure/optional.h>
+using namespace std;
 
 
-describe("Optional", []() {
-    it("doesn't have value after creation", []() {
-        Optional<int> optional;
+PluginsService::PluginsService(PluginsRepository *plugins_repository) {
+    this->plugins_repository = plugins_repository;
+}
 
-        expect(optional.isPresent()).toBe(false);
-    });
 
-    it("has value after assigning one", []() {
-        Optional<int> optional;
+Plugin PluginsService::publishPlugin(struct plugin_publication_data publication_data)
+{
+    Plugin plugin(publication_data.plugin_name,
+                  publication_data.version,
+                  publication_data.user_name,
+                  publication_data.payload);
 
-        optional = 32;
+    plugins_repository->add(plugin);
 
-        expect(optional.isPresent()).toBe(true);
-        expect(optional.value()).toBe(32);
-    });
+    return plugin;
+}
 
-    it("throws an exception when requesting non stored value", []() {
-        Optional<int> optional;
 
-        try {
-            optional.value();
-            expect(true).toBe(false);
-        } catch(const char *msg) {
-        }
-    });
-});
+list<Plugin> PluginsService::allPlugins()
+{
+    return plugins_repository->allPlugins();
+}
+
+
+Optional<Plugin> PluginsService::find(std::string plugin_name)
+{
+    return plugins_repository->find(plugin_name);
+}

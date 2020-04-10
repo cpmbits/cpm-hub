@@ -18,8 +18,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <domain/users_repository.h>
-#include <domain/users_service.h>
+#include <users/users_repository.h>
+#include <users/users_service.h>
 
 using namespace cest;
 using namespace fakeit;

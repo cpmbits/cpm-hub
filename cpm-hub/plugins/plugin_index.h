@@ -15,30 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/users_api.h>
-#include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
-#include <http/http.h>
+#include <map>
+#include <list>
+#include <string>
 
-using namespace cest;
+#include <infrastructure/optional.h>
+#include <infrastructure/filesystem.h>
+#include <plugins/plugin_metadata.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+struct plugin_index_entry {
+    PluginMetadata metadata;
+};
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+class PluginIndex {
+public:
+    virtual void indexPlugin(std::string name, std::string directory);
+
+    virtual Optional<std::string> find(std::string name);
+
+    virtual std::string serialize();
+
+    virtual void restore(std::string serialized);
+
+private:
+    Filesystem *filesystem;
+    std::string directory;
+    std::map<std::string, std::string> plugins;
+};

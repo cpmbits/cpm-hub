@@ -15,34 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
+#include <sstream>
 #include <http/http_headers.h>
 
+using namespace std;
 
-describe("HTTP headers encoder", []() {
-    it("encodes request with no headers", []() {
-        HttpRequest request;
-        expect(encodeRequestHeaders(request)).toBe("");
-    });
 
-    it("encodes request with a single header", []() {
-        HttpRequest request;
+string encodeRequestHeaders(HttpRequest request)
+{
+    ostringstream encoded;
 
-        request.headers.set("header1", "value1");
+    for (auto pair=request.headers.begin(); pair!=request.headers.end(); pair++) {
+        encoded << pair->first << ": " << pair->second << "\r\n";
+    }
 
-        expect(encodeRequestHeaders(request)).toBe("header1: value1\r\n");
-    });
-
-    it("encodes request with a many headers", []() {
-        HttpRequest request;
-
-        request.headers.set("header1", "value1");
-        request.headers.set("header2", "value2");
-
-        expect(encodeRequestHeaders(request)).toBe(
-            "header1: value1\r\n"
-            "header2: value2\r\n"
-        );
-    });
-});
+    return encoded.str();
+}

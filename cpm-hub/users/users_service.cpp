@@ -15,30 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
-#include <users/api/users_api.h>
 #include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
-#include <http/http.h>
-
-using namespace cest;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+UsersService::UsersService(UsersRepository *users_repository)
+{
+    this->users_repository = users_repository;
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+User UsersService::registerUser(user_registration_data &registration_data)
+{
+    User user(registration_data.user_name);
+
+    if (this->users_repository->exists(registration_data.user_name)) {
+        throw UsernameAlreadyTaken(registration_data.user_name);
+    }
+
+    this->users_repository->add(user);
+
+    return user;
+}

@@ -15,30 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
-#include <users/api/users_api.h>
-#include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
-#include <http/http.h>
-
-using namespace cest;
+#include <plugins/plugins_repository_in_memory.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+void PluginsRepositoryInMemory::add(Plugin &plugin)
+{
+    this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+Optional<Plugin> PluginsRepositoryInMemory::find(std::string name)
+{
+    auto iter = this->plugins.find(name);
+    Optional<Plugin> plugin;
+
+    if (iter == this->plugins.end()) {
+        return plugin;
+    }
+
+    plugin = iter->second;
+    
+    return plugin;
+}
+
+
+std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
+{
+    std::list<Plugin> stored_plugins;
+
+    for (std::pair<std::string, Plugin> iter : this->plugins) {
+        stored_plugins.push_back(iter.second);
+    }
+
+    return stored_plugins;
+}

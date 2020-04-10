@@ -1,44 +1,42 @@
 /*
  * Copyright (C) 2020  Jordi Sánchez
  * This file is part of CPM Hub
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <boost/algorithm/string.hpp>
+#include <users/basic_authenticator.h>
 
-#include <users/api/users_api.h>
-#include <users/users_service.h>
-#include <users/users_repository_in_memory.h>
-#include <http/http.h>
-
-using namespace cest;
+using namespace std;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+BasicAuthenticator::BasicAuthenticator(Filesystem *filesystem)
+{
+    this->filesystem = filesystem;
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+bool BasicAuthenticator::authenticate(const char *key)
+{
+    string contents;
+    contents = filesystem->readFile(access_file);
+    boost::trim(contents);
+    return contents == key;
+}
+
+
+void BasicAuthenticator::setAccessFile(std::string filename)
+{
+    this->access_file = filename;
+}
