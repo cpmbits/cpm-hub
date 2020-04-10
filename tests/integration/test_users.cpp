@@ -17,10 +17,10 @@
  */
 #include <cest/cest.h>
 
-#include <domain/users/api/users_api.h>
-#include <domain/users/users_service.h>
-#include <domain/users/users_repository_in_memory.h>
-#include <domain/http/http.h>
+#include <users/api/users_api.h>
+#include <users/users_service.h>
+#include <users/users_repository_in_memory.h>
+#include <http/http.h>
 
 using namespace cest;
 

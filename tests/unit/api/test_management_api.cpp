@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <domain/management/api/management_api.h>
+#include <management/api/management_api.h>
 
 using namespace cest;
 using namespace fakeit;

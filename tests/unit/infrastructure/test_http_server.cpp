@@ -17,8 +17,8 @@
  */
 #include <cest/cest.h>
 
-#include <domain/http/http_server.h>
-#include <domain/http/http_client.h>
+#include <http/http_server.h>
+#include <http/http_client.h>
 
 using namespace cest;
 

@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <domain/http/http_headers.h>
+#include <http/http_headers.h>
 
 
 describe("HTTP headers encoder", []() {
