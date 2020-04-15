@@ -19,10 +19,32 @@
 
 #include <authentication/TrivialAuthenticator.h>
 
+using namespace cest;
+using namespace std;
+
+
 describe("TrivialAuthenticator", []() {
     it("allows adding users", []() {
         TrivialAuthenticator authenticator;
+        string username("user");
+        string api_key("password");
 
-        authenticator.addUser("user", "password");
+        authenticator.addUser(username, api_key);
+    });
+
+    it("fails to authenticate user when api_key is not in the database", []() {
+        TrivialAuthenticator authenticator;
+
+        expect(authenticator.authenticate("api_key")).toBe(false);
+    });
+
+    it("authenticates user when api_key is in the database", []() {
+        TrivialAuthenticator authenticator;
+        string username("user");
+        string api_key("api_key");
+
+        authenticator.addUser(username, api_key);
+
+        expect(authenticator.authenticate("api_key")).toBe(true);
     });
 });

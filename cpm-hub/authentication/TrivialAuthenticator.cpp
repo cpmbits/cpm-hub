@@ -22,11 +22,14 @@ using namespace std;
 
 bool TrivialAuthenticator::authenticate(const char *key)
 {
-    return true;
+    auto iter = this->credentials.find(key);
+
+    return !(iter == this->credentials.end());
+
 }
 
 
-void TrivialAuthenticator::addUser(string &username, string &password)
+void TrivialAuthenticator::addUser(string &username, string &api_key)
 {
-    this->credentials.insert(make_pair(username, password));
+    this->credentials.insert(make_pair(api_key, username));
 }
