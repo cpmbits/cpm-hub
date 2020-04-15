@@ -24,7 +24,7 @@ using namespace cest;
 
 
 describe("CPM Hub plugins management", []() {
-    it("registers a plugin", [&]() {
+    it("fails to publish a plugin when authentication fails", [&]() {
         HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
@@ -34,6 +34,25 @@ describe("CPM Hub plugins management", []() {
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);
+
+        response = api.publishPlugin(request);
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("");
+    });
+
+    it("publishes a plugin using proper authentication", [&]() {
+        HttpRequest request("{"
+                            "\"plugin_name\": \"cest\","
+                            "\"version\": \"1.0\","
+                            "\"payload\": \"ABCDEabcde\""
+                            "}");
+        HttpResponse response;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service);
+
+        request.headers.set("X-API-Key", "");
 
         response = api.publishPlugin(request);
 

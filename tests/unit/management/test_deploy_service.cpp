@@ -21,7 +21,7 @@
 #include <cstdarg>
 #include <memory.h>
 #include <management/deploy_service.h>
-#include <users/authenticator.h>
+#include <authentication/authenticator.h>
 
 using namespace cest;
 using namespace fakeit;

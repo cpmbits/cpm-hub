@@ -20,6 +20,7 @@
 #include <base64/base64.h>
 #include <management/deploy_service.h>
 #include <cstring>
+#include <authentication/authenticator.h>
 
 using namespace std;
 
@@ -38,7 +39,7 @@ void DeployService::deploy(const string &payload, const string &version, const s
 {
     string file_name;
 
-    if (!authenticator->authenticate(api_key.c_str())) {
+    if (!this->authenticator->authenticate(api_key.c_str())) {
         throw AuthenticationFailure();
     }
 

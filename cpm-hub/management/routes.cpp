@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <users/basic_authenticator.h>
+#include <authentication/basic_authenticator.h>
 #include <plugins/plugins_repository_in_filesystem.h>
 #include <http/http_server.h>
 #include <management/deploy_service.h>

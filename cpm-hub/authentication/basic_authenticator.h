@@ -19,7 +19,7 @@
 
 #include <string>
 #include <infrastructure/filesystem.h>
-#include <users/authenticator.h>
+#include <authentication/authenticator.h>
 
 
 class BasicAuthenticator: public Authenticator {
