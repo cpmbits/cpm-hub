@@ -27,6 +27,7 @@
 #include <http/http.h>
 #include <http/Endpoint.h>
 
+
 typedef std::function<HttpResponse(HttpRequest &)> ServerCallback;
 
 class HttpServer {

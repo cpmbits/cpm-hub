@@ -23,8 +23,7 @@
 #include <vector>
 
 #include <infrastructure/Optional.h>
-#include <http/http.h>
-#include "HttpParameterMap.h"
+#include <http/HttpParameterMap.h>
 
 
 class Endpoint {
