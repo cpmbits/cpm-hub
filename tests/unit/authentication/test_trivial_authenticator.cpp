@@ -34,17 +34,21 @@ describe("TrivialAuthenticator", []() {
 
     it("fails to authenticate user when api_key is not in the database", []() {
         TrivialAuthenticator authenticator;
+        Optional<string> user;
 
-        expect(authenticator.authenticate("api_key")).toBe(false);
+        user = authenticator.authenticate("api_key");
+        expect(user.isPresent()).toBe(false);
     });
 
     it("authenticates user when api_key is in the database", []() {
         TrivialAuthenticator authenticator;
         string username("user");
         string api_key("api_key");
+        Optional<string> user;
 
         authenticator.addUser(username, api_key);
 
-        expect(authenticator.authenticate("api_key")).toBe(true);
+        user = authenticator.authenticate("api_key");
+        expect(user.value()).toBe("user");
     });
 });

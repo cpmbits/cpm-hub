@@ -15,22 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <boost/algorithm/string.hpp>
+#include <authentication/AccessFileAuthenticator.h>
+#include <infrastructure/Optional.h>
 
-#include <string>
-#include <infrastructure/Filesystem.h>
-#include <authentication/Authenticator.h>
+using namespace std;
 
 
-class BasicAuthenticator: public Authenticator {
-public:
-    BasicAuthenticator(Filesystem *filesystem);
+AccessFileAuthenticator::AccessFileAuthenticator(Filesystem *filesystem)
+{
+    this->filesystem = filesystem;
+}
 
-    void setAccessFile(std::string filename);
 
-    bool authenticate(const char *key);
+Optional<string> AccessFileAuthenticator::authenticate(const char *key)
+{
+    string contents;
+    Optional<string> user;
 
-private:
-    Filesystem *filesystem;
-    std::string access_file;
-};
+    contents = filesystem->readFile(access_file);
+    boost::trim(contents);
+    if (contents == key) {
+        user = "admin";
+    }
+
+    return user;
+}
+
+
+void AccessFileAuthenticator::setAccessFile(std::string filename)
+{
+    this->access_file = filename;
+}

@@ -16,15 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <authentication/TrivialAuthenticator.h>
+#include <infrastructure/Optional.h>
 
 using namespace std;
 
 
-bool TrivialAuthenticator::authenticate(const char *key)
+Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
 {
     auto iter = this->credentials.find(key);
+    Optional<string> username;
 
-    return !(iter == this->credentials.end());
+    if (iter == this->credentials.end()) {
+        return username;
+    }
+
+    username = iter->second;
+
+    return username;
 
 }
 

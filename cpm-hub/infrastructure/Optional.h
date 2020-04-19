@@ -23,6 +23,12 @@ public:
     Optional<T>() {
         this->contains_value = false;
     }
+
+    Optional<T>(T value) {
+        this->contains_value = true;
+        this->stored_value = value;
+    }
+
     bool isPresent() {
         return this->contains_value;
     }
@@ -43,6 +49,7 @@ public:
     operator bool() const {
         return isPresent();
     }
+
 private:
     bool contains_value;
     T stored_value;

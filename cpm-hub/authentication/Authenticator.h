@@ -17,17 +17,20 @@
  */
 #pragma once
 
+#include <string>
+#include <infrastructure/Optional.h>
+
 
 class Authenticator {
 public:
-    virtual bool authenticate(const char *key) = 0;
+    virtual Optional<std::string> authenticate(const char *key) = 0;
 };
 
 
 class NullAuthenticator: public Authenticator {
 public:
-    bool authenticate(const char *key) {
-        return true;
+    Optional <std::string> authenticate(const char *key) {
+        return Optional<std::string>("john_doe");
     }
 };
 

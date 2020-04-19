@@ -39,7 +39,7 @@ void DeployService::deploy(const string &payload, const string &version, const s
 {
     string file_name;
 
-    if (!this->authenticator->authenticate(api_key.c_str())) {
+    if (!this->authenticator->authenticate(api_key.c_str()).isPresent()) {
         throw AuthenticationFailure();
     }
 

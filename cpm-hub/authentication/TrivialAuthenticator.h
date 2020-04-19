@@ -20,11 +20,12 @@
 #include <string>
 #include <map>
 #include <authentication/Authenticator.h>
+#include <infrastructure/Optional.h>
 
 class TrivialAuthenticator : public Authenticator {
 
 public:
-    virtual bool authenticate(const char *key);
+    virtual Optional<std::string> authenticate(const char *key);
 
     virtual void addUser(std::string &username, std::string &api_key);
 
