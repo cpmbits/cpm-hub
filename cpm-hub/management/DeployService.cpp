@@ -20,7 +20,7 @@
 #include <base64/base64.h>
 #include <management/DeployService.h>
 #include <cstring>
-#include <authentication/authenticator.h>
+#include <authentication/Authenticator.h>
 
 using namespace std;
 

@@ -18,6 +18,7 @@
 #include <cest/cest.h>
 
 #include <http/Endpoint.h>
+#include <http/HttpParameterMap.h>
 
 
 describe("Endpoint", []() {

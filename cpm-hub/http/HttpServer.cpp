@@ -19,6 +19,7 @@
 
 #include <http/HttpServer.h>
 #include <http/http_headers.h>
+#include "HttpParameterMap.h"
 
 using namespace std;
 

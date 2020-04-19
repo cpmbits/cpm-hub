@@ -18,19 +18,36 @@
 #pragma once
 
 #include <string>
-#include <infrastructure/Filesystem.h>
-#include <authentication/Authenticator.h>
+#include <map>
 
 
-class BasicAuthenticator: public Authenticator {
+struct HttpParameterMap {
 public:
-    BasicAuthenticator(Filesystem *filesystem);
+    typedef std::map<std::string, std::string>::iterator iterator;
+    typedef std::map<std::string, std::string>::const_iterator const_iterator;
 
-    void setAccessFile(std::string filename);
+    std::string &get(const std::string& parameter) {
+        auto iter = parameters.find(parameter);
+        return iter->second;
+    }
 
-    bool authenticate(const char *key);
+    void set(const std::string& parameter, const std::string& value) {
+        parameters.insert(std::make_pair(parameter, value));
+    }
+
+    int count() {
+        return parameters.size();
+    }
+
+    iterator begin() {
+        return parameters.begin();
+    }
+
+    iterator end() {
+        return parameters.end();
+    }
 
 private:
-    Filesystem *filesystem;
-    std::string access_file;
+    std::map<std::string, std::string> parameters;
 };
+

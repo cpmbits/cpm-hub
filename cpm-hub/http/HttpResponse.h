@@ -18,19 +18,21 @@
 #pragma once
 
 #include <string>
-#include <infrastructure/Filesystem.h>
-#include <authentication/Authenticator.h>
 
 
-class BasicAuthenticator: public Authenticator {
-public:
-    BasicAuthenticator(Filesystem *filesystem);
+struct HttpResponse {
+    int status_code;
+    std::string body;
 
-    void setAccessFile(std::string filename);
+    HttpResponse()
+    {
+        status_code = 404;
+        body = "";
+    }
 
-    bool authenticate(const char *key);
-
-private:
-    Filesystem *filesystem;
-    std::string access_file;
+    HttpResponse(int _status_code, std::string _body)
+    {
+        status_code = _status_code;
+        body = _body;
+    }
 };

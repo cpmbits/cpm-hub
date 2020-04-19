@@ -19,6 +19,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <http/Endpoint.h>
+#include "HttpParameterMap.h"
 
 using namespace std;
 

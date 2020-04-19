@@ -21,7 +21,7 @@
 #include <vector>
 
 #include <infrastructure/Filesystem.h>
-#include <authentication/authenticator.h>
+#include <authentication/Authenticator.h>
 
 class DeployService {
 public:

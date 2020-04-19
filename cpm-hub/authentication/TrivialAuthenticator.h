@@ -19,7 +19,7 @@
 
 #include <string>
 #include <map>
-#include <authentication/authenticator.h>
+#include <authentication/Authenticator.h>
 
 class TrivialAuthenticator : public Authenticator {
 

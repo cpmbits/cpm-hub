@@ -18,19 +18,10 @@
 #pragma once
 
 #include <string>
-#include <infrastructure/Filesystem.h>
-#include <authentication/Authenticator.h>
 
 
-class BasicAuthenticator: public Authenticator {
-public:
-    BasicAuthenticator(Filesystem *filesystem);
-
-    void setAccessFile(std::string filename);
-
-    bool authenticate(const char *key);
-
-private:
-    Filesystem *filesystem;
-    std::string access_file;
+struct HttpSecurityOptions {
+    bool security_enabled;
+    std::string certificate_file;
+    std::string key_file;
 };

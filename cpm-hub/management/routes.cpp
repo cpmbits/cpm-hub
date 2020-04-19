@@ -16,12 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <authentication/BasicAuthenticator.h>
-#include <plugins/PluginsRepositoryInFilesystem.h>
 #include <http/HttpServer.h>
 #include <management/DeployService.h>
-#include <plugins/PluginsService.h>
-#include <management/routes.h>
 #include <management/api/ManagementApi.h>
+#include <management/routes.h>
+#include <plugins/PluginsRepositoryInFilesystem.h>
+#include <plugins/PluginsService.h>
 #include <plugins/api/PluginsApi.h>
 
 using namespace std;

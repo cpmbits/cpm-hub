@@ -19,7 +19,7 @@
 #include <boost/program_options.hpp>
 #include <inih/INIReader.h>
 
-#include <management/program_options.h>
+#include <management/ProgramOptions.h>
 #include <management/routes.h>
 
 using namespace boost::program_options;
