@@ -15,30 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+#include <string.h>
+#include <users/UsersRepository.h>
+#include <users/UserRegistrationData.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+class UsersService {
+public:
+    UsersService(UsersRepository *users_repository);
 
-        response = api.registerUser(request);
+    virtual User registerUser(UserRegistrationData &registration_data);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+private:
+    UsersRepository *users_repository;
+};
+
+
+class UsernameAlreadyTaken: public std::exception {
+public:
+    UsernameAlreadyTaken(std::string user_name) throw() {
+        sprintf(message, "username %s already in use", user_name.c_str());
+    }
+
+	const char *what() const throw () {
+    	return message;
+    }
+
+private:
+    char message[256];
+};

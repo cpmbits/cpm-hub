@@ -20,8 +20,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/api/plugins_api.h>
-#include <plugins/plugins_service.h>
+#include <plugins/api/PluginsApi.h>
+#include <plugins/PluginsService.h>
 
 using namespace cest;
 using namespace fakeit;
@@ -45,7 +45,7 @@ describe("Plugins API", []() {
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock_service, publishPlugin).Matching([](struct plugin_publication_data data) {
+        Verify(Method(mock_service, publishPlugin).Matching([](struct PluginPublicationData data) {
             return data.plugin_name == "cest" &&
                    data.version == "1.0" &&
                    data.user_name == "john_doe" &&

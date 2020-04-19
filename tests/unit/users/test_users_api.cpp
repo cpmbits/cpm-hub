@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <users/api/users_api.h>
+#include <users/api/UsersApi.h>
 
 using namespace cest;
 using namespace fakeit;
@@ -32,12 +32,12 @@ describe("Users API", []() {
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
-        struct user_registration_data registration_data;
+        struct UserRegistrationData registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;
         UsersApi api(&mock_service.get());
 
-        When(Method(mock_service, registerUser)).AlwaysDo([&](struct user_registration_data &data) {
+        When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             registration_data = data;
             return user;
         });

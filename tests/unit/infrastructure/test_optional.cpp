@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <infrastructure/optional.h>
+#include <infrastructure/Optional.h>
 
 
 describe("Optional", []() {

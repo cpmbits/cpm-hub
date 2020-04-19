@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <authentication/basic_authenticator.h>
-#include <plugins/plugins_repository_in_filesystem.h>
-#include <http/http_server.h>
-#include <management/deploy_service.h>
-#include <plugins/plugins_service.h>
+#include <authentication/BasicAuthenticator.h>
+#include <plugins/PluginsRepositoryInFilesystem.h>
+#include <http/HttpServer.h>
+#include <management/DeployService.h>
+#include <plugins/PluginsService.h>
 #include <management/routes.h>
-#include <management/api/management_api.h>
-#include <plugins/api/plugins_api.h>
+#include <management/api/ManagementApi.h>
+#include <plugins/api/PluginsApi.h>
 
 using namespace std;
 

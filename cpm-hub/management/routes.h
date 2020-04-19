@@ -18,7 +18,7 @@
 #pragma once
 
 #include <management/program_options.h>
-#include <http/http_server.h>
+#include <http/HttpServer.h>
 
 
 void installServiceRoutes(HttpServer& http_server, ProgramOptions &options);

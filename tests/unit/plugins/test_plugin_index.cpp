@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/plugin_index.h>
+#include <plugins/PluginIndex.h>
 
 using namespace cest;
 using namespace fakeit;

@@ -18,8 +18,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <users/users_repository.h>
-#include <users/users_service.h>
+#include <users/UsersRepository.h>
+#include <users/UsersService.h>
 
 using namespace cest;
 using namespace fakeit;
@@ -29,7 +29,7 @@ describe("Users Service", []() {
     it("registers a user with the given name and information", [&]() {
         Mock<UsersRepository> mock_repository;
         UsersService users_service(&mock_repository.get());
-        struct user_registration_data registration_data = {
+        struct UserRegistrationData registration_data = {
             "sotano", "654321", "sotano@example.com"
         };
         User stored_user("");
@@ -48,7 +48,7 @@ describe("Users Service", []() {
     it("throws an exception when registering a user whose user name is taken", [&]() {
         Mock<UsersRepository> mock_repository;
         UsersService users_service(&mock_repository.get());
-        struct user_registration_data registration_data = {
+        struct UserRegistrationData registration_data = {
             "sotano", "654321", "sotano@example.com"
         };
         User stored_user("");

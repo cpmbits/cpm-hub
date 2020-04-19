@@ -20,7 +20,7 @@
 
 #include <cstdarg>
 #include <memory.h>
-#include <management/deploy_service.h>
+#include <management/DeployService.h>
 #include <authentication/authenticator.h>
 
 using namespace cest;

@@ -18,8 +18,8 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/plugins_repository.h>
-#include <plugins/plugins_service.h>
+#include <plugins/PluginsRepository.h>
+#include <plugins/PluginsService.h>
 
 using namespace cest;
 using namespace fakeit;
@@ -30,7 +30,7 @@ describe("Plugins Service", []() {
         Mock<PluginsRepository> mock_repository;
         PluginsService plugins_service(&mock_repository.get());
         Plugin expected_plugin("cest", "1.0", "john_doe", "ABCDEedcba");
-        struct plugin_publication_data publication_data = {
+        struct PluginPublicationData publication_data = {
             "cest", "1.0", "john_doe", "ABCDEedcba"
         };
 

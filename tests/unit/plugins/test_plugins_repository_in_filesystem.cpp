@@ -19,8 +19,8 @@
 #include <fakeit/fakeit.hpp>
 
 #include <base64/base64.h>
-#include <plugins/plugin_index.h>
-#include <plugins/plugins_repository_in_filesystem.h>
+#include <plugins/PluginIndex.h>
+#include <plugins/PluginsRepositoryInFilesystem.h>
 
 using namespace std;
 using namespace cest;

@@ -15,30 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+#include <string>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+#define kMAX_PASSWORD_LENGTH    64
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+struct UserRegistrationData {
+    std::string user_name;
+    std::string password;
+    std::string email;
+};

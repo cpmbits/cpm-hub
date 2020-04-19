@@ -15,30 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
+#include <map>
+#include <regex>
+#include <string>
+#include <vector>
+
+#include <infrastructure/Optional.h>
 #include <http/http.h>
 
-using namespace cest;
 
+class Endpoint {
+public:
+    Endpoint(std::string path);
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+    Optional<struct HttpParameterMap> match(std::string path);
 
-        response = api.registerUser(request);
+    bool operator <(const class Endpoint& rhs) const;
 
-        expect(response.status_code).toBe(200);
-    });
-});
+private:
+    std::string matching_string;
+    std::regex matching_regex;
+    std::vector<std::string> parameter_names;
+    
+    void parsePath(std::string path);
+};
