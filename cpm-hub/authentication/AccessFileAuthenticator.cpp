@@ -1,44 +1,49 @@
 /*
  * Copyright (C) 2020  Jordi Sánchez
  * This file is part of CPM Hub
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <boost/algorithm/string.hpp>
+#include <authentication/AccessFileAuthenticator.h>
+#include <infrastructure/Optional.h>
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+using namespace std;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+AccessFileAuthenticator::AccessFileAuthenticator(Filesystem *filesystem)
+{
+    this->filesystem = filesystem;
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+Optional<string> AccessFileAuthenticator::authenticate(const char *key)
+{
+    string contents;
+    Optional<string> user;
+
+    contents = filesystem->readFile(access_file);
+    boost::trim(contents);
+    if (contents == key) {
+        user = "admin";
+    }
+
+    return user;
+}
+
+
+void AccessFileAuthenticator::setAccessFile(std::string filename)
+{
+    this->access_file = filename;
+}

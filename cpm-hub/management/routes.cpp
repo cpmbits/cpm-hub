@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <users/basic_authenticator.h>
-#include <plugins/plugins_repository_in_filesystem.h>
-#include <http/http_server.h>
-#include <management/deploy_service.h>
-#include <plugins/plugins_service.h>
+#include <authentication/AccessFileAuthenticator.h>
+#include <http/HttpServer.h>
+#include <management/DeployService.h>
+#include <management/api/ManagementApi.h>
 #include <management/routes.h>
-#include <management/api/management_api.h>
-#include <plugins/api/plugins_api.h>
+#include <plugins/PluginsRepositoryInFilesystem.h>
+#include <plugins/PluginsService.h>
+#include <plugins/api/PluginsApi.h>
 
 using namespace std;
 
@@ -33,7 +33,7 @@ static PluginsRepositoryInFilesystem plugins_repository(&filesystem, &plugin_ind
 static PluginsService plugins_service(&plugins_repository);
 static PluginsApi plugins_api(&plugins_service);
 
-static BasicAuthenticator authenticator(&filesystem);
+static AccessFileAuthenticator authenticator(&filesystem);
 static DeployService deploy_service(&filesystem);
 static ManagementApi management_api(&deploy_service);
 

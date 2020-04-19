@@ -15,30 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <plugins/PluginsService.h>
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+using namespace std;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+PluginsService::PluginsService(PluginsRepository *plugins_repository) {
+    this->plugins_repository = plugins_repository;
+}
 
-        response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+Plugin PluginsService::publishPlugin(struct PluginPublicationData publication_data)
+{
+    Plugin plugin(publication_data.plugin_name,
+                  publication_data.version,
+                  publication_data.user_name,
+                  publication_data.payload);
+
+    plugins_repository->add(plugin);
+
+    return plugin;
+}
+
+
+list<Plugin> PluginsService::allPlugins()
+{
+    return plugins_repository->allPlugins();
+}
+
+
+Optional<Plugin> PluginsService::find(std::string plugin_name)
+{
+    return plugins_repository->find(plugin_name);
+}

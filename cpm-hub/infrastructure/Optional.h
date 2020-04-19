@@ -15,30 +15,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+#pragma once
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+template<class T> class Optional {
+public:
+    Optional<T>() {
+        this->contains_value = false;
+    }
 
-        response = api.registerUser(request);
+    Optional<T>(T value) {
+        this->contains_value = true;
+        this->stored_value = value;
+    }
 
-        expect(response.status_code).toBe(200);
-    });
-});
+    bool isPresent() {
+        return this->contains_value;
+    }
+
+    T& value() {
+        if (!this->contains_value) {
+            throw "Optional has no value";
+        }
+        return this->stored_value;
+    }
+
+    Optional<T>& operator =(const T &value) {
+        this->stored_value = value;
+        this->contains_value = true;
+        return *this;
+    }
+
+    operator bool() const {
+        return isPresent();
+    }
+
+private:
+    bool contains_value;
+    T stored_value;
+};

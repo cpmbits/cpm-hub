@@ -15,30 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
+#include <string>
+#include <list>
 
-using namespace cest;
+#include <infrastructure/Optional.h>
+#include <plugins/PluginPublicationData.h>
+#include <plugins/PluginsRepository.h>
+#include <plugins/Plugin.h>
 
+class PluginsService {
+public:
+    PluginsService(PluginsRepository *plugins_repository);
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+    virtual Plugin publishPlugin(struct PluginPublicationData publication_data);
 
-        response = api.registerUser(request);
+    virtual std::list<Plugin> allPlugins();
+    
+    virtual Optional<Plugin> find(std::string plugin_name);
 
-        expect(response.status_code).toBe(200);
-    });
-});
+private:
+    PluginsRepository *plugins_repository;
+};

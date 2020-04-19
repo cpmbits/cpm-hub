@@ -17,73 +17,7 @@
  */
 #pragma once
 
-#include <string>
-#include <map>
-
-
-struct HttpParameterMap {
-public:
-    typedef std::map<std::string, std::string>::iterator iterator;
-    typedef std::map<std::string, std::string>::const_iterator const_iterator;
-
-    std::string &get(const std::string& parameter) {
-        auto iter = parameters.find(parameter);
-        return iter->second;
-    }
-
-    void set(const std::string& parameter, const std::string& value) {
-        parameters.insert(std::make_pair(parameter, value));
-    }
-
-    int count() {
-        return parameters.size();
-    }
-
-    iterator begin() {
-        return parameters.begin();
-    }
-
-    iterator end() {
-        return parameters.end();
-    }
-
-private:
-    std::map<std::string, std::string> parameters;
-};
-
-
-struct HttpSecurityOptions {
-    bool security_enabled;
-    std::string certificate_file;
-    std::string key_file;
-};
-
-
-struct HttpRequest {
-    std::string method;
-    std::string body;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
-
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
-};
-
-
-struct HttpResponse {
-    int status_code;
-    std::string body;
-
-    HttpResponse()
-    {
-        status_code = 404;
-        body = "";
-    }
-
-    HttpResponse(int _status_code, std::string _body)
-    {
-        status_code = _status_code;
-        body = _body;
-    }
-};
+#include <http/HttpParameterMap.h>
+#include <http/HttpSecurityOptions.h>
+#include <http/HttpRequest.h>
+#include <http/HttpResponse.h>

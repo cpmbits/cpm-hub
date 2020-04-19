@@ -1,22 +1,19 @@
-name: cpm-hub
-description: CPM Hub open source server for hosting CPM software
+name: 'cpm-hub'
+description: 'CPM Hub open source server for hosting CPM software'
 packages:
     cpm-hub/http:
-        cflags: [-std=c++11, -g]
     cpm-hub/infrastructure:
-        cflags: [-std=c++11, -g]
     cpm-hub/management:
-        cflags: [-std=c++11, -g]
     cpm-hub/plugins:
-        cflags: [-std=c++11, -g]
     cpm-hub/users:
-        cflags: [-std=c++11, -g]
+    cpm-hub/authentication:
+compile_flags: ['-std=c++11', '-g']
 plugins:
-    cest: 1.0
-    mongoose: 6.16
-    json: 3.7.3
-    fakeit: 2.0.5
-    base64: 1.0
-    inih: 1.0
+    cest: '1.0'
+    mongoose: '6.16'
+    json: '3.7.3'
+    fakeit: '2.0.5'
+    base64: '1.0'
+    inih: '1.0'
 link_options:
-    libraries: [boost_filesystem, boost_system, boost_program_options, pthread, ssl, crypto]
+    libraries: ['boost_filesystem', 'boost_system', 'boost_program_options', 'pthread', 'ssl', 'crypto']

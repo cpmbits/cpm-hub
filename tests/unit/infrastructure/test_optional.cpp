@@ -17,28 +17,32 @@
  */
 #include <cest/cest.h>
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+#include <infrastructure/Optional.h>
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+describe("Optional", []() {
+    it("doesn't have value after creation", []() {
+        Optional<int> optional;
 
-        response = api.registerUser(request);
+        expect(optional.isPresent()).toBe(false);
+    });
 
-        expect(response.status_code).toBe(200);
+    it("has value after assigning one", []() {
+        Optional<int> optional;
+
+        optional = 32;
+
+        expect(optional.isPresent()).toBe(true);
+        expect(optional.value()).toBe(32);
+    });
+
+    it("throws an exception when requesting non stored value", []() {
+        Optional<int> optional;
+
+        try {
+            optional.value();
+            expect(true).toBe(false);
+        } catch(const char *msg) {
+        }
     });
 });

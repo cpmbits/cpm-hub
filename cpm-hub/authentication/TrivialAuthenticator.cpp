@@ -1,44 +1,43 @@
 /*
  * Copyright (C) 2020  Jordi Sánchez
  * This file is part of CPM Hub
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <authentication/TrivialAuthenticator.h>
+#include <infrastructure/Optional.h>
 
-#include <users/api/UsersApi.h>
-#include <users/UsersService.h>
-#include <users/UsersRepositoryInMemory.h>
-#include <http/http.h>
-
-using namespace cest;
+using namespace std;
 
 
-describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
-        HttpRequest request("{"
-            "\"user_name\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service);
+Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
+{
+    auto iter = this->credentials.find(key);
+    Optional<string> username;
 
-        response = api.registerUser(request);
+    if (iter == this->credentials.end()) {
+        return username;
+    }
 
-        expect(response.status_code).toBe(200);
-    });
-});
+    username = iter->second;
+
+    return username;
+
+}
+
+
+void TrivialAuthenticator::addUser(string &username, string &api_key)
+{
+    this->credentials.insert(make_pair(api_key, username));
+}
