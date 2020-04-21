@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include <authentication/AccessFileAuthenticator.h>
 #include <infrastructure/Optional.h>
@@ -28,15 +29,33 @@ AccessFileAuthenticator::AccessFileAuthenticator(Filesystem *filesystem)
 }
 
 
+static vector<string> split(string contents, const char *delims)
+{
+    vector<string> tokens;
+    boost::split(tokens, contents, boost::is_any_of(delims), boost::token_compress_on);
+    for(auto&& token: tokens) {
+        boost::trim(token);
+    }
+    return tokens;
+}
+
+
 Optional<string> AccessFileAuthenticator::authenticate(const char *key)
 {
     string contents;
+    vector<string> lines;
+    vector<string> tokens;
     Optional<string> user;
 
     contents = filesystem->readFile(access_file);
-    boost::trim(contents);
-    if (contents == key) {
-        user = "admin";
+    lines = split(contents, "\n");
+
+    for(auto&& line: lines) {
+        tokens = split(line, ":");
+        if (tokens[0] == key) {
+            user = tokens[1];
+            break;
+        }
     }
 
     return user;
