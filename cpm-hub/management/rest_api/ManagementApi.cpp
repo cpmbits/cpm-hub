@@ -15,36 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <json/json.hpp>
+#include <management/rest_api/ManagementApi.h>
 
-#include <string>
-#include <infrastructure/Optional.h>
-
-
-class Authenticator {
-public:
-    virtual Optional<std::string> authenticate(const char *key) = 0;
-};
+using namespace nlohmann;
 
 
-class NullAuthenticator: public Authenticator {
-public:
-    Optional <std::string> authenticate(const char *key) {
-        return Optional<std::string>("john_doe");
+ManagementApi::ManagementApi(DeployService *deploy_service)
+{
+    this->deploy_service = deploy_service;
+}
+
+
+HttpResponse ManagementApi::deploy(HttpRequest &request)
+{
+    auto json = json::parse(request.body);
+
+    try {
+        this->deploy_service->deploy(
+                json.at("payload"),
+                json.at("version"),
+                request.headers.get("API_KEY"));
+        return HttpResponse(200, "");
+    } catch (AuthenticationFailure &error) {
+        return HttpResponse(401, "unauthorized");
     }
-};
-
-
-class AuthenticationFailure: public std::exception {
-public:
-    AuthenticationFailure() throw() {
-        sprintf(message, "unauthorized");
-    }
-
-    const char *what() const throw () {
-        return message;
-    }
-
-private:
-    char message[256];
-};
+}

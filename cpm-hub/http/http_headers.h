@@ -21,5 +21,5 @@
 #include <http/http.h>
 
 
-std::string encodeRequestHeaders(HttpRequest request);
+std::string encodeHeaders(HttpRequest request);
 

@@ -23,7 +23,7 @@
 describe("HTTP headers encoder", []() {
     it("encodes request with no headers", []() {
         HttpRequest request;
-        expect(encodeRequestHeaders(request)).toBe("");
+        expect(encodeHeaders(request)).toBe("");
     });
 
     it("encodes request with a single header", []() {
@@ -31,7 +31,7 @@ describe("HTTP headers encoder", []() {
 
         request.headers.set("header1", "value1");
 
-        expect(encodeRequestHeaders(request)).toBe("header1: value1\r\n");
+        expect(encodeHeaders(request)).toBe("header1: value1\r\n");
     });
 
     it("encodes request with a many headers", []() {
@@ -40,7 +40,7 @@ describe("HTTP headers encoder", []() {
         request.headers.set("header1", "value1");
         request.headers.set("header2", "value2");
 
-        expect(encodeRequestHeaders(request)).toBe(
+        expect(encodeHeaders(request)).toBe(
             "header1: value1\r\n"
             "header2: value2\r\n"
         );

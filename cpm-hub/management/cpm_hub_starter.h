@@ -15,29 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <json/json.hpp>
-#include <management/api/ManagementApi.h>
+#pragma once
 
-using namespace nlohmann;
+#include <management/ProgramOptions.h>
 
+void startCpmHub(ProgramOptions &program_options, std::vector<std::string> command_line);
 
-ManagementApi::ManagementApi(DeployService *deploy_service)
-{
-    this->deploy_service = deploy_service;
-}
-
-
-HttpResponse ManagementApi::deploy(HttpRequest &request)
-{
-    auto json = json::parse(request.body);
-
-    try {
-        this->deploy_service->deploy(
-                json.at("payload"),
-                json.at("version"),
-                request.headers.get("API_KEY"));
-        return HttpResponse(200, "");
-    } catch (AuthenticationFailure &error) {
-        return HttpResponse(401, "unauthorized");
-    }
-}

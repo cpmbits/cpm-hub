@@ -15,29 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <json/json.hpp>
-#include <users/api/UsersApi.h>
-
-using namespace nlohmann;
+#include <management/http_routes.h>
 
 
-UsersApi::UsersApi(UsersService *users_service)
+using namespace std;
+
+
+void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api)
 {
-    this->users_service = users_service;
+    http_server.post("/plugins", [plugins_api](HttpRequest &request) -> HttpResponse {
+        return plugins_api->publishPlugin(request);
+    });
+    http_server.get("/plugins/:pluginName", [plugins_api](HttpRequest &request) -> HttpResponse {
+        return plugins_api->downloadPlugin(request);
+    });
 }
 
 
-HttpResponse UsersApi::registerUser(HttpRequest &request)
+void installManagementRoutes(HttpServer &http_server, ManagementApi *management_api)
 {
-    HttpResponse response(200, "");
-    auto json = json::parse(request.body);
-    struct UserRegistrationData registration_data = {
-        json.at("user_name"),
-        json.at("password"),
-        json.at("email"),
-    };
-
-    this->users_service->registerUser(registration_data);
-
-    return response;
+    http_server.post("/deploy", [management_api](HttpRequest &request) -> HttpResponse {
+        return management_api->deploy(request);
+    });
 }

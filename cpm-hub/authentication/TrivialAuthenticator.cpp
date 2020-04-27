@@ -33,7 +33,6 @@ Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
     username = iter->second;
 
     return username;
-
 }
 
 

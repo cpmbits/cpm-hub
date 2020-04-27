@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <users/api/UsersApi.h>
+#include <users/rest_api/UsersApi.h>
 #include <users/UsersService.h>
 #include <users/UsersRepositoryInMemory.h>
 #include <http/http.h>

@@ -27,7 +27,6 @@ using namespace cest;
 using namespace fakeit;
 using namespace std;
 
-//static const char *execl_args[8];
 static string execl_args[8];
 
 

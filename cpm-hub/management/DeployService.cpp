@@ -28,6 +28,14 @@ using namespace std;
 static NullAuthenticator unauthenticated;
 
 
+DeployService::DeployService(Filesystem *filesystem, Authenticator *authenticator, std::vector<std::string> command_line)
+{
+    this->filesystem = filesystem;
+    this->authenticator = authenticator;
+    this->command_line = command_line;
+}
+
+
 DeployService::DeployService(Filesystem *filesystem)
 {
     this->filesystem = filesystem;

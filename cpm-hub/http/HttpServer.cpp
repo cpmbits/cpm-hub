@@ -159,13 +159,13 @@ ServerCallback HttpServer::parseRequest(struct http_message *message, HttpReques
         }
     }
 
-    decodeRequestHeaders(message, request);
+    digestHeaders(message, request);
 
     return server_callback;
 }
 
 
-void HttpServer::decodeRequestHeaders(struct http_message *message, HttpRequest &request)
+void HttpServer::digestHeaders(struct http_message *message, HttpRequest &request)
 {
     for (int i=0; message->header_names[i].len > 0; ++i) {
         request.headers.set(

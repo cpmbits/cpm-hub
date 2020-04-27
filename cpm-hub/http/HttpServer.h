@@ -65,7 +65,7 @@ private:
 
     ServerCallback parseRequest(struct http_message *message, HttpRequest &request);
 
-    void decodeRequestHeaders(struct http_message *message, HttpRequest &request);
+    void digestHeaders(struct http_message *message, HttpRequest &request);
 
     void createConnection(const std::string &address, int port);
 

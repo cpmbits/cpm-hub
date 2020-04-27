@@ -20,7 +20,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/api/PluginsApi.h>
+#include <plugins/rest_api/PluginsApi.h>
 #include <plugins/PluginsService.h>
 
 using namespace cest;

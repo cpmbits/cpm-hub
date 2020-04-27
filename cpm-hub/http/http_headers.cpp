@@ -21,7 +21,7 @@
 using namespace std;
 
 
-string encodeRequestHeaders(HttpRequest request)
+string encodeHeaders(HttpRequest request)
 {
     ostringstream encoded;
 
