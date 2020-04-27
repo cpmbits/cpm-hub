@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <json/json.hpp>
-#include <plugins/api/PluginsApi.h>
+#include <plugins/rest_api/PluginsApi.h>
 #include <plugins/PluginsService.h>
 
 using namespace nlohmann;

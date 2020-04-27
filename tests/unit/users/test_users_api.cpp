@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <users/api/UsersApi.h>
+#include <users/rest_api/UsersApi.h>
 
 using namespace cest;
 using namespace fakeit;

@@ -19,11 +19,11 @@
 #include <http/HttpServer.h>
 #include <management/cpm_hub_starter.h>
 #include <management/DeployService.h>
-#include <management/api/ManagementApi.h>
+#include <management/rest_api/ManagementApi.h>
 #include <management/http_routes.h>
 #include <plugins/PluginsRepositoryInFilesystem.h>
 #include <plugins/PluginsService.h>
-#include <plugins/api/PluginsApi.h>
+#include <plugins/rest_api/PluginsApi.h>
 
 
 static Filesystem filesystem;

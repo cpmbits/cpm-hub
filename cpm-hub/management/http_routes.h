@@ -21,8 +21,8 @@
 #include <string>
 
 #include <http/HttpServer.h>
-#include <plugins/api/PluginsApi.h>
-#include <management/api/ManagementApi.h>
+#include <plugins/rest_api/PluginsApi.h>
+#include <management/rest_api/ManagementApi.h>
 
 
 void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api);

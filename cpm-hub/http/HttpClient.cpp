@@ -27,7 +27,7 @@ HttpResponse HttpClient::post(std::string url, HttpRequest request)
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "POST", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
+    connection = mg_connect_http(&mgr, "POST", eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -44,7 +44,7 @@ HttpResponse HttpClient::put(std::string url, HttpRequest request)
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "PUT", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
+    connection = mg_connect_http(&mgr, "PUT", eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -61,7 +61,7 @@ HttpResponse HttpClient::method(std::string url, HttpRequest request, std::strin
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, method.c_str(), eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), request.body.c_str());
+    connection = mg_connect_http(&mgr, method.c_str(), eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -78,7 +78,7 @@ HttpResponse HttpClient::get(std::string url, HttpRequest request)
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "GET", eventHandler, url.c_str(), encodeRequestHeaders(request).c_str(), NULL);
+    connection = mg_connect_http(&mgr, "GET", eventHandler, url.c_str(), encodeHeaders(request).c_str(), NULL);
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
