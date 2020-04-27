@@ -15,12 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
-
-#include <management/ProgramOptions.h>
-#include <http/HttpServer.h>
+#include <management/http_routes.h>
 
 
-void installServiceRoutes(HttpServer& http_server, ProgramOptions &options);
+using namespace std;
 
-void installManagementRoutes(HttpServer &http_server, std::vector<std::string> vector, ProgramOptions &options);
+
+void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api)
+{
+    http_server.post("/plugins", [plugins_api](HttpRequest &request) -> HttpResponse {
+        return plugins_api->publishPlugin(request);
+    });
+    http_server.get("/plugins/:pluginName", [plugins_api](HttpRequest &request) -> HttpResponse {
+        return plugins_api->downloadPlugin(request);
+    });
+}
+
+
+void installManagementRoutes(HttpServer &http_server, ManagementApi *management_api)
+{
+    http_server.post("/deploy", [management_api](HttpRequest &request) -> HttpResponse {
+        return management_api->deploy(request);
+    });
+}

@@ -23,6 +23,13 @@
 using namespace std;
 
 
+AccessFileAuthenticator::AccessFileAuthenticator(Filesystem *filesystem, string access_file)
+{
+    this->filesystem = filesystem;
+    this->access_file = access_file;
+}
+
+
 AccessFileAuthenticator::AccessFileAuthenticator(Filesystem *filesystem)
 {
     this->filesystem = filesystem;
@@ -60,7 +67,6 @@ Optional<string> AccessFileAuthenticator::authenticate(const char *key)
 
     return user;
 }
-
 
 void AccessFileAuthenticator::setAccessFile(std::string filename)
 {

@@ -17,34 +17,7 @@
  */
 #pragma once
 
-#include <string>
-#include <infrastructure/Optional.h>
+#include <management/ProgramOptions.h>
 
+void startCpmHub(ProgramOptions &program_options, std::vector<std::string> command_line);
 
-class Authenticator {
-public:
-    virtual Optional<std::string> authenticate(const char *key) = 0;
-};
-
-
-class NullAuthenticator: public Authenticator {
-public:
-    Optional <std::string> authenticate(const char *key) {
-        return Optional<std::string>("john_doe");
-    }
-};
-
-
-class AuthenticationFailure: public std::exception {
-public:
-    AuthenticationFailure() throw() {
-        sprintf(message, "unauthorized");
-    }
-
-    const char *what() const throw () {
-        return message;
-    }
-
-private:
-    char message[256];
-};

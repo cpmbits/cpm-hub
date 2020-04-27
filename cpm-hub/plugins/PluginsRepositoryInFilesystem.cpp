@@ -46,6 +46,17 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 }
 
 
+PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, string &directory)
+{
+    this->filesystem = filesystem;
+    this->directory = directory;
+    this->index = index;
+    this->index_file = this->directory + "/index.json";
+
+    this->restore(directory);
+}
+
+
 void PluginsRepositoryInFilesystem::add(Plugin &plugin)
 {
     string relative_directory = plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;

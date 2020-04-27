@@ -24,4 +24,5 @@ struct PluginPublicationData {
     std::string version;
     std::string user_name;
     std::string payload;
+    std::string api_key;
 };

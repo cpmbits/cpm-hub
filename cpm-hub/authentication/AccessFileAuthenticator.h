@@ -27,6 +27,8 @@ class AccessFileAuthenticator: public Authenticator {
 public:
     AccessFileAuthenticator(Filesystem *filesystem);
 
+    AccessFileAuthenticator(Filesystem *filesystem, std::string access_file);
+
     void setAccessFile(std::string filename);
 
     Optional<std::string> authenticate(const char *key);

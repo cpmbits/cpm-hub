@@ -20,7 +20,7 @@
 #include <inih/INIReader.h>
 
 #include <management/ProgramOptions.h>
-#include <management/routes.h>
+#include <management/cpm_hub_starter.h>
 
 using namespace boost::program_options;
 using namespace std;
@@ -76,19 +76,11 @@ static vector<string> saveCommandLine(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
     ProgramOptions program_options;
-    HttpServer service_http_server;
-    HttpServer management_http_server;
     vector<string> command_line = saveCommandLine(argc, argv);
 
     program_options = parseProgramOptions(argc, argv);
 
-    installServiceRoutes(service_http_server, program_options);
-    service_http_server.configureSecurity(program_options.security_options);
-    service_http_server.startAsync("0.0.0.0", program_options.http_service_port);
-
-    installManagementRoutes(management_http_server, command_line, program_options);
-    management_http_server.configureSecurity(program_options.security_options);
-    management_http_server.start("0.0.0.0", program_options.http_management_port);
+    startCpmHub(program_options, command_line);
 
     return 0;
 }

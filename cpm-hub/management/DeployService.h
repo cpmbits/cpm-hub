@@ -27,11 +27,13 @@ class DeployService {
 public:
     DeployService(Filesystem *filesystem);
 
+    DeployService(Filesystem *filesystem, Authenticator *authenticator, std::vector<std::string> command_line);
+
     virtual void deploy(const std::string &payload, const std::string &version, const std::string &api_key);
 
     virtual void setCommandLine(std::vector<std::string> cmdline);
 
-    virtual void configureAuthenticator(Authenticator *auth);
+    virtual void configureAuthenticator(Authenticator *authenticator);
 
 private:
     Filesystem *filesystem;

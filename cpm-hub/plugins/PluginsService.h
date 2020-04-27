@@ -20,6 +20,7 @@
 #include <string>
 #include <list>
 
+#include <authentication/Authenticator.h>
 #include <infrastructure/Optional.h>
 #include <plugins/PluginPublicationData.h>
 #include <plugins/PluginsRepository.h>
@@ -29,6 +30,8 @@ class PluginsService {
 public:
     PluginsService(PluginsRepository *plugins_repository);
 
+    PluginsService(PluginsRepository *plugins_repository, Authenticator *authenticator);
+
     virtual Plugin publishPlugin(struct PluginPublicationData publication_data);
 
     virtual std::list<Plugin> allPlugins();
@@ -37,4 +40,5 @@ public:
 
 private:
     PluginsRepository *plugins_repository;
+    Authenticator *authenticator;
 };

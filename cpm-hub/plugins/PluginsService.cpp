@@ -19,9 +19,20 @@
 
 using namespace std;
 
+static NullAuthenticator unauthenticated;
 
-PluginsService::PluginsService(PluginsRepository *plugins_repository) {
+
+PluginsService::PluginsService(PluginsRepository *plugins_repository, Authenticator *authenticator)
+{
     this->plugins_repository = plugins_repository;
+    this->authenticator = authenticator;
+}
+
+
+PluginsService::PluginsService(PluginsRepository *plugins_repository)
+{
+    this->plugins_repository = plugins_repository;
+    this->authenticator = &unauthenticated;
 }
 
 
