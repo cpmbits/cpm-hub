@@ -10,10 +10,10 @@ proprietary plugins.
 ### Compilation
 CPM Hub depends on CPM for building its sources. Install CPM using pip:
 
-`pip install cpm`
+`pip install cpm-cli`
 
 Then you can simply build the project:
 
 `cpm build`
 
-The project binary will be found in the root folder as `cpm-hub`. 
+The project binary will be found in the build folder as `build/cpm-hub`. 
