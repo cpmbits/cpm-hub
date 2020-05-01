@@ -15,34 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <authentication/TrivialAuthenticator.h>
-#include <infrastructure/Optional.h>
+#pragma once
 
-using namespace std;
+#include <string.h>
 
 
-Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
-{
-    auto iter = this->credentials.find(key);
-    Optional<string> username;
+struct UserCredentials {
+    std::string username;
+    std::string password;
 
-    if (iter == this->credentials.end()) {
-        return username;
+    UserCredentials(std::string username, std::string password) {
+        username = std::move(username);
+        password = std::move(password);
     }
-
-    username = iter->second;
-
-    return username;
-}
-
-
-void TrivialAuthenticator::addUser(UserCredentials &credentials)
-{
-    this->credentials.insert(make_pair(credentials.username, credentials.password));
-}
-
-
-bool TrivialAuthenticator::validCredentials(UserCredentials &credentials)
-{
-    return false;
-}
+};

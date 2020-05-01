@@ -25,6 +25,7 @@
 
 using namespace cest;
 using namespace fakeit;
+using namespace std;
 
 
 describe("Plugins API", []() {
@@ -32,7 +33,9 @@ describe("Plugins API", []() {
         HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
-            "\"payload\": \"ABCDEabcde\""
+            "\"payload\": \"ABCDEabcde\","
+            "\"username\": \"john_doe\","
+            "\"password\": \"pass\""
         "}");
         HttpResponse response;
         Plugin plugin("");
@@ -52,12 +55,32 @@ describe("Plugins API", []() {
                    data.payload == "ABCDEabcde";
         }));
     });
-    
+
+    it("returns error 401 when publishing a plugin and authentication fails", [&]() {
+        HttpRequest request("{"
+            "\"plugin_name\": \"cest\","
+            "\"version\": \"1.0\","
+            "\"payload\": \"ABCDEabcde\","
+            "\"username\": \"john_doe\","
+            "\"password\": \"pass\""
+        "}");
+        HttpResponse response;
+        Mock<PluginsService> mock_service;
+        Mock<Authenticator> mock_authenticator;
+        PluginsApi api(&mock_service.get(), &mock_authenticator.get());
+
+        When(Method(mock_authenticator, validCredentials)).Return(false);
+
+        response = api.publishPlugin(request);
+
+        expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
+    });
+
     it("uses the plugin service to list the available plugins", [&]() {
         HttpRequest request("");
         HttpResponse response;
         Plugin plugin("cest");
-        std::list<Plugin> plugins {plugin};
+        list<Plugin> plugins {plugin};
         Mock<PluginsService> mock_service;
         PluginsApi api(&mock_service.get());
 

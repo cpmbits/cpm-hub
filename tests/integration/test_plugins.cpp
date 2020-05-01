@@ -17,6 +17,7 @@
  */
 #include <cest/cest.h>
 
+#include <authentication/TrivialAuthenticator.h>
 #include <plugins/rest_api/PluginsApi.h>
 #include <plugins/PluginsRepositoryInMemory.h>
 
@@ -24,47 +25,51 @@ using namespace cest;
 
 
 describe("CPM Hub plugins management", []() {
-    it("fails to publish a plugin when authentication fails", [&]() {
-        HttpRequest request("{"
-            "\"plugin_name\": \"cest\","
-            "\"version\": \"1.0\","
-            "\"payload\": \"ABCDEabcde\""
-        "}");
-        HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
-
-        response = api.publishPlugin(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("");
-    });
-
-    it("publishes a plugin using proper authentication", [&]() {
+    it("publishes a plugin when no authentication is configured", [&]() {
         HttpRequest request("{"
                             "\"plugin_name\": \"cest\","
                             "\"version\": \"1.0\","
-                            "\"payload\": \"ABCDEabcde\""
+                            "\"payload\": \"ABCDEabcde\","
+                            "\"username\": \"john_doe\","
+                            "\"password\": \"12345\""
                             "}");
         HttpResponse response;
         PluginsRepositoryInMemory repository;
         PluginsService service(&repository);
         PluginsApi api(&service);
 
-        request.headers.set("X-API-Key", "");
+        response = api.publishPlugin(request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(response.body).toBe("");
+    });
+
+    it("fails to publish a plugin when authentication fails", [&]() {
+        HttpRequest request("{"
+                            "\"plugin_name\": \"cest\","
+                            "\"version\": \"1.0\","
+                            "\"payload\": \"ABCDEabcde\","
+                            "\"username\": \"john_doe\","
+                            "\"password\": \"12345\""
+                            "}");
+        HttpResponse response;
+        TrivialAuthenticator authenticator;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service, &authenticator);
 
         response = api.publishPlugin(request);
 
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("");
+        expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
 
     it("lists a plugin after it has been registered", [&]() {
         HttpRequest request("{"
             "\"plugin_name\": \"cest\","
             "\"version\": \"1.0\","
-            "\"payload\": \"ABCDEabcde\""
+            "\"payload\": \"ABCDEabcde\","
+            "\"username\": \"john_doe\","
+            "\"password\": \"12345\""
         "}");
         HttpResponse response;
         PluginsRepositoryInMemory repository;
@@ -75,7 +80,7 @@ describe("CPM Hub plugins management", []() {
 
         response = api.listPlugins(request);
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
     });
 
@@ -90,11 +95,17 @@ describe("CPM Hub plugins management", []() {
 
         response = api.downloadPlugin(request);
 
-        expect(response.status_code).toBe(404);
+        expect(response.status_code).toBe(HttpStatus::NOT_FOUND);
     });
 
     it("finds a plugin after it has been registered", [&]() {
-        HttpRequest publish_request("{\"plugin_name\": \"cest\",\"version\": \"1.0\",\"payload\": \"ABCDEabcde\"}");
+        HttpRequest publish_request("{"
+            "\"plugin_name\": \"cest\","
+            "\"version\": \"1.0\","
+            "\"payload\": \"ABCDEabcde\","
+            "\"username\": \"john_doe\","
+            "\"password\": \"12345\""
+        "}");
         HttpRequest download_request;
         HttpResponse response;
         PluginsRepositoryInMemory repository;
@@ -106,7 +117,7 @@ describe("CPM Hub plugins management", []() {
         download_request.parameters.set("pluginName", "cest");
         response = api.downloadPlugin(download_request);
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
     });
 });

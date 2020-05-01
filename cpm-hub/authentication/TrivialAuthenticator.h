@@ -27,7 +27,9 @@ class TrivialAuthenticator : public Authenticator {
 public:
     virtual Optional<std::string> authenticate(const char *key);
 
-    virtual void addUser(std::string &username, std::string &api_key);
+    virtual void addUser(UserCredentials &credentials);
+
+    bool validCredentials(UserCredentials &credentials);
 
 private:
     std::map<std::string, std::string> credentials;

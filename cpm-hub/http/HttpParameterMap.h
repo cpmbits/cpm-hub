@@ -35,6 +35,11 @@ public:
         parameters.insert(std::make_pair(parameter, value));
     }
 
+    bool has(const std::string& parameter) {
+        auto iter = parameters.find(parameter);
+        return iter != parameters.end();
+    }
+
     int count() {
         return parameters.size();
     }
