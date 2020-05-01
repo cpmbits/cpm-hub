@@ -36,8 +36,8 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
                 json.at("payload"),
                 json.at("version"),
                 request.headers.get("API_KEY"));
-        return HttpResponse(200, "");
+        return HttpResponse::ok("");
     } catch (AuthenticationFailure &error) {
-        return HttpResponse(401, "unauthorized");
+        return HttpResponse::unauthorized();
     }
 }

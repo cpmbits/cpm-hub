@@ -50,4 +50,11 @@ struct HttpResponse {
         response.body = body;
         return response;
     }
+
+    static HttpResponse notFound() {
+        HttpResponse response;
+        response.status_code = HttpStatus::NOT_FOUND;
+        response.body = "";
+        return response;
+    }
 };

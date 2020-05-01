@@ -44,7 +44,7 @@ HttpResponse PluginsApi::publishPlugin(HttpRequest &request)
     auto json = json::parse(request.body);
     Optional<string> user;
     struct PluginPublicationData publication_data;
-    UserCredentials credentials(json.at("username"),json.at("password"));
+    UserCredentials credentials = {json.at("username"),json.at("password")};
 
     if (!this->authenticator->validCredentials(credentials)) {
         return HttpResponse::unauthorized();
