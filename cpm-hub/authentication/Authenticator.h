@@ -19,11 +19,14 @@
 
 #include <string>
 #include <infrastructure/Optional.h>
+#include <authentication/UserCredentials.h>
 
 
 class Authenticator {
 public:
     virtual Optional<std::string> authenticate(const char *key) = 0;
+
+    virtual bool validCredentials(UserCredentials &credentials) = 0;
 };
 
 
@@ -31,6 +34,10 @@ class NullAuthenticator: public Authenticator {
 public:
     Optional <std::string> authenticate(const char *key) {
         return Optional<std::string>("john_doe");
+    }
+
+    bool validCredentials(UserCredentials &credentials) {
+        return true;
     }
 };
 

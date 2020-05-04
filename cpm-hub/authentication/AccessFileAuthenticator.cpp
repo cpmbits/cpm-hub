@@ -72,3 +72,9 @@ void AccessFileAuthenticator::setAccessFile(std::string filename)
 {
     this->access_file = filename;
 }
+
+
+bool AccessFileAuthenticator::validCredentials(UserCredentials &credentials)
+{
+    return false;
+}

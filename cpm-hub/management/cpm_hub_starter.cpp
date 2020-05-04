@@ -43,8 +43,8 @@ void startServiceServer(ProgramOptions &options)
     plugin_index = new PluginIndex();
     plugins_repository = new PluginsRepositoryInFilesystem(&filesystem, plugin_index, options.plugins_directory);
     plugins_api_authenticator = new NullAuthenticator();
-    plugins_service = new PluginsService(plugins_repository, plugins_api_authenticator);
-    plugins_api = new PluginsApi(plugins_service);
+    plugins_service = new PluginsService(plugins_repository);
+    plugins_api = new PluginsApi(plugins_service, plugins_api_authenticator);
 
     installServiceRoutes(service_http_server, plugins_api);
     service_http_server.configureSecurity(options.security_options);

@@ -26,29 +26,24 @@ using namespace std;
 describe("TrivialAuthenticator", []() {
     it("allows adding users", []() {
         TrivialAuthenticator authenticator;
-        string username("user");
-        string api_key("password");
+        UserCredentials credentials = {"user", "pass"};
 
-        authenticator.addUser(username, api_key);
+        authenticator.addUser(credentials);
     });
 
-    it("fails to authenticate user when api_key is not in the database", []() {
+    it("fails to validCredentials user when user is not in the database", []() {
         TrivialAuthenticator authenticator;
-        Optional<string> user;
+        UserCredentials credentials = {"user", "pass"};
 
-        user = authenticator.authenticate("api_key");
-        expect(user.isPresent()).toBe(false);
+        expect(authenticator.validCredentials(credentials)).toBe(false);
     });
 
     it("authenticates user when api_key is in the database", []() {
         TrivialAuthenticator authenticator;
-        string username("user");
-        string api_key("api_key");
-        Optional<string> user;
+        UserCredentials credentials = {"user", "pass"};
 
-        authenticator.addUser(username, api_key);
+        authenticator.addUser(credentials);
 
-        user = authenticator.authenticate("api_key");
-        expect(user.value()).toBe("user");
+        expect(authenticator.validCredentials(credentials)).toBe(false);
     });
 });

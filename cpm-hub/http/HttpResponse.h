@@ -19,6 +19,7 @@
 
 #include <string>
 
+#include <http/http_status_codes.h>
 
 struct HttpResponse {
     int status_code;
@@ -34,5 +35,26 @@ struct HttpResponse {
     {
         status_code = _status_code;
         body = _body;
+    }
+
+    static HttpResponse unauthorized() {
+        HttpResponse response;
+        response.status_code = HttpStatus::UNAUTHORIZED;
+        response.body = "";
+        return response;
+    }
+
+    static HttpResponse ok(std::string body) {
+        HttpResponse response;
+        response.status_code = HttpStatus::OK;
+        response.body = body;
+        return response;
+    }
+
+    static HttpResponse notFound() {
+        HttpResponse response;
+        response.status_code = HttpStatus::NOT_FOUND;
+        response.body = "";
+        return response;
     }
 };

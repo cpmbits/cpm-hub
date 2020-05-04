@@ -24,11 +24,11 @@
 
 class HttpClient {
 public:
-    HttpResponse get(std::string url, HttpRequest request);
-    HttpResponse post(std::string url, HttpRequest request);
-    HttpResponse put(std::string url, HttpRequest request);
-    HttpResponse method(std::string url, HttpRequest request, std::string method);
-    void responseArrived(HttpResponse response);
+    virtual HttpResponse get(std::string url, HttpRequest request);
+    virtual HttpResponse post(std::string url, HttpRequest request);
+    virtual HttpResponse put(std::string url, HttpRequest request);
+    virtual HttpResponse method(std::string url, HttpRequest request, std::string method);
+    virtual void responseArrived(HttpResponse response);
 
 private:
     bool request_pending;

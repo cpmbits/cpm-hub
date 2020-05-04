@@ -17,13 +17,17 @@
  */
 #pragma once
 
+#include <authentication/Authenticator.h>
 #include <http/http.h>
 #include <plugins/PluginsService.h>
+#include <authentication/UserCredentials.h>
 
 class PluginsApi {
 public:
     PluginsApi(PluginsService *plugins_service);
-    
+
+    PluginsApi(PluginsService *plugins_service, Authenticator *authenticator);
+
     HttpResponse publishPlugin(HttpRequest &request);
 
     HttpResponse listPlugins(HttpRequest &request);
@@ -32,4 +36,10 @@ public:
 
 private:
     PluginsService *plugins_service;
+
+    Authenticator *authenticator;
+
+    bool validCredentials(HttpRequest &request);
+
+    UserCredentials credentialsFrom(HttpRequest &request);
 };

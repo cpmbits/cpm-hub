@@ -18,36 +18,52 @@
 #include <json/json.hpp>
 #include <plugins/rest_api/PluginsApi.h>
 #include <plugins/PluginsService.h>
+#include <authentication/UserCredentials.h>
 
 using namespace nlohmann;
 using namespace std;
 
+static NullAuthenticator unauthenticated;
+
 
 PluginsApi::PluginsApi(PluginsService *plugins_service) {
     this->plugins_service = plugins_service;
+    this->authenticator = &unauthenticated;
+}
+
+
+PluginsApi::PluginsApi(PluginsService *plugins_service, Authenticator *authenticator)
+{
+    this->plugins_service = plugins_service;
+    this->authenticator = authenticator;
 }
 
 
 HttpResponse PluginsApi::publishPlugin(HttpRequest &request)
 {
-    HttpResponse response(200, "");
     auto json = json::parse(request.body);
-    struct PluginPublicationData registration_data = {
-        json.at("plugin_name"), 
-        json.at("version"), 
-        "john_doe" ,
-        json.at("payload"),
-    };
+    Optional<string> user;
+    struct PluginPublicationData publication_data;
+    UserCredentials credentials = {json.at("username"),json.at("password")};
 
-    plugins_service->publishPlugin(registration_data);
+    if (!this->authenticator->validCredentials(credentials)) {
+        return HttpResponse::unauthorized();
+    }
 
-    return response;
+    publication_data.plugin_name = json.at("plugin_name");
+    publication_data.version = json.at("version");
+    publication_data.user_name = json.at("username");
+    publication_data.payload = json.at("payload");
+
+    plugins_service->publishPlugin(publication_data);
+
+    return HttpResponse::ok("");
 }
 
 
 HttpResponse PluginsApi::listPlugins(HttpRequest &request)
 {
-    HttpResponse response(200, "");
+    HttpResponse response(HttpStatus::OK, "");
     json json_plugin_list = json::array();
 
     for (Plugin plugin : plugins_service->allPlugins()) {
@@ -78,8 +94,8 @@ HttpResponse PluginsApi::downloadPlugin(HttpRequest &request)
 
     plugin = plugins_service->find(request.parameters.get("pluginName"));
     if (!plugin.isPresent()) {
-        return HttpResponse(404, "");
+        return HttpResponse(HttpStatus::NOT_FOUND, "");
     }
 
-    return HttpResponse(200, asJson(plugin.value()));
+    return HttpResponse(HttpStatus::OK, asJson(plugin.value()));
 }

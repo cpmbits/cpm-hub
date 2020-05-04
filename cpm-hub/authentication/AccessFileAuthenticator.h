@@ -33,6 +33,8 @@ public:
 
     Optional<std::string> authenticate(const char *key);
 
+    bool validCredentials(UserCredentials &credentials);
+
 private:
     Filesystem *filesystem;
     std::string access_file;

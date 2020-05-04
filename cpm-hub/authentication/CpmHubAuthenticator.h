@@ -15,34 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <authentication/TrivialAuthenticator.h>
-#include <infrastructure/Optional.h>
+#pragma once
 
-using namespace std;
-
-
-Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
-{
-    auto iter = this->credentials.find(key);
-    Optional<string> username;
-
-    if (iter == this->credentials.end()) {
-        return username;
-    }
-
-    username = iter->second;
-
-    return username;
-}
+#include <string>
+#include <authentication/Authenticator.h>
+#include <http/HttpClient.h>
 
 
-void TrivialAuthenticator::addUser(UserCredentials &credentials)
-{
-    this->credentials.insert(make_pair(credentials.username, credentials.password));
-}
+class CpmHubAuthenticator : public Authenticator {
 
+public:
+    CpmHubAuthenticator(std::string &auth_service_url, HttpClient &client);
 
-bool TrivialAuthenticator::validCredentials(UserCredentials &credentials)
-{
-    return false;
-}
+    Optional<std::string> authenticate(const char *key) override;
+
+    bool validCredentials(UserCredentials &credentials) override;
+
+private:
+    std::string auth_service_url;
+
+    HttpClient *client;
+};
