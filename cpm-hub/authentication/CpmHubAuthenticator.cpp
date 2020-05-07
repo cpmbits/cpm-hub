@@ -54,8 +54,8 @@ static string hashed(string &password)
 static string asJson(UserCredentials &credentials)
 {
     json json_credentials = {
-            {"username", credentials.username},
-            {"password", hashed(credentials.password)},
+        {"username", credentials.username},
+        {"password", hashed(credentials.password)},
     };
 
     return json_credentials.dump();
@@ -67,6 +67,7 @@ bool CpmHubAuthenticator::validCredentials(UserCredentials &credentials)
     HttpRequest request(asJson(credentials));
     HttpResponse response;
 
+    request.headers.set("Content-type", "application/json");
     response = this->client->post(this->auth_service_url, request);
 
     return response.status_code == HttpStatus::OK;

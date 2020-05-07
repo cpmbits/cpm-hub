@@ -60,7 +60,8 @@ describe("CpmHubAuthenticator", []() {
 
         Verify(Method(mock_http_client, post).Matching([](string url, HttpRequest request) {
             return url == "http://localhost:1234" &&
-                   request.body == "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}";
+                   request.body == "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}" &&
+                   request.headers.get("Content-type") == "application/json";
         }));
     });
 });

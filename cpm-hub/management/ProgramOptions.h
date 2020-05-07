@@ -21,8 +21,15 @@
 #include <http/http.h>
 
 struct ProgramOptions {
+    enum AuthenticatorType {
+        UNAUTHENTICATED,
+        ACCESS_FILE_AUTHENTICATOR,
+        CPM_HUB_AUTHENTICATOR,
+    };
     std::string plugins_directory = ".";
+    AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
+    std::string cpm_hub_url = "http://localhost:1234";
     int http_service_port = 8000;
     int http_management_port = 8001;
     HttpSecurityOptions security_options;
