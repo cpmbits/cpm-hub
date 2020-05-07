@@ -22,6 +22,12 @@
 using namespace boost::program_options;
 using namespace std;
 
+map<string, ProgramOptions::AuthenticatorType> string_to_authenticator_type = {
+        {"unauthenticated", ProgramOptions::UNAUTHENTICATED},
+        {"access_file", ProgramOptions::ACCESS_FILE_AUTHENTICATOR},
+        {"cpm_hub_auth", ProgramOptions::CPM_HUB_AUTHENTICATOR},
+};
+
 
 static ProgramOptions parseIniFile(string &ini_file)
 {
@@ -30,6 +36,8 @@ static ProgramOptions parseIniFile(string &ini_file)
 
     program_options.plugins_directory = ini_reader.Get("Service", "plugins_directory", ".");
     program_options.http_service_port = ini_reader.GetInteger("Service", "port", 8000);
+    program_options.authenticator_type = string_to_authenticator_type[ini_reader.Get("Service", "authentication", "unauthenticated")];
+    program_options.cpm_hub_url = ini_reader.Get("Service", "cpm_hub_url", "http://localhost:1234");
     program_options.http_management_port = ini_reader.GetInteger("Management", "port", 8001);
     program_options.security_options.security_enabled = ini_reader.GetBoolean("Management", "security_enabled", true);
     program_options.security_options.certificate_file = ini_reader.Get("Management", "certificate_file", "certificate.pem");

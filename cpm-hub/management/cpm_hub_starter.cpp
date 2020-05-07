@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <authentication/AccessFileAuthenticator.h>
+#include <authentication/CpmHubAuthenticator.h>
 #include <http/HttpServer.h>
 #include <management/cpm_hub_starter.h>
 #include <management/DeployService.h>
@@ -31,6 +32,7 @@ static HttpServer service_http_server;
 static PluginsApi *plugins_api;
 static HttpServer management_http_server;
 static ManagementApi *management_api;
+static HttpClient cpm_hub_auth_client;
 
 
 void startServiceServer(ProgramOptions &options)
@@ -42,7 +44,19 @@ void startServiceServer(ProgramOptions &options)
 
     plugin_index = new PluginIndex();
     plugins_repository = new PluginsRepositoryInFilesystem(&filesystem, plugin_index, options.plugins_directory);
-    plugins_api_authenticator = new NullAuthenticator();
+    switch (options.authenticator_type) {
+    case ProgramOptions::UNAUTHENTICATED:
+        plugins_api_authenticator = new NullAuthenticator();
+        break;
+
+    case ProgramOptions::CPM_HUB_AUTHENTICATOR:
+        plugins_api_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
+        break;
+
+    case ProgramOptions::ACCESS_FILE_AUTHENTICATOR:
+        plugins_api_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
+        break;
+    }
     plugins_service = new PluginsService(plugins_repository);
     plugins_api = new PluginsApi(plugins_service, plugins_api_authenticator);
 
