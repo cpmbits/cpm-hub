@@ -49,3 +49,9 @@ std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
 
     return stored_plugins;
 }
+
+
+Optional<Plugin> PluginsRepositoryInMemory::find(std::string name, std::string version)
+{
+    return Optional<Plugin>();
+}

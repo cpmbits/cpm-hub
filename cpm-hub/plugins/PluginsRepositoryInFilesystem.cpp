@@ -90,7 +90,7 @@ void PluginsRepositoryInFilesystem::saveMetadata(const string& name, const strin
 }
 
 
-Optional<Plugin> PluginsRepositoryInFilesystem::find(string name)
+Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name)
 {
     Optional<Plugin> plugin;
     Optional<string> relative_directory;
@@ -139,4 +139,10 @@ void PluginsRepositoryInFilesystem::restore(string directory)
     if (this->filesystem->fileExists(this->index_file)) {
         this->index->restore(this->filesystem->readFile(this->index_file));
     }
+}
+
+
+Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name, std::string version)
+{
+    return Optional<Plugin>();
 }

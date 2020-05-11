@@ -49,3 +49,9 @@ Optional<Plugin> PluginsService::find(std::string plugin_name)
 {
     return plugins_repository->find(plugin_name);
 }
+
+
+Optional<Plugin> PluginsService::find(std::string plugin_name, std::string version)
+{
+    return plugins_repository->find(plugin_name, version);
+}

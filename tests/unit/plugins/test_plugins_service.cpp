@@ -23,6 +23,7 @@
 
 using namespace cest;
 using namespace fakeit;
+using namespace std;
 
 
 describe("Plugins Service", []() {
@@ -62,9 +63,22 @@ describe("Plugins Service", []() {
         Optional<Plugin> plugin;
 
         plugin = Plugin("cest");
-        When(Method(mock_repository, find)).Return(plugin);
+        When(OverloadedMethod(mock_repository, find, Optional<Plugin>(string))).Return(plugin);
 
         auto found_plugin = plugins_service.find("cest");
+
+        expect(found_plugin.value().metadata.name).toBe("cest");
+    });
+
+    it("uses the repository to find a plugin by name and version", [&]() {
+        Mock<PluginsRepository> mock_repository;
+        PluginsService plugins_service(&mock_repository.get());
+        Optional<Plugin> plugin;
+
+        plugin = Plugin("cest");
+        When(OverloadedMethod(mock_repository, find, Optional<Plugin>(string, string))).Return(plugin);
+
+        auto found_plugin = plugins_service.find("cest", "1.1");
 
         expect(found_plugin.value().metadata.name).toBe("cest");
     });

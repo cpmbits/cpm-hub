@@ -34,6 +34,8 @@ public:
 
     virtual Optional<Plugin> find(std::string name);
 
+    virtual Optional<Plugin> find(std::string name, std::string version);
+
     virtual std::list<Plugin> allPlugins();
 
     void restore(std::string directory);

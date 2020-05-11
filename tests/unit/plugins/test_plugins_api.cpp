@@ -100,15 +100,15 @@ describe("Plugins API", []() {
         Optional<Plugin> no_plugin;
 
         request.parameters.set("pluginName", "cest");
-        When(Method(mock_service, find)).Return(no_plugin);
+        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string))).Return(no_plugin);
 
         response = api.downloadPlugin(request);
 
-        Verify(Method(mock_service, find).Using("cest"));
+        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string)).Using("cest"));
         expect(response.status_code).toBe(404);
     });
             
-    it("returns plugin when downloading an existing plugin", [&]() {
+    it("returns latest plugin version when downloading an existing plugin", [&]() {
         HttpRequest request;
         HttpResponse response;
         Mock<PluginsService> mock_service;
@@ -117,16 +117,39 @@ describe("Plugins API", []() {
 
         request.parameters.set("pluginName", "cest");
         cest_plugin = Plugin("cest", "1.0", "user", "ABCDEabcde");
-        When(Method(mock_service, find)).Return(cest_plugin);
+        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string))).Return(cest_plugin);
 
         response = api.downloadPlugin(request);
 
-        Verify(Method(mock_service, find).Using("cest"));
+        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
             "\"payload\":\"ABCDEabcde\","
             "\"plugin_name\":\"cest\","
             "\"version\":\"1.0\""
+        "}");
+    });
+
+    it("returns specific plugin version when downloading an existing plugin", [&]() {
+        HttpRequest request;
+        HttpResponse response;
+        Mock<PluginsService> mock_service;
+        PluginsApi api(&mock_service.get());
+        Optional<Plugin> cest_plugin;
+
+        request.parameters.set("pluginName", "cest");
+        request.parameters.set("pluginVersion", "1.1");
+        cest_plugin = Plugin("cest", "1.1", "user", "ABCDEabcde");
+        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string, string))).Return(cest_plugin);
+
+        response = api.downloadPlugin(request);
+
+        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string, string)).Using("cest", "1.1"));
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("{"
+            "\"payload\":\"ABCDEabcde\","
+            "\"plugin_name\":\"cest\","
+            "\"version\":\"1.1\""
         "}");
     });
 });

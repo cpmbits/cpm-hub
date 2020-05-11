@@ -29,6 +29,9 @@ void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api)
     http_server.get("/plugins/:pluginName", [plugins_api](HttpRequest &request) -> HttpResponse {
         return plugins_api->downloadPlugin(request);
     });
+    http_server.get("/plugins/:pluginName/:pluginVersion", [plugins_api](HttpRequest &request) -> HttpResponse {
+        return plugins_api->downloadPlugin(request);
+    });
 }
 
 
