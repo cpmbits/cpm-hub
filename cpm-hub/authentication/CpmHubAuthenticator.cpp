@@ -27,7 +27,8 @@ constexpr char hexmap[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a'
 
 CpmHubAuthenticator::CpmHubAuthenticator(string &auth_service_url, HttpClient &client)
 {
-    this->auth_service_url = auth_service_url;
+    this->authentication_endpoint = auth_service_url + "/auth";
+    this->users_endpoint = auth_service_url + "/users";
     this->client = &client;
 }
 
@@ -68,7 +69,7 @@ bool CpmHubAuthenticator::validCredentials(UserCredentials &credentials)
     HttpResponse response;
 
     request.headers.set("Content-type", "application/json");
-    response = this->client->post(this->auth_service_url, request);
+    response = this->client->post(this->authentication_endpoint, request);
 
     return response.status_code == HttpStatus::OK;
 }
@@ -82,5 +83,8 @@ Optional<string> CpmHubAuthenticator::authenticate(const char *key)
 
 void CpmHubAuthenticator::addUser(UserCredentials &credentials)
 {
+    HttpRequest request(asJson(credentials));
+    request.headers.set("Content-type", "application/json");
+    this->client->post(this->users_endpoint, request);
 }
 
