@@ -34,6 +34,7 @@ public:
     virtual void addUser(UserCredentials &credentials);
 
 private:
-    std::string auth_service_url;
+    std::string authentication_endpoint;
+    std::string users_endpoint;
     HttpClient *client;
 };

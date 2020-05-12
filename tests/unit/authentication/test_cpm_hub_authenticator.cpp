@@ -59,7 +59,24 @@ describe("CpmHubAuthenticator", []() {
         expect(authenticator.validCredentials(credentials)).toBe(true);
 
         Verify(Method(mock_http_client, post).Matching([](string url, HttpRequest request) {
-            return url == "http://localhost:1234" &&
+            return url == "http://localhost:1234/auth" &&
+                   request.body == "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}" &&
+                   request.headers.get("Content-type") == "application/json";
+        }));
+    });
+
+    it("Sends request to authentication service when adding user", []() {
+        Mock<HttpClient> mock_http_client;
+        string auth_service_url("http://localhost:1234");
+        CpmHubAuthenticator authenticator(auth_service_url, mock_http_client.get());
+        UserCredentials credentials = {"user", "pass"};
+
+        When(Method(mock_http_client, post)).Return(HttpResponse::ok(""));
+
+        authenticator.addUser(credentials);
+
+        Verify(Method(mock_http_client, post).Matching([](string url, HttpRequest request) {
+            return url == "http://localhost:1234/users" &&
                    request.body == "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}" &&
                    request.headers.get("Content-type") == "application/json";
         }));
