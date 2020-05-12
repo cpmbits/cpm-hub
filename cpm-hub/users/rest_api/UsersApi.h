@@ -19,14 +19,17 @@
 
 #include <http/http.h>
 #include <users/UsersService.h>
+#include <authentication/Authenticator.h>
 
 
 class UsersApi {
 public:
-    UsersApi(UsersService *users_service);
+    UsersApi(UsersService *users_service, Authenticator *authenticator);
 
     HttpResponse registerUser(HttpRequest &request);
 
 private:
     UsersService *users_service;
+
+    Authenticator *authenticator;
 };

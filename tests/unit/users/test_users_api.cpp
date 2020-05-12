@@ -19,15 +19,16 @@
 #include <fakeit/fakeit.hpp>
 
 #include <users/rest_api/UsersApi.h>
+#include <authentication/TrivialAuthenticator.h>
 
 using namespace cest;
 using namespace fakeit;
 
 
 describe("Users API", []() {
-    it("uses the users service to register a user", []() {
+    it("returns unauthorized when api key is not provided", []() {
         HttpRequest request("{"
-            "\"user_name\": \"juancho\","
+            "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
         "}");
@@ -35,12 +36,78 @@ describe("Users API", []() {
         struct UserRegistrationData registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;
-        UsersApi api(&mock_service.get());
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get(), &authenticator);
+
+        response = api.registerUser(request);
+
+        expect(response.status_code).toBe(401);
+    });
+
+    it("returns unauthorized when provided api key is invalid", []() {
+        HttpRequest request("{"
+            "\"username\": \"juancho\","
+            "\"password\": \"123456\","
+            "\"email\": \"juancho@encho.com\""
+        "}");
+        HttpResponse response;
+        struct UserRegistrationData registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get(), &authenticator);
+
+        request.headers.set("API_KEY", "cafecafe");
+
+        response = api.registerUser(request);
+
+        expect(response.status_code).toBe(401);
+    });
+
+    it("returns unauthorized when provided api key is not valid admin api key", []() {
+        HttpRequest request("{"
+                            "\"username\": \"juancho\","
+                            "\"password\": \"123456\","
+                            "\"email\": \"juancho@encho.com\""
+                            "}");
+        HttpResponse response;
+        struct UserRegistrationData registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get(), &authenticator);
+        UserCredentials user_credentials = {"user", "afecafec"};
+        UserCredentials admin_credentials = {"admin", "cafecafe"};
+
+        authenticator.addUser(user_credentials);
+        authenticator.addUser(admin_credentials);
+        request.headers.set("API_KEY", "afecafec");
+
+        response = api.registerUser(request);
+
+        expect(response.status_code).toBe(401);
+    });
+
+    it("uses the users service to register a user when provided api key is valid", []() {
+        HttpRequest request("{"
+            "\"username\": \"juancho\","
+            "\"password\": \"123456\","
+            "\"email\": \"juancho@encho.com\""
+        "}");
+        HttpResponse response;
+        struct UserRegistrationData registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get(), &authenticator);
+        UserCredentials credentials = {"admin", "cafecafe"};
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             registration_data = data;
             return user;
         });
+        authenticator.addUser(credentials);
+        request.headers.set("API_KEY", "cafecafe");
 
         response = api.registerUser(request);
 

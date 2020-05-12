@@ -38,7 +38,7 @@ Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
 
 void TrivialAuthenticator::addUser(UserCredentials &credentials)
 {
-    this->credentials.insert(make_pair(credentials.username, credentials.password));
+    this->credentials.insert(make_pair(credentials.password, credentials.username));
 }
 
 

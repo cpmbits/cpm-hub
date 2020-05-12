@@ -21,21 +21,27 @@
 #include <users/UsersService.h>
 #include <users/UsersRepositoryInMemory.h>
 #include <http/http.h>
+#include <authentication/TrivialAuthenticator.h>
 
 using namespace cest;
 
 
 describe("CPM Hub users management", []() {
-    it("registers a user", [&]() {
+    it("registers a user when api_key is valid", [&]() {
         HttpRequest request("{"
-            "\"user_name\": \"juancho\","
+            "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
+        TrivialAuthenticator authenticator;
         UsersRepositoryInMemory repository;
         UsersService service(&repository);
-        UsersApi api(&service);
+        UsersApi api(&service, &authenticator);
+        UserCredentials credentials = {"admin", "cafecafe"};
+
+        authenticator.addUser(credentials);
+        request.headers.set("API_KEY", "cafecafe");
 
         response = api.registerUser(request);
 
