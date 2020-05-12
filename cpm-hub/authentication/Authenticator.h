@@ -27,6 +27,8 @@ public:
     virtual Optional<std::string> authenticate(const char *key) = 0;
 
     virtual bool validCredentials(UserCredentials &credentials) = 0;
+
+    virtual void addUser(UserCredentials &credentials) = 0;
 };
 
 
@@ -39,6 +41,8 @@ public:
     bool validCredentials(UserCredentials &credentials) {
         return true;
     }
+
+    void addUser(UserCredentials &credentials) {}
 };
 
 

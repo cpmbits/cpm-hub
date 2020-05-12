@@ -19,11 +19,13 @@
 #include <users/rest_api/UsersApi.h>
 
 using namespace nlohmann;
+using namespace std;
 
 
-UsersApi::UsersApi(UsersService *users_service)
+UsersApi::UsersApi(UsersService *users_service, Authenticator *authenticator)
 {
     this->users_service = users_service;
+    this->authenticator = authenticator;
 }
 
 
@@ -32,10 +34,24 @@ HttpResponse UsersApi::registerUser(HttpRequest &request)
     HttpResponse response(200, "");
     auto json = json::parse(request.body);
     struct UserRegistrationData registration_data = {
-        json.at("user_name"),
+        json.at("username"),
         json.at("password"),
         json.at("email"),
     };
+    Optional<string> username;
+
+    if (!request.headers.has("API_KEY")) {
+        return HttpResponse::unauthorized();
+    }
+
+    username = this->authenticator->authenticate(request.headers.get("API_KEY").c_str());
+    if (!username.isPresent()) {
+        return HttpResponse::unauthorized();
+    }
+
+    if (username.value() != "admin") {
+        return HttpResponse::unauthorized();
+    }
 
     this->users_service->registerUser(registration_data);
 

@@ -79,3 +79,8 @@ Optional<string> CpmHubAuthenticator::authenticate(const char *key)
     return Optional<string>();
 }
 
+
+void CpmHubAuthenticator::addUser(UserCredentials &credentials)
+{
+}
+

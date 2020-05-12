@@ -20,15 +20,18 @@
 
 #include <users/UsersRepository.h>
 #include <users/UsersService.h>
+#include <authentication/CpmHubAuthenticator.h>
 
 using namespace cest;
 using namespace fakeit;
+using namespace std;
 
 
 describe("Users Service", []() {
     it("registers a user with the given name and information", [&]() {
         Mock<UsersRepository> mock_repository;
-        UsersService users_service(&mock_repository.get());
+        Mock<CpmHubAuthenticator> user_authenticator;
+        UsersService users_service(&mock_repository.get(), &user_authenticator.get());
         struct UserRegistrationData registration_data = {
             "sotano", "654321", "sotano@example.com"
         };
@@ -38,16 +41,18 @@ describe("Users Service", []() {
         When(Method(mock_repository, add)).AlwaysDo([&](User &user) {
             stored_user = user;
         });
+        When(Method(user_authenticator, addUser)).Return();
 
         users_service.registerUser(registration_data);
 
-        Verify(Method(mock_repository, add));
         expect(stored_user.name).toBe("sotano");
+        Verify(Method(mock_repository, add));
+        Verify(Method(user_authenticator, addUser));
     });
 
     it("throws an exception when registering a user whose user name is taken", [&]() {
         Mock<UsersRepository> mock_repository;
-        UsersService users_service(&mock_repository.get());
+        UsersService users_service(&mock_repository.get(), nullptr);
         struct UserRegistrationData registration_data = {
             "sotano", "654321", "sotano@example.com"
         };
