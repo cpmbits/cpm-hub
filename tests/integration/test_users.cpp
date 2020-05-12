@@ -34,13 +34,14 @@ describe("CPM Hub users management", []() {
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
-        TrivialAuthenticator authenticator;
+        TrivialAuthenticator management_authenticator;
         UsersRepositoryInMemory repository;
-        UsersService service(&repository);
-        UsersApi api(&service, &authenticator);
+        NullAuthenticator service_authenticator;
+        UsersService service(&repository, &service_authenticator);
+        UsersApi api(&service, &management_authenticator);
         UserCredentials credentials = {"admin", "cafecafe"};
 
-        authenticator.addUser(credentials);
+        management_authenticator.addUser(credentials);
         request.headers.set("API_KEY", "cafecafe");
 
         response = api.registerUser(request);

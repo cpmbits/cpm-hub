@@ -24,7 +24,7 @@
 
 
 struct UserRegistrationData {
-    std::string user_name;
+    std::string username;
     std::string password;
     std::string email;
 };

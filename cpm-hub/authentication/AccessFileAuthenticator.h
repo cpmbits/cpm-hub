@@ -35,6 +35,8 @@ public:
 
     bool validCredentials(UserCredentials &credentials);
 
+    void addUser(UserCredentials &credentials);
+
 private:
     Filesystem *filesystem;
     std::string access_file;

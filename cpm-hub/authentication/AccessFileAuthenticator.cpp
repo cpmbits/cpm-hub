@@ -78,3 +78,8 @@ bool AccessFileAuthenticator::validCredentials(UserCredentials &credentials)
 {
     return false;
 }
+
+
+void AccessFileAuthenticator::addUser(UserCredentials &credentials)
+{
+}

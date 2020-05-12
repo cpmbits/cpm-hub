@@ -20,16 +20,18 @@
 #include <string.h>
 #include <users/UsersRepository.h>
 #include <users/UserRegistrationData.h>
+#include <authentication/Authenticator.h>
 
 
 class UsersService {
 public:
-    UsersService(UsersRepository *users_repository);
+    UsersService(UsersRepository *users_repository, Authenticator *authenticator);
 
     virtual User registerUser(UserRegistrationData &registration_data);
 
 private:
     UsersRepository *users_repository;
+    Authenticator *authenticator;
 };
 
 

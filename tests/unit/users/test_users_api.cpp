@@ -112,7 +112,7 @@ describe("Users API", []() {
         response = api.registerUser(request);
 
         expect(response.status_code).toBe(200);
-        expect(registration_data.user_name).toBe("juancho");
+        expect(registration_data.username).toBe("juancho");
         expect(registration_data.password).toBe("123456");
         expect(registration_data.email).toBe("juancho@encho.com");
     });

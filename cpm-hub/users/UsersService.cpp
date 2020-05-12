@@ -18,20 +18,23 @@
 #include <users/UsersService.h>
 
 
-UsersService::UsersService(UsersRepository *users_repository)
+UsersService::UsersService(UsersRepository *users_repository, Authenticator *authenticator)
 {
     this->users_repository = users_repository;
+    this->authenticator = authenticator;
 }
 
 
 User UsersService::registerUser(UserRegistrationData &registration_data)
 {
-    User user(registration_data.user_name);
+    User user(registration_data.username);
+    UserCredentials credentials = {registration_data.username, registration_data.password};
 
-    if (this->users_repository->exists(registration_data.user_name)) {
-        throw UsernameAlreadyTaken(registration_data.user_name);
+    if (this->users_repository->exists(registration_data.username)) {
+        throw UsernameAlreadyTaken(registration_data.username);
     }
 
+    this->authenticator->addUser(credentials);
     this->users_repository->add(user);
 
     return user;
