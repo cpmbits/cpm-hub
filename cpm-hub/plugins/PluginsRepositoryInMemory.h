@@ -18,6 +18,7 @@
 #pragma once
 
 #include <map>
+#include <list>
 #include <string>
 #include <plugins/PluginsRepository.h>
 
@@ -33,5 +34,7 @@ public:
     virtual std::list<Plugin> allPlugins();
 
 private:
-    std::map<std::string, Plugin> plugins;
+    std::map<std::string, std::list<Plugin>> plugins;
+
+    bool pluginExists(const Plugin &plugin) const;
 };

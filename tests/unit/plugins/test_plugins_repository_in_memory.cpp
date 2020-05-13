@@ -75,4 +75,51 @@ describe("Plugins Repository in Memory", []() {
 
         expect(stored_plugin.value().metadata.name).toBe(fakeit_plugin.metadata.name);
     });
+
+    it("doesn't find a plugin given version when it's not stored", [&]() {
+        PluginsRepositoryInMemory repository;
+        Plugin cest_plugin("cest");
+        Optional<Plugin> stored_plugin;
+
+        cest_plugin.metadata.version = "1.0";
+        repository.add(cest_plugin);
+
+        stored_plugin = repository.find("cest", "1.1");
+
+        expect(stored_plugin.isPresent()).toBe(false);
+    });
+
+    it("finds a plugin given version when it's stored", [&]() {
+        PluginsRepositoryInMemory repository;
+        Plugin cest_plugin_1_0("cest");
+        Plugin cest_plugin_1_1("cest");
+        Optional<Plugin> stored_plugin;
+
+        cest_plugin_1_1.metadata.version = "1.1";
+        repository.add(cest_plugin_1_1);
+        cest_plugin_1_0.metadata.version = "1.0";
+        repository.add(cest_plugin_1_0);
+
+        stored_plugin = repository.find("cest", "1.1");
+
+        expect(stored_plugin.isPresent()).toBe(true);
+        expect(stored_plugin.value().metadata.version).toBe("1.1");
+    });
+
+    it("finds the latest version of a plugin when many are stored but version is not specified", [&]() {
+        PluginsRepositoryInMemory repository;
+        Plugin cest_plugin_1_0("cest");
+        Plugin cest_plugin_1_1("cest");
+        Optional<Plugin> stored_plugin;
+
+        cest_plugin_1_1.metadata.version = "1.1";
+        repository.add(cest_plugin_1_1);
+        cest_plugin_1_0.metadata.version = "1.0";
+        repository.add(cest_plugin_1_0);
+
+        stored_plugin = repository.find("cest");
+
+        expect(stored_plugin.isPresent()).toBe(true);
+        expect(stored_plugin.value().metadata.version).toBe("1.1");
+    });
 });

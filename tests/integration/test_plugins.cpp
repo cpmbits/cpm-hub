@@ -120,4 +120,28 @@ describe("CPM Hub plugins management", []() {
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
     });
+
+    it("finds a plugin given version after it has been registered", [&]() {
+        HttpRequest publish_request("{"
+            "\"plugin_name\": \"cest\","
+            "\"version\": \"1.0\","
+            "\"payload\": \"ABCDEabcde\","
+            "\"username\": \"john_doe\","
+            "\"password\": \"12345\""
+        "}");
+        HttpRequest download_request;
+        HttpResponse response;
+        PluginsRepositoryInMemory repository;
+        PluginsService service(&repository);
+        PluginsApi api(&service);
+
+        api.publishPlugin(publish_request);
+
+        download_request.parameters.set("pluginName", "cest");
+        download_request.parameters.set("pluginVersion", "1.0");
+        response = api.downloadPlugin(download_request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
+    });
 });
