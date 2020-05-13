@@ -53,4 +53,6 @@ private:
     std::string loadPayload(std::string name, std::string plugin_directory);
 
     PluginMetadata loadMetadata(const std::string& name, std::string plugin_directory);
+
+    std::string latestVersionDirectory(std::string base_directory);
 };

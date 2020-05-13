@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
+#include <boost/algorithm/string.hpp>
 #include <json/json.hpp>
 #include <plugins/PluginIndex.h>
 
@@ -23,15 +23,11 @@ using namespace std;
 using namespace nlohmann;
 
 
-void PluginIndex::indexPlugin(std::string name, std::string directory)
+void PluginIndex::indexPlugin(string name, string username, std::string directory)
 {
-    auto iter = this->plugins.find(name);
+    PluginIndexEntry index_entry = {username, directory};
 
-    if (iter != this->plugins.end()) {
-        iter->second = directory;
-    } else {
-        this->plugins.insert(make_pair(name, directory));
-    }
+    this->plugins[name] = index_entry;
 }
 
 
@@ -44,9 +40,15 @@ Optional<string> PluginIndex::find(string name)
         return directory;
     }
 
-    directory = iter->second;
+    directory = iter->second.directory;
 
     return directory;
+}
+
+
+Optional<std::string> PluginIndex::find(std::string name, std::string version)
+{
+    return Optional<std::string>();
 }
 
 
@@ -54,12 +56,14 @@ string PluginIndex::serialize()
 {
     json json_index;
     string plugin_name;
-    string directory;
+    PluginIndexEntry index_entry;
 
+    json_index["__version__"] = this->index_version;
     for (auto iter : this->plugins) {
         plugin_name = iter.first;
-        directory = iter.second;
-        json_index[plugin_name] = directory;
+        index_entry = iter.second;
+        json_index[plugin_name]["username"] = index_entry.username;
+        json_index[plugin_name]["directory"] = index_entry.directory;
     }
 
     return json_index.dump();
@@ -70,7 +74,25 @@ void PluginIndex::restore(std::string serialized)
 {
     auto json = json::parse(serialized);
 
+    if (!json.contains("__version__")) {
+        this->restoreFromVersion0(serialized);
+    }
+
     for (auto& element: json.items()) {
-        this->indexPlugin(element.key(), element.value());
+        this->indexPlugin(element.key(), element.value().at("username"), element.value().at("directory"));
+    }
+}
+
+
+void PluginIndex::restoreFromVersion0(std::string serialized)
+{
+    auto json = json::parse(serialized);
+
+    for (auto& element: json.items()) {
+        string directory = element.value();
+        vector<string> tokens;
+
+        boost::split(tokens, directory, boost::is_any_of("/"));
+        this->indexPlugin(element.key(), tokens.at(0), tokens.at(1));
     }
 }

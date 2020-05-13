@@ -18,6 +18,7 @@
 #pragma once
 
 #include <string>
+#include <list>
 
 #define FILESYSTEM_PERMISSION_READ  (1U)
 #define FILESYSTEM_PERMISSION_WRITE (2U)
@@ -30,6 +31,8 @@ public:
     virtual std::string readFile(std::string file_name);
 
     virtual void createDirectory(std::string path);
+
+    virtual std::list<std::string> listDirectories(std::string path);
 
     virtual bool fileExists(std::string file_name);
 

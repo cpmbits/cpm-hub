@@ -29,7 +29,7 @@ describe("Plugins Repository in file system", []() {
     it("indexes one plugin", [&]() {
         PluginIndex plugin_index;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
 
         expect(plugin_index.serialize()).toBe(
             "{"
@@ -41,9 +41,9 @@ describe("Plugins Repository in file system", []() {
     it("updates plugin version when plugin is already inserted", [&]() {
         PluginIndex plugin_index;
 
-        plugin_index.indexPlugin("cest", "user/cest/0.1");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/0.1");
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
 
         expect(plugin_index.serialize()).toBe(
             "{"
@@ -55,8 +55,8 @@ describe("Plugins Repository in file system", []() {
     it("indexes many plugins", [&]() {
         PluginIndex plugin_index;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
-        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
+        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit/3.1");
 
         expect(plugin_index.serialize()).toBe(
             "{"
@@ -79,8 +79,8 @@ describe("Plugins Repository in file system", []() {
         PluginIndex plugin_index;
         Optional<string> directory;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
-        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
+        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit/3.1");
 
         expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
         expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
