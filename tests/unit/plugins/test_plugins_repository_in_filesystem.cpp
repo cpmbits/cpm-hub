@@ -89,11 +89,9 @@ describe("Plugins Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         PluginIndex plugin_index;
         PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin cest_plugin("cest", "0.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Plugin cest_plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
         Optional<Plugin> plugin;
-        Optional<string> directory;
 
-        directory = string("./user/cest");
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"user/cest/1.0"});
@@ -105,6 +103,7 @@ describe("Plugins Repository in file system", []() {
 
         plugin = repository.find("cest");
 
+        expect(plugin.isPresent()).toBe(true);
         expect(plugin.value().metadata.name).toBe("cest");
         expect(plugin.value().metadata.version).toBe("1.0");
         expect(plugin.value().metadata.user_name).toBe("user");
@@ -146,28 +145,70 @@ describe("Plugins Repository in file system", []() {
         expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
-    it("finds given version of an indexed plugin", [&]() {
+    it("finds an indexed plugin after index was restored from filesystem from version 1", [&]() {
         Mock<Filesystem> mock_filesystem;
-        Mock<PluginIndex> mock_plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &mock_plugin_index.get());
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
         Optional<Plugin> plugin;
-        Optional<string> directory;
 
-        directory = string("./user/cest/1.0");
-        When(OverloadedMethod(mock_plugin_index, find, Optional<string>(string, string))).Return(directory);
+        When(Method(mock_filesystem, fileExists)).Return(true);
         When(Method(mock_filesystem, readFile))
-                .Return("{\"cest\": {\"username\": \"user\",\"directory\": \"user/cest\"}}")
+                .Return("{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}")
+                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
                 .Return("plugin payload");
+        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
-        try {
-            plugin = repository.find("cest");
-        } catch(std::exception e) {
-            cout << e.what() << endl;
-        }
+        repository.restore(".");
+        plugin = repository.find("cest");
 
         expect(plugin.value().metadata.name).toBe("cest");
         expect(plugin.value().metadata.version).toBe("1.0");
         expect(plugin.value().metadata.user_name).toBe("user");
         expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+    });
+
+    it("finds given version of an indexed plugin", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
+        Plugin cest_plugin("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Optional<Plugin> plugin;
+
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
+        When(Method(mock_filesystem, directoryExists)).Return(true);
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_filesystem, readFile))
+                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}")
+                .Return("plugin payload");
+
+        repository.add(cest_plugin);
+
+        plugin = repository.find("cest", "1.1");
+
+        Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.1"));
+        expect(plugin.isPresent()).toBe(true);
+        expect(plugin.value().metadata.name).toBe("cest");
+        expect(plugin.value().metadata.version).toBe("1.1");
+        expect(plugin.value().metadata.user_name).toBe("user");
+        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+    });
+
+    it("fails to find non existent version of a plugin", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        PluginIndex plugin_index;
+        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
+        Plugin cest_plugin("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Optional<Plugin> plugin;
+
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
+        When(Method(mock_filesystem, directoryExists)).Return(false);
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+
+        repository.add(cest_plugin);
+
+        plugin = repository.find("cest", "1.0");
+
+        Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.0"));
+        expect(plugin.isPresent()).toBe(false);
     });
 });

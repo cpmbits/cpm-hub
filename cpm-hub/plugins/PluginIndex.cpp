@@ -46,12 +46,6 @@ Optional<string> PluginIndex::find(string name)
 }
 
 
-Optional<std::string> PluginIndex::find(std::string name, std::string version)
-{
-    return Optional<std::string>();
-}
-
-
 string PluginIndex::serialize()
 {
     json json_index;
@@ -76,10 +70,13 @@ void PluginIndex::restore(std::string serialized)
 
     if (!json.contains("__version__")) {
         this->restoreFromVersion0(serialized);
+        return;
     }
 
     for (auto& element: json.items()) {
-        this->indexPlugin(element.key(), element.value().at("username"), element.value().at("directory"));
+        if (element.key() != "__version__") {
+            this->indexPlugin(element.key(), element.value().at("username"), element.value().at("directory"));
+        }
     }
 }
 
@@ -93,6 +90,6 @@ void PluginIndex::restoreFromVersion0(std::string serialized)
         vector<string> tokens;
 
         boost::split(tokens, directory, boost::is_any_of("/"));
-        this->indexPlugin(element.key(), tokens.at(0), tokens.at(1));
+        this->indexPlugin(element.key(), tokens.at(0), tokens.at(0)+"/"+tokens.at(1));
     }
 }

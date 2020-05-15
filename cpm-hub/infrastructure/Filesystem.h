@@ -36,6 +36,8 @@ public:
 
     virtual bool fileExists(std::string file_name);
 
+    virtual bool directoryExists(std::string path);
+
     virtual void deleteFile(std::string file_name);
 
     virtual void changePermissions(std::string file_name, unsigned int mask);

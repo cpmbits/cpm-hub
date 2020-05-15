@@ -92,3 +92,9 @@ list<string> Filesystem::listDirectories(string path)
     }
     return directories;
 }
+
+
+bool Filesystem::directoryExists(string path)
+{
+    return boost::filesystem::exists(path) && boost::filesystem::is_directory(path);
+}

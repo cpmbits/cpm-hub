@@ -38,8 +38,6 @@ public:
 
     virtual Optional<std::string> find(std::string name);
 
-    virtual Optional<std::string> find(std::string name, std::string version);
-
     virtual std::string serialize();
 
     virtual void restore(std::string serialized);

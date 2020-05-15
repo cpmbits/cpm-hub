@@ -117,7 +117,25 @@ string PluginsRepositoryInFilesystem::latestVersionDirectory(string base_directo
 
 Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name, std::string version)
 {
-    return Optional<Plugin>();
+    Optional<Plugin> plugin;
+    Optional<string> base_directory;
+    string plugin_directory;
+
+    base_directory = this->index->find(name);
+    if (!base_directory.isPresent()) {
+        return plugin;
+    }
+
+    plugin_directory = this->directory + "/" + base_directory.value() + "/" + version;
+    if (!this->filesystem->directoryExists(plugin_directory)) {
+        return plugin;
+    }
+
+    PluginMetadata metadata = this->loadMetadata(name, plugin_directory);
+    string payload = this->loadPayload(name, directory);
+    plugin = Plugin(name, metadata.version, metadata.user_name, payload);
+
+    return plugin;
 }
 
 
