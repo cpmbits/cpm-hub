@@ -92,15 +92,17 @@ void PluginsRepositoryInFilesystem::saveMetadata(const string& name, const strin
 Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name)
 {
     Optional<Plugin> plugin;
-    Optional<string> base_directory;
+    Optional<string> index_directory;
+    string plugin_directory;
 
-    base_directory = this->index->find(name);
-    if (!base_directory.isPresent()) {
+    index_directory = this->index->find(name);
+    if (!index_directory.isPresent()) {
         return plugin;
     }
 
-    PluginMetadata metadata = this->loadMetadata(name, latestVersionDirectory(base_directory.value()));
-    string payload = this->loadPayload(name, directory);
+    plugin_directory = latestVersionDirectory(this->directory + "/" + index_directory.value());
+    PluginMetadata metadata = this->loadMetadata(name, plugin_directory);
+    string payload = this->loadPayload(name, plugin_directory);
     plugin = Plugin(name, metadata.version, metadata.user_name, payload);
 
     return plugin;
@@ -111,7 +113,7 @@ string PluginsRepositoryInFilesystem::latestVersionDirectory(string base_directo
 {
     list<string> versions = filesystem->listDirectories(base_directory);
     versions.sort();
-    return this->directory + "/" + base_directory + "/" + versions.back();
+    return versions.back();
 }
 
 
@@ -132,7 +134,7 @@ Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name, std::stri
     }
 
     PluginMetadata metadata = this->loadMetadata(name, plugin_directory);
-    string payload = this->loadPayload(name, directory);
+    string payload = this->loadPayload(name, plugin_directory);
     plugin = Plugin(name, metadata.version, metadata.user_name, payload);
 
     return plugin;
