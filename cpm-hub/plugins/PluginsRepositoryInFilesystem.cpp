@@ -16,7 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <iostream>
-
 #include <json/json.hpp>
 #include <base64/base64.h>
 #include <plugins/PluginsRepositoryInFilesystem.h>
@@ -59,13 +58,13 @@ PluginsRepositoryInFilesystem::PluginsRepositoryInFilesystem(Filesystem *filesys
 
 void PluginsRepositoryInFilesystem::add(Plugin &plugin)
 {
-    string relative_directory = plugin.metadata.user_name + "/" + plugin.metadata.name + "/" + plugin.metadata.version;
-    string plugin_directory = this->directory + "/" + relative_directory;
+    string base_directory = plugin.metadata.user_name + "/" + plugin.metadata.name;
+    string plugin_directory = this->directory + "/" + base_directory + "/" + plugin.metadata.version;
 
     this->filesystem->createDirectory(plugin_directory);
     this->savePayload(plugin.metadata.name, plugin_directory, plugin.payload);
     this->saveMetadata(plugin.metadata.name, plugin_directory, plugin.metadata);
-    this->index->indexPlugin(plugin.metadata.name, relative_directory);
+    this->index->indexPlugin(plugin.metadata.name, plugin.metadata.user_name, base_directory);
     this->filesystem->writeFile(this->index_file, this->index->serialize());
 }
 
@@ -90,18 +89,53 @@ void PluginsRepositoryInFilesystem::saveMetadata(const string& name, const strin
 }
 
 
-Optional<Plugin> PluginsRepositoryInFilesystem::find(string name)
+Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name)
 {
     Optional<Plugin> plugin;
-    Optional<string> relative_directory;
+    Optional<string> index_directory;
+    string plugin_directory;
 
-    relative_directory = this->index->find(name);
-    if (relative_directory.isPresent()) {
-        string directory = this->directory + "/" + relative_directory.value();
-        PluginMetadata metadata = this->loadMetadata(name, directory);
-        string payload = this->loadPayload(name, directory);
-        plugin = Plugin(name, metadata.version, metadata.user_name, payload);
+    index_directory = this->index->find(name);
+    if (!index_directory.isPresent()) {
+        return plugin;
     }
+
+    plugin_directory = latestVersionDirectory(this->directory + "/" + index_directory.value());
+    PluginMetadata metadata = this->loadMetadata(name, plugin_directory);
+    string payload = this->loadPayload(name, plugin_directory);
+    plugin = Plugin(name, metadata.version, metadata.user_name, payload);
+
+    return plugin;
+}
+
+
+string PluginsRepositoryInFilesystem::latestVersionDirectory(string base_directory)
+{
+    list<string> versions = filesystem->listDirectories(base_directory);
+    versions.sort();
+    return versions.back();
+}
+
+
+Optional<Plugin> PluginsRepositoryInFilesystem::find(std::string name, std::string version)
+{
+    Optional<Plugin> plugin;
+    Optional<string> base_directory;
+    string plugin_directory;
+
+    base_directory = this->index->find(name);
+    if (!base_directory.isPresent()) {
+        return plugin;
+    }
+
+    plugin_directory = this->directory + "/" + base_directory.value() + "/" + version;
+    if (!this->filesystem->directoryExists(plugin_directory)) {
+        return plugin;
+    }
+
+    PluginMetadata metadata = this->loadMetadata(name, plugin_directory);
+    string payload = this->loadPayload(name, plugin_directory);
+    plugin = Plugin(name, metadata.version, metadata.user_name, payload);
 
     return plugin;
 }

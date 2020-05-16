@@ -26,14 +26,15 @@
 #include <plugins/PluginMetadata.h>
 
 
-struct plugin_index_entry {
-    PluginMetadata metadata;
+struct PluginIndexEntry {
+    std::string username;
+    std::string directory;
 };
 
 
 class PluginIndex {
 public:
-    virtual void indexPlugin(std::string name, std::string directory);
+    virtual void indexPlugin(std::string name, std::string username, std::string directory);
 
     virtual Optional<std::string> find(std::string name);
 
@@ -42,7 +43,10 @@ public:
     virtual void restore(std::string serialized);
 
 private:
+    const std::string index_version = "1";
     Filesystem *filesystem;
     std::string directory;
-    std::map<std::string, std::string> plugins;
+    std::map<std::string, PluginIndexEntry> plugins;
+
+    void restoreFromVersion0(std::string serialized);
 };

@@ -23,7 +23,7 @@
 using namespace std;
 
 
-void Filesystem::writeFile(std::string file_name, std::string contents)
+void Filesystem::writeFile(string file_name, string contents)
 {
     ofstream file;
 
@@ -33,7 +33,7 @@ void Filesystem::writeFile(std::string file_name, std::string contents)
 }
 
 
-std::string Filesystem::readFile(std::string file_name)
+string Filesystem::readFile(string file_name)
 {
     ifstream file(file_name, ios::binary);
     ostringstream ostream;
@@ -44,24 +44,24 @@ std::string Filesystem::readFile(std::string file_name)
 }
 
 
-void Filesystem::createDirectory(std::string path)
+void Filesystem::createDirectory(string path)
 {
     boost::filesystem::create_directories(path);
 }
 
 
-bool Filesystem::fileExists(std::string path)
+bool Filesystem::fileExists(string path)
 {
     return boost::filesystem::exists(path);
 }
 
 
-void Filesystem::deleteFile(std::string file_name)
+void Filesystem::deleteFile(string file_name)
 {
     remove(file_name.c_str());
 }
 
-void Filesystem::changePermissions(std::string file_name, unsigned int mask)
+void Filesystem::changePermissions(string file_name, unsigned int mask)
 {
     using namespace boost::filesystem;
     perms boost_permissions(no_perms);
@@ -78,4 +78,23 @@ void Filesystem::changePermissions(std::string file_name, unsigned int mask)
     }
 
     permissions(path, boost_permissions);
+}
+
+
+list<string> Filesystem::listDirectories(string path)
+{
+    list<string> directories;
+
+    for(auto &entry: boost::filesystem::directory_iterator(path)) {
+        if (boost::filesystem::is_directory(entry)) {
+            directories.emplace_back(entry.path().c_str());
+        }
+    }
+    return directories;
+}
+
+
+bool Filesystem::directoryExists(string path)
+{
+    return boost::filesystem::exists(path) && boost::filesystem::is_directory(path);
 }

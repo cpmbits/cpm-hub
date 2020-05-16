@@ -30,5 +30,7 @@ public:
 
     virtual Optional<Plugin> find(std::string name) = 0;
 
+    virtual Optional<Plugin> find(std::string name, std::string version) = 0;
+
     virtual std::list<Plugin>allPlugins() = 0;
 };

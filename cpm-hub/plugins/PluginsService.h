@@ -35,6 +35,8 @@ public:
     
     virtual Optional<Plugin> find(std::string plugin_name);
 
+    virtual Optional<Plugin> find(std::string name, std::string version);
+
 private:
     PluginsRepository *plugins_repository;
 };

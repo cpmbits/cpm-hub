@@ -29,39 +29,29 @@ describe("Plugins Repository in file system", []() {
     it("indexes one plugin", [&]() {
         PluginIndex plugin_index;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest");
 
         expect(plugin_index.serialize()).toBe(
-            "{"
-                "\"cest\":\"user/cest/1.0\""
-            "}"
-        );
-    });
-
-    it("updates plugin version when plugin is already inserted", [&]() {
-        PluginIndex plugin_index;
-
-        plugin_index.indexPlugin("cest", "user/cest/0.1");
-
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
-
-        expect(plugin_index.serialize()).toBe(
-            "{"
-                "\"cest\":\"user/cest/1.0\""
-            "}"
+            "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"\"}}"
         );
     });
 
     it("indexes many plugins", [&]() {
         PluginIndex plugin_index;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
-        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest");
+        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit");
 
         expect(plugin_index.serialize()).toBe(
             "{"
-                "\"cest\":\"user/cest/1.0\","
-                "\"fakeit\":\"user/fakeit/3.1\""
+              "\"__version__\":\"1\","
+              "\"cest\":{"
+                "\"directory\":\"user/cest\","
+                "\"username\":\"\"},"
+              "\"fakeit\":{"
+                "\"directory\":\"user/fakeit\","
+                "\"username\":\"\""
+              "}"
             "}"
         );
     });
@@ -79,8 +69,8 @@ describe("Plugins Repository in file system", []() {
         PluginIndex plugin_index;
         Optional<string> directory;
 
-        plugin_index.indexPlugin("cest", "user/cest/1.0");
-        plugin_index.indexPlugin("fakeit", "user/fakeit/3.1");
+        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
+        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit/3.1");
 
         expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
         expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");

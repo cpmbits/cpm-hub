@@ -92,7 +92,13 @@ HttpResponse PluginsApi::downloadPlugin(HttpRequest &request)
 {
     Optional<Plugin> plugin;
 
-    plugin = plugins_service->find(request.parameters.get("pluginName"));
+    if (!request.parameters.has("pluginVersion")) {
+        plugin = plugins_service->find(request.parameters.get("pluginName"));
+    } else {
+        plugin = plugins_service->find(
+                request.parameters.get("pluginName"),
+                request.parameters.get("pluginVersion"));
+    }
     if (!plugin.isPresent()) {
         return HttpResponse(HttpStatus::NOT_FOUND, "");
     }

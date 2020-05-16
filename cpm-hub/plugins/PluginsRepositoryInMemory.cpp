@@ -17,34 +17,72 @@
  */
 #include <plugins/PluginsRepositoryInMemory.h>
 
+using namespace std;
 
-void PluginsRepositoryInMemory::add(Plugin &plugin)
+
+static bool compareVersion(const Plugin& first, const Plugin& second)
 {
-    this->plugins.insert(std::make_pair(plugin.metadata.name, plugin));
+    return first.metadata.version < second.metadata.version;
 }
 
 
-Optional<Plugin> PluginsRepositoryInMemory::find(std::string name)
+void PluginsRepositoryInMemory::add(Plugin &plugin)
 {
-    auto iter = this->plugins.find(name);
+    if (!pluginExists(plugin)) {
+        this->plugins[plugin.metadata.name] = list<Plugin>();
+    }
+
+    this->plugins[plugin.metadata.name].push_back(plugin);
+    this->plugins[plugin.metadata.name].sort(compareVersion);
+}
+
+
+bool PluginsRepositoryInMemory::pluginExists(const Plugin &plugin) const
+{
+    return plugins.find(plugin.metadata.name) != plugins.end();
+}
+
+
+Optional<Plugin> PluginsRepositoryInMemory::find(string name)
+{
     Optional<Plugin> plugin;
 
-    if (iter == this->plugins.end()) {
+    if (!pluginExists(name)) {
         return plugin;
     }
 
-    plugin = iter->second;
+    plugin = this->plugins[name].back();
     
     return plugin;
 }
 
 
-std::list<Plugin> PluginsRepositoryInMemory::allPlugins()
+Optional<Plugin> PluginsRepositoryInMemory::find(string name, string version)
 {
-    std::list<Plugin> stored_plugins;
+    Optional<Plugin> plugin;
 
-    for (std::pair<std::string, Plugin> iter : this->plugins) {
-        stored_plugins.push_back(iter.second);
+    if (!pluginExists(name)) {
+        return plugin;
+    }
+
+    for (auto &plugin_version: this->plugins[name]) {
+        if (plugin_version.metadata.version == version) {
+            plugin = plugin_version;
+        }
+    }
+
+    return plugin;
+}
+
+
+list<Plugin> PluginsRepositoryInMemory::allPlugins()
+{
+    list<Plugin> stored_plugins;
+
+    for (auto &plugin_map: this->plugins) {
+        for (auto &plugin: plugin_map.second) {
+            stored_plugins.push_back(plugin);
+        }
     }
 
     return stored_plugins;

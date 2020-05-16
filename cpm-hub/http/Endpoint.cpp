@@ -15,19 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
-
 #include <boost/algorithm/string.hpp>
 #include <http/Endpoint.h>
-#include "HttpParameterMap.h"
+#include <http/HttpParameterMap.h>
 
 using namespace std;
 
 
 Endpoint::Endpoint(string path)
 {
-    parsePath(path);
     matching_string = "";
+    parsePath(path);
 }
 
 
@@ -56,7 +54,7 @@ void Endpoint::parsePath(string path)
     boost::split(tokens, path, boost::is_any_of("/"));
     for(auto&& token: tokens) {
         if (token.front() == ':') {
-            matching_string += "/([\\w-]+)";
+            matching_string += "/([\\w\\-0-9\\\\.]+)";
             this->parameter_names.push_back(token.substr(1));
         } else {
             matching_string += "/" + token;

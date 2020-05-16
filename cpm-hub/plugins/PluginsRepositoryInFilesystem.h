@@ -34,6 +34,8 @@ public:
 
     virtual Optional<Plugin> find(std::string name);
 
+    virtual Optional<Plugin> find(std::string name, std::string version);
+
     virtual std::list<Plugin> allPlugins();
 
     void restore(std::string directory);
@@ -51,4 +53,6 @@ private:
     std::string loadPayload(std::string name, std::string plugin_directory);
 
     PluginMetadata loadMetadata(const std::string& name, std::string plugin_directory);
+
+    std::string latestVersionDirectory(std::string base_directory);
 };
