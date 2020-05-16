@@ -24,8 +24,8 @@ using namespace std;
 
 Endpoint::Endpoint(string path)
 {
-    parsePath(path);
     matching_string = "";
+    parsePath(path);
 }
 
 
@@ -54,7 +54,7 @@ void Endpoint::parsePath(string path)
     boost::split(tokens, path, boost::is_any_of("/"));
     for(auto&& token: tokens) {
         if (token.front() == ':') {
-            matching_string += "/([\\w-]+)";
+            matching_string += "/([\\w\\-0-9\\\\.]+)";
             this->parameter_names.push_back(token.substr(1));
         } else {
             matching_string += "/" + token;

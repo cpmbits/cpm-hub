@@ -57,17 +57,6 @@ describe("Endpoint", []() {
         expect(match.isPresent()).toBe(false);
     });
 
-    xit("creates regex from path", []() {
-        expect(Endpoint::parsePath("/plain_path")).toBe("/plain_path");
-        expect(Endpoint::parsePath("/plain_path/:parameter")).toBe("/plain_path/[\\w-]+");
-    });
-
-
-    xit("creates regex from long path with multiple parameters", []() {
-        expect(Endpoint::parsePath("/plain_path")).toBe("/plain_path");
-        expect(Endpoint::parsePath("/leve1/:parameter1/level2/:parameter2")).toBe("/leve1/[\\w-]+/level2/[\\w-]+");
-    });
-
     it("returns match when path with one parameter match", []() {
         Endpoint endpoint("/plain_path/:parameter");
         Optional<struct HttpParameterMap> match;
@@ -78,14 +67,40 @@ describe("Endpoint", []() {
         expect(match.value().get("parameter")).toBe("value");
     });
 
-    it("returns match when path with many parameter matches", []() {
-        Endpoint endpoint("/leve1/:parameter1/level2/:parameter2");
+    it("returns match when path with one parameter match alphanumeric", []() {
+        Endpoint endpoint("/plain_path/:parameter");
         Optional<struct HttpParameterMap> match;
 
-        match = endpoint.match("/leve1/value1/level2/value2");
+        match = endpoint.match("/plain_path/3.7.3");
+
+        expect(match.isPresent()).toBe(true);
+        expect(match.value().get("parameter")).toBe("3.7.3");
+    });
+
+    it("returns match when path with many parameter matches", []() {
+        Endpoint endpoint("/leve1/:parameter1/:parameter2");
+        Optional<struct HttpParameterMap> match;
+
+        match = endpoint.match("/leve1/value1/3.7.3");
 
         expect(match.isPresent()).toBe(true);
         expect(match.value().get("parameter1")).toBe("value1");
-        expect(match.value().get("parameter2")).toBe("value2");
+        expect(match.value().get("parameter2")).toBe("3.7.3");
+    });
+
+    it("returns empty match when matching partial path with many parameter", []() {
+        Endpoint endpoint("/leve1/:parameter1/:parameter2");
+        Optional<struct HttpParameterMap> match;
+
+        match = endpoint.match("/leve1/value1");
+
+        expect(match.isPresent()).toBe(false);
+    });
+
+    it("compares two endpoints alphabetically by matching regex", []() {
+        Endpoint endpoint1("/plain_path/:parameter");
+        Endpoint endpoint2("/plain_path/:parameter/:parameter2");
+
+        expect(endpoint1 < endpoint2).toBe(true);
     });
 });
