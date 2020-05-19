@@ -17,26 +17,24 @@
  */
 #pragma once
 
-#include <string>
+#include <map>
 #include <list>
+#include <string>
+#include <bits/BitsRepository.h>
 
-#include <infrastructure/Optional.h>
-#include <plugins/PluginPublicationData.h>
-#include <plugins/PluginsRepository.h>
-#include <plugins/Plugin.h>
 
-class PluginsService {
+class BitsRepositoryInMemory: public BitsRepository {
 public:
-    PluginsService(PluginsRepository *plugins_repository);
+    virtual void add(Bit &bit);
 
-    virtual Plugin publishPlugin(struct PluginPublicationData publication_data);
+    virtual Optional<Bit> find(std::string name);
 
-    virtual std::list<Plugin> allPlugins();
-    
-    virtual Optional<Plugin> find(std::string plugin_name);
+    virtual Optional<Bit> find(std::string name, std::string version);
 
-    virtual Optional<Plugin> find(std::string name, std::string version);
+    virtual std::list<Bit> allBits();
 
 private:
-    PluginsRepository *plugins_repository;
+    std::map<std::string, std::list<Bit>> bits;
+
+    bool bitExists(const Bit &bit) const;
 };

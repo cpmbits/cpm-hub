@@ -19,23 +19,35 @@
 
 #include <string>
 
+#include <bits/BitMetadata.h>
 
-class PluginMetadata {
+class Bit {
 public:
-    PluginMetadata() : PluginMetadata("", "", "") {
+    Bit() : Bit("") {
+    } 
+
+    Bit(std::string name) : Bit("", "") {
+        this->metadata.name = name;
     }
 
-    PluginMetadata(std::string name, std::string user_name, std::string version) {
-        this->name = name;
-        this->user_name = user_name;
-        this->version = version;
-    };
-
-    bool operator==(const PluginMetadata &other) {
-        return this->name == other.name;
+    Bit(std::string name, std::string payload) {
+        this->metadata.name = name;
+        this->metadata.user_name = "";
+        this->metadata.version = "";
+        this->payload = payload;
     }
 
-    std::string name;
-    std::string user_name;
-    std::string version;
+    Bit(std::string name, std::string version, std::string user_name, std::string payload) {
+        this->metadata.name = name;
+        this->metadata.user_name = user_name;
+        this->metadata.version = version;
+        this->payload = payload;
+    }
+
+    bool operator==(const Bit &other) {
+        return this->metadata.name == other.metadata.name;
+    }
+
+    BitMetadata metadata;
+    std::string payload;
 };

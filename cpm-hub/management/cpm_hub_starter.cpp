@@ -22,14 +22,14 @@
 #include <management/DeployService.h>
 #include <management/rest_api/ManagementApi.h>
 #include <management/http_routes.h>
-#include <plugins/PluginsRepositoryInFilesystem.h>
-#include <plugins/PluginsService.h>
-#include <plugins/rest_api/PluginsApi.h>
+#include <bits/BitsRepositoryInFilesystem.h>
+#include <bits/BitsService.h>
+#include <bits/rest_api/BitsApi.h>
 
 
 static Filesystem filesystem;
 static HttpServer service_http_server;
-static PluginsApi *plugins_api;
+static BitsApi *bits_api;
 static HttpServer management_http_server;
 static ManagementApi *management_api;
 static HttpClient cpm_hub_auth_client;
@@ -37,30 +37,30 @@ static HttpClient cpm_hub_auth_client;
 
 void startServiceServer(ProgramOptions &options)
 {
-    PluginIndex *plugin_index;
-    PluginsRepository *plugins_repository;
-    Authenticator *plugins_api_authenticator;
-    PluginsService *plugins_service;
+    BitIndex *bit_index;
+    BitsRepository *bits_repository;
+    Authenticator *bits_api_authenticator;
+    BitsService *bits_service;
 
-    plugin_index = new PluginIndex();
-    plugins_repository = new PluginsRepositoryInFilesystem(&filesystem, plugin_index, options.plugins_directory);
+    bit_index = new BitIndex();
+    bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
     switch (options.authenticator_type) {
     case ProgramOptions::UNAUTHENTICATED:
-        plugins_api_authenticator = new NullAuthenticator();
+        bits_api_authenticator = new NullAuthenticator();
         break;
 
     case ProgramOptions::CPM_HUB_AUTHENTICATOR:
-        plugins_api_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
+        bits_api_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
         break;
 
     case ProgramOptions::ACCESS_FILE_AUTHENTICATOR:
-        plugins_api_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
+        bits_api_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
         break;
     }
-    plugins_service = new PluginsService(plugins_repository);
-    plugins_api = new PluginsApi(plugins_service, plugins_api_authenticator);
+    bits_service = new BitsService(bits_repository);
+    bits_api = new BitsApi(bits_service, bits_api_authenticator);
 
-    installServiceRoutes(service_http_server, plugins_api);
+    installServiceRoutes(service_http_server, bits_api);
     service_http_server.configureSecurity(options.security_options);
     service_http_server.startAsync("0.0.0.0", options.http_service_port);
 }

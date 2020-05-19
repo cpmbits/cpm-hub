@@ -19,28 +19,28 @@
 #include <fakeit/fakeit.hpp>
 
 #include <base64/base64.h>
-#include <plugins/PluginIndex.h>
-#include <plugins/PluginsRepositoryInFilesystem.h>
+#include <bits/BitIndex.h>
+#include <bits/BitsRepositoryInFilesystem.h>
 
 using namespace cest;
 using namespace fakeit;
 using namespace std;
 
 
-describe("Plugins Repository in file system", []() {
-    it("stores and indexes one plugin", [&]() {
+describe("Bits Repository in file system", []() {
+    it("stores and indexes one bit", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        repository.add(plugin);
+        repository.add(bit);
 
         Verify(Method(mock_filesystem, createDirectory).Using("./user/cest/1.0"));
-        Verify(Method(mock_filesystem, writeFile).Using("./user/cest/1.0/cest.zip", "plugin payload"));
+        Verify(Method(mock_filesystem, writeFile).Using("./user/cest/1.0/cest.zip", "bit payload"));
         Verify(Method(mock_filesystem, writeFile).Using(
             "./user/cest/1.0/cest.json", 
             "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
@@ -51,18 +51,18 @@ describe("Plugins Repository in file system", []() {
         ));
     });
 
-    it("stores a new version of a given plugin", [&]() {
+    it("stores a new version of a given bit", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin plugin("cest", "0.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit bit("cest", "0.1", "user", "cGx1Z2luIHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        repository.add(plugin);
-        plugin = Plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        repository.add(bit);
+        bit = Bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
 
-        repository.add(plugin);
+        repository.add(bit);
 
         Verify(Method(mock_filesystem, writeFile).Using(
             "./index.json",
@@ -74,47 +74,47 @@ describe("Plugins Repository in file system", []() {
         )).AtLeastOnce();
     });
 
-    it("doesn't find a non existent plugin", []() {
+    it("doesn't find a non existent bit", []() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Optional<Bit> bit;
 
-        plugin = repository.find("cest");
+        bit = repository.find("cest");
 
-        expect(plugin.isPresent()).toBe(false);
+        expect(bit.isPresent()).toBe(false);
     });
 
-    it("finds an indexed plugin", [&]() {
+    it("finds an indexed bit", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin cest_plugin("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit cest_bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"user/cest/1.0"});
         When(Method(mock_filesystem, readFile))
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("plugin payload");
+                .Return("bit payload");
 
-        repository.add(cest_plugin);
+        repository.add(cest_bit);
 
-        plugin = repository.find("cest");
+        bit = repository.find("cest");
 
-        expect(plugin.isPresent()).toBe(true);
-        expect(plugin.value().metadata.name).toBe("cest");
-        expect(plugin.value().metadata.version).toBe("1.0");
-        expect(plugin.value().metadata.user_name).toBe("user");
-        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.isPresent()).toBe(true);
+        expect(bit.value().metadata.name).toBe("cest");
+        expect(bit.value().metadata.version).toBe("1.0");
+        expect(bit.value().metadata.user_name).toBe("user");
+        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
     it("doesn't restore index when repository doesn't have an index file", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Optional<Bit> bit;
         Optional<string> directory;
 
         When(Method(mock_filesystem, fileExists)).Return(false);
@@ -122,93 +122,93 @@ describe("Plugins Repository in file system", []() {
         repository.restore(".");
     });
 
-    it("finds an indexed plugin after index was restored from filesystem from version 0", [&]() {
+    it("finds an indexed bit after index was restored from filesystem from version 0", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Optional<Bit> bit;
         Optional<string> directory;
 
         When(Method(mock_filesystem, fileExists)).Return(true);
         When(Method(mock_filesystem, readFile))
                 .Return("{\"cest\":\"user/cest/1.0\"}")
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("plugin payload");
+                .Return("bit payload");
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
         repository.restore(".");
-        plugin = repository.find("cest");
+        bit = repository.find("cest");
 
-        expect(plugin.value().metadata.name).toBe("cest");
-        expect(plugin.value().metadata.version).toBe("1.0");
-        expect(plugin.value().metadata.user_name).toBe("user");
-        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().metadata.name).toBe("cest");
+        expect(bit.value().metadata.version).toBe("1.0");
+        expect(bit.value().metadata.user_name).toBe("user");
+        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
-    it("finds an indexed plugin after index was restored from filesystem from version 1", [&]() {
+    it("finds an indexed bit after index was restored from filesystem from version 1", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Optional<Bit> bit;
 
         When(Method(mock_filesystem, fileExists)).Return(true);
         When(Method(mock_filesystem, readFile))
                 .Return("{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}")
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("plugin payload");
+                .Return("bit payload");
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
         repository.restore(".");
-        plugin = repository.find("cest");
+        bit = repository.find("cest");
 
-        expect(plugin.value().metadata.name).toBe("cest");
-        expect(plugin.value().metadata.version).toBe("1.0");
-        expect(plugin.value().metadata.user_name).toBe("user");
-        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().metadata.name).toBe("cest");
+        expect(bit.value().metadata.version).toBe("1.0");
+        expect(bit.value().metadata.user_name).toBe("user");
+        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
-    it("finds given version of an indexed plugin", [&]() {
+    it("finds given version of an indexed bit", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin cest_plugin("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit cest_bit("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, directoryExists)).Return(true);
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_filesystem, readFile))
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}")
-                .Return("plugin payload");
+                .Return("bit payload");
 
-        repository.add(cest_plugin);
+        repository.add(cest_bit);
 
-        plugin = repository.find("cest", "1.1");
+        bit = repository.find("cest", "1.1");
 
         Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.1"));
-        expect(plugin.isPresent()).toBe(true);
-        expect(plugin.value().metadata.name).toBe("cest");
-        expect(plugin.value().metadata.version).toBe("1.1");
-        expect(plugin.value().metadata.user_name).toBe("user");
-        expect(plugin.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.isPresent()).toBe(true);
+        expect(bit.value().metadata.name).toBe("cest");
+        expect(bit.value().metadata.version).toBe("1.1");
+        expect(bit.value().metadata.user_name).toBe("user");
+        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
     });
 
-    it("fails to find non existent version of a plugin", [&]() {
+    it("fails to find non existent version of a bit", [&]() {
         Mock<Filesystem> mock_filesystem;
-        PluginIndex plugin_index;
-        PluginsRepositoryInFilesystem repository(&mock_filesystem.get(), &plugin_index);
-        Plugin cest_plugin("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
-        Optional<Plugin> plugin;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit cest_bit("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, directoryExists)).Return(false);
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        repository.add(cest_plugin);
+        repository.add(cest_bit);
 
-        plugin = repository.find("cest", "1.0");
+        bit = repository.find("cest", "1.0");
 
         Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.0"));
-        expect(plugin.isPresent()).toBe(false);
+        expect(bit.isPresent()).toBe(false);
     });
 });

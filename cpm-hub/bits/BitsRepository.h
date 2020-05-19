@@ -17,36 +17,20 @@
  */
 #pragma once
 
-#include <map>
-#include <list>
 #include <string>
+#include <list>
 
 #include <infrastructure/Optional.h>
-#include <infrastructure/Filesystem.h>
-#include <plugins/PluginMetadata.h>
+#include <bits/Bit.h>
 
 
-struct PluginIndexEntry {
-    std::string username;
-    std::string directory;
-};
-
-
-class PluginIndex {
+class BitsRepository {
 public:
-    virtual void indexPlugin(std::string name, std::string username, std::string directory);
+    virtual void add(Bit &bit) = 0;
 
-    virtual Optional<std::string> find(std::string name);
+    virtual Optional<Bit> find(std::string name) = 0;
 
-    virtual std::string serialize();
+    virtual Optional<Bit> find(std::string name, std::string version) = 0;
 
-    virtual void restore(std::string serialized);
-
-private:
-    const std::string index_version = "1";
-    Filesystem *filesystem;
-    std::string directory;
-    std::map<std::string, PluginIndexEntry> plugins;
-
-    void restoreFromVersion0(std::string serialized);
+    virtual std::list<Bit>allBits() = 0;
 };

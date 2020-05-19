@@ -20,135 +20,135 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/rest_api/PluginsApi.h>
-#include <plugins/PluginsService.h>
+#include <bits/rest_api/BitsApi.h>
+#include <bits/BitsService.h>
 
 using namespace cest;
 using namespace fakeit;
 using namespace std;
 
 
-describe("Plugins API", []() {
-    it("uses the plugin service to publish a plugin", [&]() {
+describe("Bits API", []() {
+    it("uses the bit service to publish a bit", [&]() {
         HttpRequest request("{"
-            "\"plugin_name\": \"cest\","
+            "\"bit_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\","
             "\"username\": \"john_doe\","
             "\"password\": \"pass\""
         "}");
         HttpResponse response;
-        Plugin plugin("");
-        Mock<PluginsService> mock_service;
-        PluginsApi api(&mock_service.get());
+        Bit bit("");
+        Mock<BitsService> mock_service;
+        BitsApi api(&mock_service.get());
 
-        When(Method(mock_service, publishPlugin)).Return(plugin);
+        When(Method(mock_service, publishBit)).Return(bit);
 
-        response = api.publishPlugin(request);
+        response = api.publishBit(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
-        Verify(Method(mock_service, publishPlugin).Matching([](struct PluginPublicationData data) {
-            return data.plugin_name == "cest" &&
+        Verify(Method(mock_service, publishBit).Matching([](struct BitPublicationData data) {
+            return data.bit_name == "cest" &&
                    data.version == "1.0" &&
                    data.user_name == "john_doe" &&
                    data.payload == "ABCDEabcde";
         }));
     });
 
-    it("returns error 401 when publishing a plugin and authentication fails", [&]() {
+    it("returns error 401 when publishing a bit and authentication fails", [&]() {
         HttpRequest request("{"
-            "\"plugin_name\": \"cest\","
+            "\"bit_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\","
             "\"username\": \"john_doe\","
             "\"password\": \"pass\""
         "}");
         HttpResponse response;
-        Mock<PluginsService> mock_service;
+        Mock<BitsService> mock_service;
         Mock<Authenticator> mock_authenticator;
-        PluginsApi api(&mock_service.get(), &mock_authenticator.get());
+        BitsApi api(&mock_service.get(), &mock_authenticator.get());
 
         When(Method(mock_authenticator, validCredentials)).Return(false);
 
-        response = api.publishPlugin(request);
+        response = api.publishBit(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
 
-    it("uses the plugin service to list the available plugins", [&]() {
+    it("uses the bit service to list the available bits", [&]() {
         HttpRequest request("");
         HttpResponse response;
-        Plugin plugin("cest");
-        list<Plugin> plugins {plugin};
-        Mock<PluginsService> mock_service;
-        PluginsApi api(&mock_service.get());
+        Bit bit("cest");
+        list<Bit> bits {bit};
+        Mock<BitsService> mock_service;
+        BitsApi api(&mock_service.get());
 
-        When(Method(mock_service, allPlugins)).Return(plugins);
+        When(Method(mock_service, allBits)).Return(bits);
 
-        response = api.listPlugins(request);
+        response = api.listBits(request);
 
         expect(response.status_code).toBe(200);
-        expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
+        expect(response.body).toBe("[{\"bit_name\":\"cest\"}]");
     });
         
-    it("returns error 404 when downloading a plugin that is not found", [&]() {
+    it("returns error 404 when downloading a bit that is not found", [&]() {
         HttpRequest request;
         HttpResponse response;
-        Mock<PluginsService> mock_service;
-        PluginsApi api(&mock_service.get());
-        Optional<Plugin> no_plugin;
+        Mock<BitsService> mock_service;
+        BitsApi api(&mock_service.get());
+        Optional<Bit> no_bit;
 
-        request.parameters.set("pluginName", "cest");
-        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string))).Return(no_plugin);
+        request.parameters.set("bitName", "cest");
+        When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(no_bit);
 
-        response = api.downloadPlugin(request);
+        response = api.downloadBit(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(404);
     });
             
-    it("returns latest plugin version when downloading an existing plugin", [&]() {
+    it("returns latest bit version when downloading an existing bit", [&]() {
         HttpRequest request;
         HttpResponse response;
-        Mock<PluginsService> mock_service;
-        PluginsApi api(&mock_service.get());
-        Optional<Plugin> cest_plugin;
+        Mock<BitsService> mock_service;
+        BitsApi api(&mock_service.get());
+        Optional<Bit> cest_bit;
 
-        request.parameters.set("pluginName", "cest");
-        cest_plugin = Plugin("cest", "1.0", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string))).Return(cest_plugin);
+        request.parameters.set("bitName", "cest");
+        cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
+        When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(cest_bit);
 
-        response = api.downloadPlugin(request);
+        response = api.downloadBit(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
             "\"payload\":\"ABCDEabcde\","
-            "\"plugin_name\":\"cest\","
+            "\"bit_name\":\"cest\","
             "\"version\":\"1.0\""
         "}");
     });
 
-    it("returns specific plugin version when downloading an existing plugin", [&]() {
+    it("returns specific bit version when downloading an existing bit", [&]() {
         HttpRequest request;
         HttpResponse response;
-        Mock<PluginsService> mock_service;
-        PluginsApi api(&mock_service.get());
-        Optional<Plugin> cest_plugin;
+        Mock<BitsService> mock_service;
+        BitsApi api(&mock_service.get());
+        Optional<Bit> cest_bit;
 
-        request.parameters.set("pluginName", "cest");
-        request.parameters.set("pluginVersion", "1.1");
-        cest_plugin = Plugin("cest", "1.1", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, find, Optional<Plugin>(string, string))).Return(cest_plugin);
+        request.parameters.set("bitName", "cest");
+        request.parameters.set("bitVersion", "1.1");
+        cest_bit = Bit("cest", "1.1", "user", "ABCDEabcde");
+        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(cest_bit);
 
-        response = api.downloadPlugin(request);
+        response = api.downloadBit(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Plugin>(string, string)).Using("cest", "1.1"));
+        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string, string)).Using("cest", "1.1"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
             "\"payload\":\"ABCDEabcde\","
-            "\"plugin_name\":\"cest\","
+            "\"bit_name\":\"cest\","
             "\"version\":\"1.1\""
         "}");
     });

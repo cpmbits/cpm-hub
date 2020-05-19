@@ -19,24 +19,24 @@
 
 #include <map>
 #include <string>
-#include <plugins/PluginsRepository.h>
+#include <bits/BitsRepository.h>
 #include <infrastructure/Filesystem.h>
-#include <plugins/PluginIndex.h>
+#include <bits/BitIndex.h>
 
 
-class PluginsRepositoryInFilesystem: public PluginsRepository {
+class BitsRepositoryInFilesystem: public BitsRepository {
 public:
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index);
+    BitsRepositoryInFilesystem(Filesystem *filesystem, BitIndex *index);
 
-    PluginsRepositoryInFilesystem(Filesystem *filesystem, PluginIndex *index, std::string &directory);
+    BitsRepositoryInFilesystem(Filesystem *filesystem, BitIndex *index, std::string &directory);
 
-    virtual void add(Plugin &plugin);
+    virtual void add(Bit &bit);
 
-    virtual Optional<Plugin> find(std::string name);
+    virtual Optional<Bit> find(std::string name);
 
-    virtual Optional<Plugin> find(std::string name, std::string version);
+    virtual Optional<Bit> find(std::string name, std::string version);
 
-    virtual std::list<Plugin> allPlugins();
+    virtual std::list<Bit> allBits();
 
     void restore(std::string directory);
 
@@ -44,15 +44,15 @@ private:
     std::string directory;
     std::string index_file;
     Filesystem *filesystem;
-    PluginIndex *index;
+    BitIndex *index;
 
-    void savePayload(const std::string& name, const std::string& plugin_directory, const std::string& base64_payload);
+    void savePayload(const std::string& name, const std::string& bit_directory, const std::string& base64_payload);
 
-    void saveMetadata(const std::string& name, const std::string& plugin_directory, PluginMetadata metadata);
+    void saveMetadata(const std::string& name, const std::string& bit_directory, BitMetadata metadata);
 
-    std::string loadPayload(std::string name, std::string plugin_directory);
+    std::string loadPayload(std::string name, std::string bit_directory);
 
-    PluginMetadata loadMetadata(const std::string& name, std::string plugin_directory);
+    BitMetadata loadMetadata(const std::string& name, std::string bit_directory);
 
     std::string latestVersionDirectory(std::string base_directory);
 };

@@ -16,8 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <json/json.hpp>
-#include <plugins/rest_api/PluginsApi.h>
-#include <plugins/PluginsService.h>
+#include <bits/rest_api/BitsApi.h>
+#include <bits/BitsService.h>
 #include <authentication/UserCredentials.h>
 
 using namespace nlohmann;
@@ -26,82 +26,82 @@ using namespace std;
 static NullAuthenticator unauthenticated;
 
 
-PluginsApi::PluginsApi(PluginsService *plugins_service) {
-    this->plugins_service = plugins_service;
+BitsApi::BitsApi(BitsService *bits_service) {
+    this->bits_service = bits_service;
     this->authenticator = &unauthenticated;
 }
 
 
-PluginsApi::PluginsApi(PluginsService *plugins_service, Authenticator *authenticator)
+BitsApi::BitsApi(BitsService *bits_service, Authenticator *authenticator)
 {
-    this->plugins_service = plugins_service;
+    this->bits_service = bits_service;
     this->authenticator = authenticator;
 }
 
 
-HttpResponse PluginsApi::publishPlugin(HttpRequest &request)
+HttpResponse BitsApi::publishBit(HttpRequest &request)
 {
     auto json = json::parse(request.body);
     Optional<string> user;
-    struct PluginPublicationData publication_data;
+    struct BitPublicationData publication_data;
     UserCredentials credentials = {json.at("username"),json.at("password")};
 
     if (!this->authenticator->validCredentials(credentials)) {
         return HttpResponse::unauthorized();
     }
 
-    publication_data.plugin_name = json.at("plugin_name");
+    publication_data.bit_name = json.at("bit_name");
     publication_data.version = json.at("version");
     publication_data.user_name = json.at("username");
     publication_data.payload = json.at("payload");
 
-    plugins_service->publishPlugin(publication_data);
+    bits_service->publishBit(publication_data);
 
     return HttpResponse::ok("");
 }
 
 
-HttpResponse PluginsApi::listPlugins(HttpRequest &request)
+HttpResponse BitsApi::listBits(HttpRequest &request)
 {
     HttpResponse response(HttpStatus::OK, "");
-    json json_plugin_list = json::array();
+    json json_bit_list = json::array();
 
-    for (Plugin plugin : plugins_service->allPlugins()) {
-        json json_plugin = {{"plugin_name", plugin.metadata.name}};
-        json_plugin_list.push_back(json_plugin);
+    for (Bit bit : bits_service->allBits()) {
+        json json_bit = {{"bit_name", bit.metadata.name}};
+        json_bit_list.push_back(json_bit);
     }
 
-    response.body = json_plugin_list.dump();
+    response.body = json_bit_list.dump();
 
     return response;
 }
 
 
-static string asJson(Plugin plugin)
+static string asJson(Bit bit)
 {
-    json json_plugin = {
-        {"plugin_name", plugin.metadata.name},
-        {"version", plugin.metadata.version},
-        {"payload", plugin.payload}
+    json json_bit = {
+        {"bit_name", bit.metadata.name},
+        {"version", bit.metadata.version},
+        {"payload", bit.payload}
     };
-    return json_plugin.dump();
+    return json_bit.dump();
 }
 
 
-HttpResponse PluginsApi::downloadPlugin(HttpRequest &request)
+HttpResponse BitsApi::downloadBit(HttpRequest &request)
 {
-    Optional<Plugin> plugin;
+    Optional<Bit> bit;
 
-    if (!request.parameters.has("pluginVersion")) {
-        plugin = plugins_service->find(request.parameters.get("pluginName"));
+    if (!request.parameters.has("bitVersion")) {
+        bit = bits_service->find(request.parameters.get("bitName"));
     } else {
-        plugin = plugins_service->find(
-                request.parameters.get("pluginName"),
-                request.parameters.get("pluginVersion"));
+        bit = bits_service->find(
+                request.parameters.get("bitName"),
+                request.parameters.get("bitVersion"));
     }
-    if (!plugin.isPresent()) {
+    if (!bit.isPresent()) {
         return HttpResponse(HttpStatus::NOT_FOUND, "");
     }
 
-    return HttpResponse(HttpStatus::OK, asJson(plugin.value()));
+    return HttpResponse(HttpStatus::OK, asJson(bit.value()));
 }

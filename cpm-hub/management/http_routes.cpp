@@ -21,16 +21,16 @@
 using namespace std;
 
 
-void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api)
+void installServiceRoutes(HttpServer& http_server, BitsApi *bits_api)
 {
-    http_server.post("/plugins", [plugins_api](HttpRequest &request) -> HttpResponse {
-        return plugins_api->publishPlugin(request);
+    http_server.post("/bits", [bits_api](HttpRequest &request) -> HttpResponse {
+        return bits_api->publishBit(request);
     });
-    http_server.get("/plugins/:pluginName", [plugins_api](HttpRequest &request) -> HttpResponse {
-        return plugins_api->downloadPlugin(request);
+    http_server.get("/bits/:bitName", [bits_api](HttpRequest &request) -> HttpResponse {
+        return bits_api->downloadBit(request);
     });
-    http_server.get("/plugins/:pluginName/:pluginVersion", [plugins_api](HttpRequest &request) -> HttpResponse {
-        return plugins_api->downloadPlugin(request);
+    http_server.get("/bits/:bitName/:bitVersion", [bits_api](HttpRequest &request) -> HttpResponse {
+        return bits_api->downloadBit(request);
     });
 }
 

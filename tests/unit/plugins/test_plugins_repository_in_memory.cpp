@@ -17,109 +17,109 @@
  */
 #include <cest/cest.h>
 
-#include <plugins/PluginsRepositoryInMemory.h>
+#include <bits/BitsRepositoryInMemory.h>
 
 using namespace cest;
 
 
-describe("Plugins Repository in Memory", []() {
-    it("stores a plugin", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin plugin("cest");
+describe("Bits Repository in Memory", []() {
+    it("stores a bit", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit bit("cest");
 
-        repository.add(plugin);
+        repository.add(bit);
     });
 
-    it("lists stored plugins", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin plugin("cest");
-        std::list<Plugin> stored_plugins;
+    it("lists stored bits", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit bit("cest");
+        std::list<Bit> stored_bits;
 
-        repository.add(plugin);
+        repository.add(bit);
 
-        stored_plugins = repository.allPlugins();
+        stored_bits = repository.allBits();
 
-        expect(stored_plugins.size()).toBe(1);
+        expect(stored_bits.size()).toBe(1);
     });
 
-    it("doesn't find a plugin when it's not stored", [&]() {
-        PluginsRepositoryInMemory repository;
-        Optional<Plugin> plugin;
+    it("doesn't find a bit when it's not stored", [&]() {
+        BitsRepositoryInMemory repository;
+        Optional<Bit> bit;
 
-        plugin = repository.find("cest");
+        bit = repository.find("cest");
 
-        expect(plugin.isPresent()).toBe(false);
+        expect(bit.isPresent()).toBe(false);
     });
 
-    it("finds the plugin with the same name when one plugin is stored", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin plugin("cest");
-        Optional<Plugin> stored_plugin;
+    it("finds the bit with the same name when one bit is stored", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit bit("cest");
+        Optional<Bit> stored_bit;
 
-        repository.add(plugin);
+        repository.add(bit);
 
-        stored_plugin = repository.find("cest");
+        stored_bit = repository.find("cest");
 
-        expect(stored_plugin.value().metadata.name).toBe(plugin.metadata.name);
+        expect(stored_bit.value().metadata.name).toBe(bit.metadata.name);
     });
 
-    it("finds the plugin with the same name when many plugins are stored", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin cest_plugin("cest"), fakeit_plugin("fakeit");
-        Optional<Plugin> stored_plugin;
+    it("finds the bit with the same name when many bits are stored", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit cest_bit("cest"), fakeit_bit("fakeit");
+        Optional<Bit> stored_bit;
 
-        repository.add(cest_plugin);
-        repository.add(fakeit_plugin);
+        repository.add(cest_bit);
+        repository.add(fakeit_bit);
 
-        stored_plugin = repository.find("fakeit");
+        stored_bit = repository.find("fakeit");
 
-        expect(stored_plugin.value().metadata.name).toBe(fakeit_plugin.metadata.name);
+        expect(stored_bit.value().metadata.name).toBe(fakeit_bit.metadata.name);
     });
 
-    it("doesn't find a plugin given version when it's not stored", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin cest_plugin("cest");
-        Optional<Plugin> stored_plugin;
+    it("doesn't find a bit given version when it's not stored", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit cest_bit("cest");
+        Optional<Bit> stored_bit;
 
-        cest_plugin.metadata.version = "1.0";
-        repository.add(cest_plugin);
+        cest_bit.metadata.version = "1.0";
+        repository.add(cest_bit);
 
-        stored_plugin = repository.find("cest", "1.1");
+        stored_bit = repository.find("cest", "1.1");
 
-        expect(stored_plugin.isPresent()).toBe(false);
+        expect(stored_bit.isPresent()).toBe(false);
     });
 
-    it("finds a plugin given version when it's stored", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin cest_plugin_1_0("cest");
-        Plugin cest_plugin_1_1("cest");
-        Optional<Plugin> stored_plugin;
+    it("finds a bit given version when it's stored", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit cest_bit_1_0("cest");
+        Bit cest_bit_1_1("cest");
+        Optional<Bit> stored_bit;
 
-        cest_plugin_1_1.metadata.version = "1.1";
-        repository.add(cest_plugin_1_1);
-        cest_plugin_1_0.metadata.version = "1.0";
-        repository.add(cest_plugin_1_0);
+        cest_bit_1_1.metadata.version = "1.1";
+        repository.add(cest_bit_1_1);
+        cest_bit_1_0.metadata.version = "1.0";
+        repository.add(cest_bit_1_0);
 
-        stored_plugin = repository.find("cest", "1.1");
+        stored_bit = repository.find("cest", "1.1");
 
-        expect(stored_plugin.isPresent()).toBe(true);
-        expect(stored_plugin.value().metadata.version).toBe("1.1");
+        expect(stored_bit.isPresent()).toBe(true);
+        expect(stored_bit.value().metadata.version).toBe("1.1");
     });
 
-    it("finds the latest version of a plugin when many are stored but version is not specified", [&]() {
-        PluginsRepositoryInMemory repository;
-        Plugin cest_plugin_1_0("cest");
-        Plugin cest_plugin_1_1("cest");
-        Optional<Plugin> stored_plugin;
+    it("finds the latest version of a bit when many are stored but version is not specified", [&]() {
+        BitsRepositoryInMemory repository;
+        Bit cest_bit_1_0("cest");
+        Bit cest_bit_1_1("cest");
+        Optional<Bit> stored_bit;
 
-        cest_plugin_1_1.metadata.version = "1.1";
-        repository.add(cest_plugin_1_1);
-        cest_plugin_1_0.metadata.version = "1.0";
-        repository.add(cest_plugin_1_0);
+        cest_bit_1_1.metadata.version = "1.1";
+        repository.add(cest_bit_1_1);
+        cest_bit_1_0.metadata.version = "1.0";
+        repository.add(cest_bit_1_0);
 
-        stored_plugin = repository.find("cest");
+        stored_bit = repository.find("cest");
 
-        expect(stored_plugin.isPresent()).toBe(true);
-        expect(stored_plugin.value().metadata.version).toBe("1.1");
+        expect(stored_bit.isPresent()).toBe(true);
+        expect(stored_bit.value().metadata.version).toBe("1.1");
     });
 });

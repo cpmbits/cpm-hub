@@ -21,10 +21,10 @@
 #include <string>
 
 #include <http/HttpServer.h>
-#include <plugins/rest_api/PluginsApi.h>
+#include <bits/rest_api/BitsApi.h>
 #include <management/rest_api/ManagementApi.h>
 
 
-void installServiceRoutes(HttpServer& http_server, PluginsApi *plugins_api);
+void installServiceRoutes(HttpServer& http_server, BitsApi *bits_api);
 
 void installManagementRoutes(HttpServer &http_server, ManagementApi *management_api);

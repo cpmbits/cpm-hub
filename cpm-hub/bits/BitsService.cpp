@@ -15,43 +15,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <plugins/PluginsService.h>
+#include <bits/BitsService.h>
 
 using namespace std;
 
 
-PluginsService::PluginsService(PluginsRepository *plugins_repository)
+BitsService::BitsService(BitsRepository *bits_repository)
 {
-    this->plugins_repository = plugins_repository;
+    this->bits_repository = bits_repository;
 }
 
 
-Plugin PluginsService::publishPlugin(struct PluginPublicationData publication_data)
+Bit BitsService::publishBit(struct BitPublicationData publication_data)
 {
-    Plugin plugin(publication_data.plugin_name,
+    Bit bit(publication_data.bit_name,
                   publication_data.version,
                   publication_data.user_name,
                   publication_data.payload);
 
-    plugins_repository->add(plugin);
+    bits_repository->add(bit);
 
-    return plugin;
+    return bit;
 }
 
 
-list<Plugin> PluginsService::allPlugins()
+list<Bit> BitsService::allBits()
 {
-    return plugins_repository->allPlugins();
+    return bits_repository->allBits();
 }
 
 
-Optional<Plugin> PluginsService::find(std::string plugin_name)
+Optional<Bit> BitsService::find(std::string bit_name)
 {
-    return plugins_repository->find(plugin_name);
+    return bits_repository->find(bit_name);
 }
 
 
-Optional<Plugin> PluginsService::find(std::string plugin_name, std::string version)
+Optional<Bit> BitsService::find(std::string bit_name, std::string version)
 {
-    return plugins_repository->find(plugin_name, version);
+    return bits_repository->find(bit_name, version);
 }

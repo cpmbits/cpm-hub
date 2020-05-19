@@ -18,31 +18,31 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/PluginIndex.h>
+#include <bits/BitIndex.h>
 
 using namespace cest;
 using namespace fakeit;
 using namespace std;
 
 
-describe("Plugins Repository in file system", []() {
-    it("indexes one plugin", [&]() {
-        PluginIndex plugin_index;
+describe("Bits Repository in file system", []() {
+    it("indexes one bit", [&]() {
+        BitIndex bit_index;
 
-        plugin_index.indexPlugin("cest", std::string(), "user/cest");
+        bit_index.indexBit("cest", std::string(), "user/cest");
 
-        expect(plugin_index.serialize()).toBe(
+        expect(bit_index.serialize()).toBe(
             "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"\"}}"
         );
     });
 
-    it("indexes many plugins", [&]() {
-        PluginIndex plugin_index;
+    it("indexes many bits", [&]() {
+        BitIndex bit_index;
 
-        plugin_index.indexPlugin("cest", std::string(), "user/cest");
-        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit");
+        bit_index.indexBit("cest", std::string(), "user/cest");
+        bit_index.indexBit("fakeit", std::string(), "user/fakeit");
 
-        expect(plugin_index.serialize()).toBe(
+        expect(bit_index.serialize()).toBe(
             "{"
               "\"__version__\":\"1\","
               "\"cest\":{"
@@ -56,37 +56,37 @@ describe("Plugins Repository in file system", []() {
         );
     });
 
-    it("fails to find a plugin when it's not indexed", [&]() {
-        PluginIndex plugin_index;
+    it("fails to find a bit when it's not indexed", [&]() {
+        BitIndex bit_index;
         Optional<string> directory;
 
-        directory = plugin_index.find("cest");
+        directory = bit_index.find("cest");
 
         expect(directory.isPresent()).toBe(false);
     });
 
-    it("finds an indexed plugin", [&]() {
-        PluginIndex plugin_index;
+    it("finds an indexed bit", [&]() {
+        BitIndex bit_index;
         Optional<string> directory;
 
-        plugin_index.indexPlugin("cest", std::string(), "user/cest/1.0");
-        plugin_index.indexPlugin("fakeit", std::string(), "user/fakeit/3.1");
+        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+        bit_index.indexBit("fakeit", std::string(), "user/fakeit/3.1");
 
-        expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
-        expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
+        expect(bit_index.find("cest").value()).toBe("user/cest/1.0");
+        expect(bit_index.find("fakeit").value()).toBe("user/fakeit/3.1");
     });
 
     if("loads the index from serialized dump", []() {
-        PluginIndex plugin_index;
+        BitIndex bit_index;
         string serialized(
         "{"
             "\"cest\":\"user/cest/1.0\","
             "\"fakeit\":\"user/fakeit/3.1\""
         "}");
 
-        plugin_index.restore(serialized);
+        bit_index.restore(serialized);
 
-        expect(plugin_index.find("cest").value()).toBe("user/cest/1.0");
-        expect(plugin_index.find("fakeit").value()).toBe("user/fakeit/3.1");
+        expect(bit_index.find("cest").value()).toBe("user/cest/1.0");
+        expect(bit_index.find("fakeit").value()).toBe("user/fakeit/3.1");
     });
 });

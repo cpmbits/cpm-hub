@@ -18,68 +18,68 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <plugins/PluginsRepository.h>
-#include <plugins/PluginsService.h>
+#include <bits/BitsRepository.h>
+#include <bits/BitsService.h>
 
 using namespace cest;
 using namespace fakeit;
 using namespace std;
 
 
-describe("Plugins Service", []() {
-    it("stores a plugin with the given name when registering a plugin", [&]() {
-        Mock<PluginsRepository> mock_repository;
-        PluginsService plugins_service(&mock_repository.get());
-        Plugin expected_plugin("cest", "1.0", "john_doe", "ABCDEedcba");
-        struct PluginPublicationData publication_data = {
+describe("Bits Service", []() {
+    it("stores a bit with the given name when registering a bit", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Bit expected_bit("cest", "1.0", "john_doe", "ABCDEedcba");
+        struct BitPublicationData publication_data = {
             "cest", "1.0", "john_doe", "ABCDEedcba"
         };
 
         When(Method(mock_repository, add)).AlwaysReturn();
 
-        plugins_service.publishPlugin(publication_data);
+        bits_service.publishBit(publication_data);
 
         Verify(Method(mock_repository, add));
     });
 
-    it("returns all available plugins", [&]() {
-        Mock<PluginsRepository> mock_repository;
-        PluginsService plugins_service(&mock_repository.get());
-        Plugin plugin("cest");
-        std::list<Plugin> plugins {plugin};
-        std::list<Plugin> returned_plugins;
+    it("returns all available bits", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Bit bit("cest");
+        std::list<Bit> bits {bit};
+        std::list<Bit> returned_bits;
 
-        When(Method(mock_repository, allPlugins)).Return(plugins);
+        When(Method(mock_repository, allBits)).Return(bits);
 
-        returned_plugins = plugins_service.allPlugins();
+        returned_bits = bits_service.allBits();
 
-        expect(returned_plugins.size()).toBe(1);
-        expect(returned_plugins.front().metadata.name).toBe(plugin.metadata.name);
+        expect(returned_bits.size()).toBe(1);
+        expect(returned_bits.front().metadata.name).toBe(bit.metadata.name);
     });
     
-    it("uses the repository to find a plugin by name", [&]() {
-        Mock<PluginsRepository> mock_repository;
-        PluginsService plugins_service(&mock_repository.get());
-        Optional<Plugin> plugin;
+    it("uses the repository to find a bit by name", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Optional<Bit> bit;
 
-        plugin = Plugin("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Plugin>(string))).Return(plugin);
+        bit = Bit("cest");
+        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string))).Return(bit);
 
-        auto found_plugin = plugins_service.find("cest");
+        auto found_bit = bits_service.find("cest");
 
-        expect(found_plugin.value().metadata.name).toBe("cest");
+        expect(found_bit.value().metadata.name).toBe("cest");
     });
 
-    it("uses the repository to find a plugin by name and version", [&]() {
-        Mock<PluginsRepository> mock_repository;
-        PluginsService plugins_service(&mock_repository.get());
-        Optional<Plugin> plugin;
+    it("uses the repository to find a bit by name and version", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Optional<Bit> bit;
 
-        plugin = Plugin("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Plugin>(string, string))).Return(plugin);
+        bit = Bit("cest");
+        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string, string))).Return(bit);
 
-        auto found_plugin = plugins_service.find("cest", "1.1");
+        auto found_bit = bits_service.find("cest", "1.1");
 
-        expect(found_plugin.value().metadata.name).toBe("cest");
+        expect(found_bit.value().metadata.name).toBe("cest");
     });
 });
