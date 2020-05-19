@@ -17,29 +17,25 @@
  */
 #pragma once
 
-#include <authentication/Authenticator.h>
-#include <http/http.h>
-#include <plugins/PluginsService.h>
-#include <authentication/UserCredentials.h>
+#include <string>
 
-class PluginsApi {
+
+class BitMetadata {
 public:
-    PluginsApi(PluginsService *plugins_service);
+    BitMetadata() : BitMetadata("", "", "") {
+    }
 
-    PluginsApi(PluginsService *plugins_service, Authenticator *authenticator);
+    BitMetadata(std::string name, std::string user_name, std::string version) {
+        this->name = name;
+        this->user_name = user_name;
+        this->version = version;
+    };
 
-    HttpResponse publishPlugin(HttpRequest &request);
+    bool operator==(const BitMetadata &other) {
+        return this->name == other.name;
+    }
 
-    HttpResponse listPlugins(HttpRequest &request);
-
-    HttpResponse downloadPlugin(HttpRequest &request);
-
-private:
-    PluginsService *plugins_service;
-
-    Authenticator *authenticator;
-
-    bool validCredentials(HttpRequest &request);
-
-    UserCredentials credentialsFrom(HttpRequest &request);
+    std::string name;
+    std::string user_name;
+    std::string version;
 };

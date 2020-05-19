@@ -4,11 +4,11 @@ packages:
     cpm-hub/http:
     cpm-hub/infrastructure:
     cpm-hub/management:
-    cpm-hub/plugins:
+    cpm-hub/bits:
     cpm-hub/users:
     cpm-hub/authentication:
 compile_flags: ['-std=c++11', '-g']
-plugins:
+bits:
     cest: '1.0'
     mongoose: '6.16'
     json: '3.7.3'
@@ -17,3 +17,5 @@ plugins:
     inih: '1.0'
 link_options:
     libraries: ['boost_filesystem', 'boost_system', 'boost_program_options', 'pthread', 'ssl', 'crypto']
+actions:
+    docker: 'docker run -it -v $(pwd):/project -w /project jorsanpe/cpm'

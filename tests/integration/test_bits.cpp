@@ -18,35 +18,35 @@
 #include <cest/cest.h>
 
 #include <authentication/TrivialAuthenticator.h>
-#include <plugins/rest_api/PluginsApi.h>
-#include <plugins/PluginsRepositoryInMemory.h>
+#include <bits/rest_api/BitsApi.h>
+#include <bits/BitsRepositoryInMemory.h>
 
 using namespace cest;
 
 
-describe("CPM Hub plugins management", []() {
-    it("publishes a plugin when no authentication is configured", [&]() {
+describe("CPM Hub bits management", []() {
+    it("publishes a bit when no authentication is configured", [&]() {
         HttpRequest request("{"
-                            "\"plugin_name\": \"cest\","
+                            "\"bit_name\": \"cest\","
                             "\"version\": \"1.0\","
                             "\"payload\": \"ABCDEabcde\","
                             "\"username\": \"john_doe\","
                             "\"password\": \"12345\""
                             "}");
         HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service);
 
-        response = api.publishPlugin(request);
+        response = api.publishBit(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("");
     });
 
-    it("fails to publish a plugin when authentication fails", [&]() {
+    it("fails to publish a bit when authentication fails", [&]() {
         HttpRequest request("{"
-                            "\"plugin_name\": \"cest\","
+                            "\"bit_name\": \"cest\","
                             "\"version\": \"1.0\","
                             "\"payload\": \"ABCDEabcde\","
                             "\"username\": \"john_doe\","
@@ -54,53 +54,53 @@ describe("CPM Hub plugins management", []() {
                             "}");
         HttpResponse response;
         TrivialAuthenticator authenticator;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service, &authenticator);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service, &authenticator);
 
-        response = api.publishPlugin(request);
+        response = api.publishBit(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
 
-    it("lists a plugin after it has been registered", [&]() {
+    it("lists a bit after it has been registered", [&]() {
         HttpRequest request("{"
-            "\"plugin_name\": \"cest\","
+            "\"bit_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\","
             "\"username\": \"john_doe\","
             "\"password\": \"12345\""
         "}");
         HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service);
 
-        api.publishPlugin(request);
+        api.publishBit(request);
 
-        response = api.listPlugins(request);
+        response = api.listBits(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("[{\"plugin_name\":\"cest\"}]");
+        expect(response.body).toBe("[{\"bit_name\":\"cest\"}]");
     });
 
-    it("fails to download plugin when it's not found", [&]() {
+    it("fails to download bit when it's not found", [&]() {
         HttpRequest request;
         HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service);
 
-        request.parameters.set("pluginName", "cest");
+        request.parameters.set("bitName", "cest");
 
-        response = api.downloadPlugin(request);
+        response = api.downloadBit(request);
 
         expect(response.status_code).toBe(HttpStatus::NOT_FOUND);
     });
 
-    it("finds a plugin after it has been registered", [&]() {
+    it("finds a bit after it has been registered", [&]() {
         HttpRequest publish_request("{"
-            "\"plugin_name\": \"cest\","
+            "\"bit_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\","
             "\"username\": \"john_doe\","
@@ -108,22 +108,22 @@ describe("CPM Hub plugins management", []() {
         "}");
         HttpRequest download_request;
         HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service);
 
-        api.publishPlugin(publish_request);
+        api.publishBit(publish_request);
 
-        download_request.parameters.set("pluginName", "cest");
-        response = api.downloadPlugin(download_request);
+        download_request.parameters.set("bitName", "cest");
+        response = api.downloadBit(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
+        expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
     });
 
-    it("finds a plugin given version after it has been registered", [&]() {
+    it("finds a bit given version after it has been registered", [&]() {
         HttpRequest publish_request("{"
-            "\"plugin_name\": \"cest\","
+            "\"bit_name\": \"cest\","
             "\"version\": \"1.0\","
             "\"payload\": \"ABCDEabcde\","
             "\"username\": \"john_doe\","
@@ -131,17 +131,17 @@ describe("CPM Hub plugins management", []() {
         "}");
         HttpRequest download_request;
         HttpResponse response;
-        PluginsRepositoryInMemory repository;
-        PluginsService service(&repository);
-        PluginsApi api(&service);
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsApi api(&service);
 
-        api.publishPlugin(publish_request);
+        api.publishBit(publish_request);
 
-        download_request.parameters.set("pluginName", "cest");
-        download_request.parameters.set("pluginVersion", "1.0");
-        response = api.downloadPlugin(download_request);
+        download_request.parameters.set("bitName", "cest");
+        download_request.parameters.set("bitVersion", "1.0");
+        response = api.downloadBit(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"plugin_name\":\"cest\",\"version\":\"1.0\"}");
+        expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
     });
 });

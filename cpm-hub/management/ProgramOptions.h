@@ -26,7 +26,7 @@ struct ProgramOptions {
         ACCESS_FILE_AUTHENTICATOR,
         CPM_HUB_AUTHENTICATOR,
     };
-    std::string plugins_directory = ".";
+    std::string bits_directory = ".";
     AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
     std::string cpm_hub_url = "http://localhost:1234";

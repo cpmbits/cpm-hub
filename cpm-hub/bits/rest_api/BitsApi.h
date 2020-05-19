@@ -17,20 +17,29 @@
  */
 #pragma once
 
-#include <string>
-#include <list>
+#include <authentication/Authenticator.h>
+#include <http/http.h>
+#include <bits/BitsService.h>
+#include <authentication/UserCredentials.h>
 
-#include <infrastructure/Optional.h>
-#include <plugins/Plugin.h>
-
-
-class PluginsRepository {
+class BitsApi {
 public:
-    virtual void add(Plugin &plugin) = 0;
+    BitsApi(BitsService *bits_service);
 
-    virtual Optional<Plugin> find(std::string name) = 0;
+    BitsApi(BitsService *bits_service, Authenticator *authenticator);
 
-    virtual Optional<Plugin> find(std::string name, std::string version) = 0;
+    HttpResponse publishBit(HttpRequest &request);
 
-    virtual std::list<Plugin>allPlugins() = 0;
+    HttpResponse listBits(HttpRequest &request);
+
+    HttpResponse downloadBit(HttpRequest &request);
+
+private:
+    BitsService *bits_service;
+
+    Authenticator *authenticator;
+
+    bool validCredentials(HttpRequest &request);
+
+    UserCredentials credentialsFrom(HttpRequest &request);
 };

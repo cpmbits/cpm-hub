@@ -17,26 +17,26 @@
  */
 #include <boost/algorithm/string.hpp>
 #include <json/json.hpp>
-#include <plugins/PluginIndex.h>
+#include <bits/BitIndex.h>
 
 using namespace std;
 using namespace nlohmann;
 
 
-void PluginIndex::indexPlugin(string name, string username, std::string directory)
+void BitIndex::indexBit(string name, string username, std::string directory)
 {
-    PluginIndexEntry index_entry = {username, directory};
+    BitIndexEntry index_entry = {username, directory};
 
-    this->plugins[name] = index_entry;
+    this->bits[name] = index_entry;
 }
 
 
-Optional<string> PluginIndex::find(string name)
+Optional<string> BitIndex::find(string name)
 {
-    auto iter = this->plugins.find(name);
+    auto iter = this->bits.find(name);
     Optional<string> directory;
 
-    if (iter == this->plugins.end()) {
+    if (iter == this->bits.end()) {
         return directory;
     }
 
@@ -46,25 +46,25 @@ Optional<string> PluginIndex::find(string name)
 }
 
 
-string PluginIndex::serialize()
+string BitIndex::serialize()
 {
     json json_index;
-    string plugin_name;
-    PluginIndexEntry index_entry;
+    string bit_name;
+    BitIndexEntry index_entry;
 
     json_index["__version__"] = this->index_version;
-    for (auto iter : this->plugins) {
-        plugin_name = iter.first;
+    for (auto iter : this->bits) {
+        bit_name = iter.first;
         index_entry = iter.second;
-        json_index[plugin_name]["username"] = index_entry.username;
-        json_index[plugin_name]["directory"] = index_entry.directory;
+        json_index[bit_name]["username"] = index_entry.username;
+        json_index[bit_name]["directory"] = index_entry.directory;
     }
 
     return json_index.dump();
 }
 
 
-void PluginIndex::restore(std::string serialized)
+void BitIndex::restore(std::string serialized)
 {
     auto json = json::parse(serialized);
 
@@ -75,13 +75,13 @@ void PluginIndex::restore(std::string serialized)
 
     for (auto& element: json.items()) {
         if (element.key() != "__version__") {
-            this->indexPlugin(element.key(), element.value().at("username"), element.value().at("directory"));
+            this->indexBit(element.key(), element.value().at("username"), element.value().at("directory"));
         }
     }
 }
 
 
-void PluginIndex::restoreFromVersion0(std::string serialized)
+void BitIndex::restoreFromVersion0(std::string serialized)
 {
     auto json = json::parse(serialized);
 
@@ -90,6 +90,6 @@ void PluginIndex::restoreFromVersion0(std::string serialized)
         vector<string> tokens;
 
         boost::split(tokens, directory, boost::is_any_of("/"));
-        this->indexPlugin(element.key(), tokens.at(0), tokens.at(0)+"/"+tokens.at(1));
+        this->indexBit(element.key(), tokens.at(0), tokens.at(0)+"/"+tokens.at(1));
     }
 }

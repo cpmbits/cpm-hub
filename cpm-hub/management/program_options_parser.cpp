@@ -34,7 +34,7 @@ static ProgramOptions parseIniFile(string &ini_file)
     ProgramOptions program_options;
     INIReader ini_reader(ini_file);
 
-    program_options.plugins_directory = ini_reader.Get("Service", "plugins_directory", ".");
+    program_options.bits_directory = ini_reader.Get("Service", "bits_directory", ".");
     program_options.http_service_port = ini_reader.GetInteger("Service", "port", 8000);
     program_options.authenticator_type = string_to_authenticator_type[ini_reader.Get("Service", "authentication", "unauthenticated")];
     program_options.cpm_hub_url = ini_reader.Get("Service", "cpm_hub_url", "http://localhost:1234");

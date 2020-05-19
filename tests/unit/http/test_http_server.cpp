@@ -23,29 +23,29 @@
 using namespace cest;
 
 
-static HttpResponse get_plugins_response;
+static HttpResponse get_bits_response;
 
-static HttpResponse getPlugins(HttpRequest request)
+static HttpResponse getBits(HttpRequest request)
 {
-    return get_plugins_response;
+    return get_bits_response;
 }
 
 
-static HttpRequest post_plugin_request;
-static HttpResponse post_plugin_response;
+static HttpRequest post_bit_request;
+static HttpResponse post_bit_response;
 
-static HttpResponse postPlugin(HttpRequest request)
+static HttpResponse postBit(HttpRequest request)
 {
-    post_plugin_request = request;
-    return post_plugin_response;
+    post_bit_request = request;
+    return post_bit_response;
 }
 
 
-static HttpResponse put_plugin_response;
+static HttpResponse put_bit_response;
 
-static HttpResponse putPlugin(HttpRequest request)
+static HttpResponse putBit(HttpRequest request)
 {
-    return put_plugin_response;
+    return put_bit_response;
 }
 
 static HttpResponse throwsException(HttpRequest request)
@@ -64,7 +64,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
     it("allows registering a callback for a given verb and path", [&]() {
         HttpServer server;
 
-        server.get("/plugins", getPlugins);
+        server.get("/bits", getBits);
     });
 
     it("returns status code 404 when endpoint is not known", [&]() {
@@ -74,7 +74,7 @@ describe("HTTP server based on Cesanta Mongoose", []() {
 
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
+        response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
         expect(response.status_code).toBe(404);
 
@@ -86,12 +86,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        get_plugins_response.body = "hello";
-        get_plugins_response.status_code = 200;
-        server.get("/plugins", getPlugins);
+        get_bits_response.body = "hello";
+        get_bits_response.status_code = 200;
+        server.get("/bits", getBits);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
+        response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
@@ -104,12 +104,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        post_plugin_response.body = "hello";
-        post_plugin_response.status_code = 200;
-        server.post("/plugins", postPlugin);
+        post_bit_response.body = "hello";
+        post_bit_response.status_code = 200;
+        server.post("/bits", postBit);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.post("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
+        response = client.post("http://127.0.0.1:8000/bits", HttpRequest("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
@@ -124,12 +124,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpResponse response;
 
         request.headers.set("header1", "value1");
-        server.post("/plugins", postPlugin);
+        server.post("/bits", postBit);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.post("http://127.0.0.1:8000/plugins", request);
+        response = client.post("http://127.0.0.1:8000/bits", request);
 
-        expect(post_plugin_request.headers.get("header1")).toBe("value1");
+        expect(post_bit_request.headers.get("header1")).toBe("value1");
 
         server.stop();
     });
@@ -139,12 +139,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        put_plugin_response.body = "hello";
-        put_plugin_response.status_code = 200;
-        server.put("/plugins", putPlugin);
+        put_bit_response.body = "hello";
+        put_bit_response.status_code = 200;
+        server.put("/bits", putBit);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.put("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
+        response = client.put("http://127.0.0.1:8000/bits", HttpRequest("post data"));
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
@@ -157,11 +157,11 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        put_plugin_response.body = "hello";
-        put_plugin_response.status_code = 200;
+        put_bit_response.body = "hello";
+        put_bit_response.status_code = 200;
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.method("http://127.0.0.1:8000/plugins", HttpRequest("post data"), "CONNECT");
+        response = client.method("http://127.0.0.1:8000/bits", HttpRequest("post data"), "CONNECT");
 
         expect(response.status_code).toBe(400);
 
@@ -173,12 +173,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        put_plugin_response.body = "hello";
-        put_plugin_response.status_code = 200;
-        server.put("/plugins", putPlugin);
+        put_bit_response.body = "hello";
+        put_bit_response.status_code = 200;
+        server.put("/bits", putBit);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.post("http://127.0.0.1:8000/plugins", HttpRequest("post data"));
+        response = client.post("http://127.0.0.1:8000/bits", HttpRequest("post data"));
 
         expect(response.status_code).toBe(404);
 
@@ -190,12 +190,12 @@ describe("HTTP server based on Cesanta Mongoose", []() {
         HttpClient client;
         HttpResponse response;
 
-        get_plugins_response.body = "hello";
-        get_plugins_response.status_code = 200;
-        server.get("/plugins", throwsException);
+        get_bits_response.body = "hello";
+        get_bits_response.status_code = 200;
+        server.get("/bits", throwsException);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.get("http://127.0.0.1:8000/plugins", HttpRequest(""));
+        response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
         expect(response.status_code).toBe(500);
 
