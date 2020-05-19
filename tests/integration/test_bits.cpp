@@ -118,7 +118,7 @@ describe("CPM Hub bits management", []() {
         response = api.downloadBit(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"bit_name\":\"cest\",\"version\":\"1.0\"}");
+        expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
     });
 
     it("finds a bit given version after it has been registered", [&]() {
@@ -142,6 +142,6 @@ describe("CPM Hub bits management", []() {
         response = api.downloadBit(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("{\"payload\":\"ABCDEabcde\",\"bit_name\":\"cest\",\"version\":\"1.0\"}");
+        expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
     });
 });

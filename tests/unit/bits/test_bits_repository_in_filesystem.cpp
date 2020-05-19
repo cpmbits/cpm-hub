@@ -32,7 +32,7 @@ describe("Bits Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         BitIndex bit_index;
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Bit bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
@@ -55,12 +55,12 @@ describe("Bits Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         BitIndex bit_index;
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit bit("cest", "0.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Bit bit("cest", "0.1", "user", "Yml0IHBheWxvYWQ=");
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         repository.add(bit);
-        bit = Bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        bit = Bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
 
         repository.add(bit);
 
@@ -89,7 +89,7 @@ describe("Bits Repository in file system", []() {
         Mock<Filesystem> mock_filesystem;
         BitIndex bit_index;
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.0", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Bit cest_bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
         Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
@@ -107,7 +107,7 @@ describe("Bits Repository in file system", []() {
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.0");
         expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
     });
 
     it("doesn't restore index when repository doesn't have an index file", [&]() {
@@ -142,7 +142,7 @@ describe("Bits Repository in file system", []() {
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.0");
         expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
     });
 
     it("finds an indexed bit after index was restored from filesystem from version 1", [&]() {
@@ -164,14 +164,14 @@ describe("Bits Repository in file system", []() {
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.0");
         expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
     });
 
     it("finds given version of an indexed bit", [&]() {
         Mock<Filesystem> mock_filesystem;
         BitIndex bit_index;
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
         Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
@@ -190,14 +190,14 @@ describe("Bits Repository in file system", []() {
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.1");
         expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("cGx1Z2luIHBheWxvYWQ=");
+        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
     });
 
     it("fails to find non existent version of a bit", [&]() {
         Mock<Filesystem> mock_filesystem;
         BitIndex bit_index;
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.1", "user", "cGx1Z2luIHBheWxvYWQ=");
+        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
         Optional<Bit> bit;
 
         When(Method(mock_filesystem, createDirectory)).AlwaysReturn();

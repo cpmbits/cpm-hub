@@ -124,8 +124,8 @@ describe("Bits API", []() {
         Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
-            "\"payload\":\"ABCDEabcde\","
             "\"bit_name\":\"cest\","
+            "\"payload\":\"ABCDEabcde\","
             "\"version\":\"1.0\""
         "}");
     });
@@ -147,9 +147,9 @@ describe("Bits API", []() {
         Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string, string)).Using("cest", "1.1"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
-            "\"payload\":\"ABCDEabcde\","
-            "\"bit_name\":\"cest\","
-            "\"version\":\"1.1\""
+           "\"bit_name\":\"cest\","
+           "\"payload\":\"ABCDEabcde\","
+           "\"version\":\"1.1\""
         "}");
     });
 });
