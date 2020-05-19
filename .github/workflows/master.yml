@@ -17,10 +17,11 @@ jobs:
           python-version: 3.7
       - name: Install dependencies
         run: |
-          pip3 install cpm-cli
+          pip3 install --upgrade cpm-cli
           pip3 install pyyaml
           pip3 install requests
           sudo apt install -yq ninja-build g++ libboost-all-dev
+          cpm install
       - name: Test with CPM
         run: |
           cpm test

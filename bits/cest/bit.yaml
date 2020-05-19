@@ -1,5 +1,0 @@
-name: cest
-description: Cest testing framework for C++
-version: "1.0"
-packages:
-    cest:
