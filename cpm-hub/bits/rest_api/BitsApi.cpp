@@ -63,17 +63,15 @@ HttpResponse BitsApi::publishBit(HttpRequest &request)
 
 HttpResponse BitsApi::listBits(HttpRequest &request)
 {
-    HttpResponse response(HttpStatus::OK, "");
-    json json_bit_list = json::array();
+    HttpResponse response;
+    json json_bits = json::array();
 
     for (Bit bit : bits_service->allBits()) {
         json json_bit = {{"bit_name", bit.metadata.name}};
-        json_bit_list.push_back(json_bit);
+        json_bits.push_back(json_bit);
     }
 
-    response.body = json_bit_list.dump();
-
-    return response;
+    return HttpResponse::ok(json_bits.dump());
 }
 
 

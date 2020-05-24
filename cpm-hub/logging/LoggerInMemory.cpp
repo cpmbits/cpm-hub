@@ -17,6 +17,8 @@
  */
 #include <logging/LoggerInMemory.h>
 
+using namespace std;
+
 
 void LoggerInMemory::log(const char *)
 {
@@ -33,4 +35,10 @@ void LoggerInMemory::warn(const char *)
 void LoggerInMemory::error(const char *)
 {
 
+}
+
+
+vector<string> LoggerInMemory::snapshot()
+{
+    return vector<string>();
 }

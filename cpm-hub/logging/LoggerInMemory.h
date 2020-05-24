@@ -24,5 +24,6 @@ public:
     virtual void log(const char *);
     virtual void warn(const char *);
     virtual void error(const char *);
+    virtual std::vector<std::string> snapshot();
 };
 

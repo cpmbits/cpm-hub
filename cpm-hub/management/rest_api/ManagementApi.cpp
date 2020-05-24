@@ -20,16 +20,32 @@
 
 using namespace nlohmann;
 
+static NullAuthenticator unauthenticated;
+
 
 ManagementApi::ManagementApi(DeployService *deploy_service, Logger *logger)
 {
     this->deploy_service = deploy_service;
+    this->logger = logger;
+    this->authenticator = &unauthenticated;
+}
+
+
+ManagementApi::ManagementApi(DeployService *deploy_service, Logger *logger, Authenticator *authenticator)
+{
+    this->deploy_service = deploy_service;
+    this->logger = logger;
+    this->authenticator = authenticator;
 }
 
 
 HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
     auto json = json::parse(request.body);
+
+    if (!isAuthorized(request)) {
+        return HttpResponse::unauthorized();
+    }
 
     try {
         this->deploy_service->deploy(
@@ -45,5 +61,22 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
 
 HttpResponse ManagementApi::getLogs(HttpRequest &request)
 {
-    return HttpResponse();
+    json json_logs = json::array();
+
+    if (!isAuthorized(request)) {
+        return HttpResponse::unauthorized();
+    }
+
+    for (std::string log : logger->snapshot()) {
+        json_logs.push_back(log);
+    }
+
+    return HttpResponse::ok(json_logs.dump());
+}
+
+
+bool ManagementApi::isAuthorized(HttpRequest &request)
+{
+    return request.headers.has("API_KEY") &&
+           authenticator->authenticate(request.headers.get("API_KEY").c_str()).isPresent();
 }
