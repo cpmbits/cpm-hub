@@ -15,18 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
 
-#include <logging/Logger.h>
+#include <logging/LoggerInMemory.h>
 
-class LoggerInMemory: public Logger {
-public:
-    virtual void log(const char *);
-    virtual void warn(const char *);
-    virtual void error(const char *);
-    virtual std::vector<std::string> snapshot();
+using namespace cest;
 
-private:
-    std::vector<std::string> logs;
-};
 
+describe("LoggerInMemory", []() {
+    it("can be initialized", []() {
+        LoggerInMemory logger;
+    });
+});

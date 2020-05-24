@@ -17,16 +17,14 @@
  */
 #pragma once
 
-#include <logging/Logger.h>
+#include <vector>
+#include <string>
 
-class LoggerInMemory: public Logger {
+class Logger {
 public:
-    virtual void log(const char *);
-    virtual void warn(const char *);
-    virtual void error(const char *);
-    virtual std::vector<std::string> snapshot();
-
-private:
-    std::vector<std::string> logs;
+    virtual void log(const char *) = 0;
+    virtual void warn(const char *) = 0;
+    virtual void error(const char *) = 0;
+    virtual std::vector<std::string> snapshot() = 0;
 };
 
