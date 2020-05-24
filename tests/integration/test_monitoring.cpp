@@ -15,22 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
 
-#include <string>
+#include <logging/LoggerInMemory.h>
+#include <management/rest_api/ManagementApi.h>
 
-#include <http/http.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
+using namespace cest;
 
-class ManagementApi {
-public:
-    ManagementApi(DeployService *deploy_service, Logger *logger);
 
-    HttpResponse deploy(HttpRequest &request);
+describe("CPM Hub monitoring", []() {
+    it("allows popping all generated logs", []() {
+        Filesystem filesystem;
+        LoggerInMemory logger;
+        DeployService deploy_service(&filesystem);
+        ManagementApi management_api(&deploy_service, &logger);
+        HttpRequest request;
+        HttpResponse response;
 
-    HttpResponse getLogs(HttpRequest &request);
+        logger.log("First log message");
 
-private:
-    DeployService *deploy_service;
-};
+        response = management_api.getLogs(request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(response.body).toBe("[\"First log message\"]");
+    });
+});

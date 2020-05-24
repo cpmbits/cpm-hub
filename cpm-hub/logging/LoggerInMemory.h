@@ -17,20 +17,12 @@
  */
 #pragma once
 
-#include <string>
-
-#include <http/http.h>
 #include <logging/Logger.h>
-#include <management/DeployService.h>
 
-class ManagementApi {
+class LoggerInMemory: public Logger {
 public:
-    ManagementApi(DeployService *deploy_service, Logger *logger);
-
-    HttpResponse deploy(HttpRequest &request);
-
-    HttpResponse getLogs(HttpRequest &request);
-
-private:
-    DeployService *deploy_service;
+    virtual void log(const char *);
+    virtual void warn(const char *);
+    virtual void error(const char *);
 };
+

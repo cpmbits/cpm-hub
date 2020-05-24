@@ -21,7 +21,7 @@
 using namespace nlohmann;
 
 
-ManagementApi::ManagementApi(DeployService *deploy_service)
+ManagementApi::ManagementApi(DeployService *deploy_service, Logger *logger)
 {
     this->deploy_service = deploy_service;
 }
@@ -40,4 +40,10 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
     } catch (AuthenticationFailure &error) {
         return HttpResponse::unauthorized();
     }
+}
+
+
+HttpResponse ManagementApi::getLogs(HttpRequest &request)
+{
+    return HttpResponse();
 }

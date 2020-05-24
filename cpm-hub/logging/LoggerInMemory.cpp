@@ -15,22 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <logging/LoggerInMemory.h>
 
-#include <string>
 
-#include <http/http.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
+void LoggerInMemory::log(const char *)
+{
 
-class ManagementApi {
-public:
-    ManagementApi(DeployService *deploy_service, Logger *logger);
+}
 
-    HttpResponse deploy(HttpRequest &request);
 
-    HttpResponse getLogs(HttpRequest &request);
+void LoggerInMemory::warn(const char *)
+{
 
-private:
-    DeployService *deploy_service;
-};
+}
+
+
+void LoggerInMemory::error(const char *)
+{
+
+}

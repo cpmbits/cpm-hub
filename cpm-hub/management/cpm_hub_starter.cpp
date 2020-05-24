@@ -73,7 +73,7 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
     management_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
     deploy_service = new DeployService(&filesystem, management_authenticator, command_line);
-    management_api = new ManagementApi(deploy_service);
+    management_api = new ManagementApi(deploy_service, nullptr);
 
     installManagementRoutes(management_http_server, management_api);
     management_http_server.configureSecurity(options.security_options);

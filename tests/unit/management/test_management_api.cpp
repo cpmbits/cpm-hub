@@ -48,7 +48,7 @@ describe("Management API", []() {
                             "}");
         HttpResponse response(200, "");
         MockDeployService mock_service;
-        ManagementApi api(&mock_service);
+        ManagementApi api(&mock_service, nullptr);
 
         request.headers.set("API_KEY", "cafecafe");
 
@@ -63,7 +63,7 @@ describe("Management API", []() {
         HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
         HttpResponse response(200, "");
         Mock<DeployService> mock_service;
-        ManagementApi api(&mock_service.get());
+        ManagementApi api(&mock_service.get(), nullptr);
 
         request.headers.set("API_KEY", "cafecafe");
         When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
