@@ -15,30 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <logging/LoggerInMemory.h>
+#pragma once
 
-using namespace std;
+#include <spdlog/spdlog.h>
+#include <logging/Logger.h>
 
+class LoggerInRotatingFile: public Logger {
+public:
+    LoggerInRotatingFile(std::string filename, int max_size, int max_files);
+    void info(const char *message, ...) override;
+    void warn(const char *message, ...) override;
+    void error(const char *message, ...) override;
+    std::vector<LogMessage> snapshot() override;
 
-void LoggerInMemory::log(const char *)
-{
+private:
+    std::shared_ptr<spdlog::logger> logger;
+};
 
-}
-
-
-void LoggerInMemory::warn(const char *)
-{
-
-}
-
-
-void LoggerInMemory::error(const char *)
-{
-
-}
-
-
-vector<string> LoggerInMemory::snapshot()
-{
-    return vector<string>();
-}

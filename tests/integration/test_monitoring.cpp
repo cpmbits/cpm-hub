@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <logging/LoggerInMemory.h>
+#include <logging/LoggerInRotatingFile.h>
 #include <management/rest_api/ManagementApi.h>
 
 using namespace cest;
@@ -26,13 +26,13 @@ using namespace cest;
 describe("CPM Hub monitoring", []() {
     it("allows popping all generated logs", []() {
         Filesystem filesystem;
-        LoggerInMemory logger;
+        LoggerInRotatingFile logger;
         DeployService deploy_service(&filesystem);
         ManagementApi management_api(&deploy_service, &logger);
         HttpRequest request;
         HttpResponse response;
 
-        logger.log("First log message");
+        logger.info("First log message");
 
         response = management_api.getLogs(request);
 

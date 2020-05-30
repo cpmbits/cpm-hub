@@ -33,6 +33,7 @@ static BitsApi *bits_api;
 static HttpServer management_http_server;
 static ManagementApi *management_api;
 static HttpClient cpm_hub_auth_client;
+Logger *logger;
 
 
 void startServiceServer(ProgramOptions &options)
@@ -63,6 +64,10 @@ void startServiceServer(ProgramOptions &options)
     installServiceRoutes(service_http_server, bits_api);
     service_http_server.configureSecurity(options.security_options);
     service_http_server.startAsync("0.0.0.0", options.http_service_port);
+
+    if (!options.logger_file.empty()) {
+
+    }
 }
 
 

@@ -44,6 +44,10 @@ static ProgramOptions parseIniFile(string &ini_file)
     program_options.security_options.key_file = ini_reader.Get("Management", "key_file", "key.pem");
     program_options.access_file = ini_reader.Get("Management", "access_file", ".access");
 
+    program_options.logger_file = ini_reader.Get("Logging", "logger_file", "cpmhub.log");
+    program_options.logger_max_file_size = ini_reader.GetInteger("Logging", "logger_max_file_size", 1024*1024);
+    program_options.logger_max_files = ini_reader.GetInteger("Logging", "logger_max_files", 10);
+
     return program_options;
 }
 

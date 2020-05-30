@@ -17,6 +17,7 @@ bits:
     base64: '1.0'
     blake3: '1.0'
     inih: '1.0'
+    spdlog: '1.5.0'
 link_options:
     libraries: ['boost_filesystem', 'boost_system', 'boost_program_options', 'pthread', 'ssl', 'crypto']
 actions:

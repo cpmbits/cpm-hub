@@ -17,16 +17,17 @@
  */
 #pragma once
 
-#include <logging/Logger.h>
+#include <stdint.h>
 
-class LoggerInMemory: public Logger {
-public:
-    virtual void log(const char *);
-    virtual void warn(const char *);
-    virtual void error(const char *);
-    virtual std::vector<std::string> snapshot();
+using TimeS = int64_t;
+using TimeMs = int64_t;
 
-private:
-    std::vector<std::string> logs;
+enum TimeFormat {
+    TIME_FORMAT_ISO_8601
 };
 
+TimeMs nowMs();
+
+std::string timeAsString(TimeMs time, const char *format);
+
+std::string timeAsString(TimeS time);

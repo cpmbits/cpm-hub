@@ -19,12 +19,25 @@
 
 #include <vector>
 #include <string>
+#include <infrastructure/clock.h>
+
+
+struct LogMessage {
+    TimeMs time;
+    enum {
+        LOG_SEVERITY_INFO,
+        LOG_SEVERITY_WARNING,
+        LOG_SEVERITY_ERROR,
+    } severity;
+    const char *message;
+};
+
 
 class Logger {
 public:
-    virtual void log(const char *) = 0;
-    virtual void warn(const char *) = 0;
-    virtual void error(const char *) = 0;
-    virtual std::vector<std::string> snapshot() = 0;
+    virtual void info(const char *message, ...) = 0;
+    virtual void warn(const char *message, ...) = 0;
+    virtual void error(const char *message, ...) = 0;
+    virtual std::vector<LogMessage> snapshot() = 0;
 };
 

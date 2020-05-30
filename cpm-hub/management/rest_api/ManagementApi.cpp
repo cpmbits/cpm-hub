@@ -61,17 +61,18 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
 
 HttpResponse ManagementApi::getLogs(HttpRequest &request)
 {
-    json json_logs = json::array();
-
-    if (!isAuthorized(request)) {
-        return HttpResponse::unauthorized();
-    }
-
-    for (std::string log : logger->snapshot()) {
-        json_logs.push_back(log);
-    }
-
-    return HttpResponse::ok(json_logs.dump());
+//    json json_logs = json::array();
+//
+//    if (!isAuthorized(request)) {
+//        return HttpResponse::unauthorized();
+//    }
+//
+//    for (std::string log: logger->snapshot()) {
+//        json_logs.push_back(log);
+//    }
+//
+//    return HttpResponse::ok(json_logs.dump());
+return HttpResponse::notFound();
 }
 
 
