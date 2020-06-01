@@ -20,16 +20,30 @@
 
 using namespace nlohmann;
 
+static NullAuthenticator unauthenticated;
+
 
 ManagementApi::ManagementApi(DeployService *deploy_service)
 {
     this->deploy_service = deploy_service;
+    this->authenticator = &unauthenticated;
+}
+
+
+ManagementApi::ManagementApi(DeployService *deploy_service, Authenticator *authenticator)
+{
+    this->deploy_service = deploy_service;
+    this->authenticator = authenticator;
 }
 
 
 HttpResponse ManagementApi::deploy(HttpRequest &request)
 {
     auto json = json::parse(request.body);
+
+    if (!isAuthorized(request)) {
+        return HttpResponse::unauthorized();
+    }
 
     try {
         this->deploy_service->deploy(
@@ -40,4 +54,17 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
     } catch (AuthenticationFailure &error) {
         return HttpResponse::unauthorized();
     }
+}
+
+
+HttpResponse ManagementApi::getLogs(HttpRequest &request)
+{
+    return HttpResponse::notFound();
+}
+
+
+bool ManagementApi::isAuthorized(HttpRequest &request)
+{
+    return request.headers.has("API_KEY") &&
+           authenticator->authenticate(request.headers.get("API_KEY").c_str()).isPresent();
 }

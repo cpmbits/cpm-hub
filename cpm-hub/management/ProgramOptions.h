@@ -26,6 +26,7 @@ struct ProgramOptions {
         ACCESS_FILE_AUTHENTICATOR,
         CPM_HUB_AUTHENTICATOR,
     };
+
     std::string bits_directory = ".";
     AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
@@ -33,4 +34,8 @@ struct ProgramOptions {
     int http_service_port = 8000;
     int http_management_port = 8001;
     HttpSecurityOptions security_options;
+
+    std::string logger_file;
+    int logger_max_file_size;
+    int logger_max_files;
 };

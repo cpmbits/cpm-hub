@@ -17,26 +17,33 @@
  */
 #pragma once
 
+#include <vector>
 #include <string>
+#include <infrastructure/clock.h>
 
-#include <http/http.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
 
-class ManagementApi {
-public:
-    ManagementApi(DeployService *deploy_service);
+#define INFO(...)       logger->info(__VA_ARGS__)
+#define WARN(...)       logger->warn(__VA_ARGS__)
+#define ERROR(...)      logger->error(__VA_ARGS__)
 
-    ManagementApi(DeployService *deploy_service, Authenticator *authenticator);
 
-    HttpResponse deploy(HttpRequest &request);
-
-    HttpResponse getLogs(HttpRequest &request);
-
-private:
-    DeployService *deploy_service;
-    Logger *logger;
-    Authenticator *authenticator;
-
-    bool isAuthorized(HttpRequest &request);
+struct LogMessage {
+    TimeMs time;
+    enum {
+        LOG_SEVERITY_INFO,
+        LOG_SEVERITY_WARNING,
+        LOG_SEVERITY_ERROR,
+    } severity;
+    const char *message;
 };
+
+
+class Logger {
+public:
+    virtual void info(const char *message, ...) = 0;
+    virtual void warn(const char *message, ...) = 0;
+    virtual void error(const char *message, ...) = 0;
+};
+
+
+extern Logger *logger;

@@ -17,26 +17,17 @@
  */
 #pragma once
 
-#include <string>
-
-#include <http/http.h>
+#include <spdlog/spdlog.h>
 #include <logging/Logger.h>
-#include <management/DeployService.h>
 
-class ManagementApi {
+class LoggerInRotatingFile: public Logger {
 public:
-    ManagementApi(DeployService *deploy_service);
-
-    ManagementApi(DeployService *deploy_service, Authenticator *authenticator);
-
-    HttpResponse deploy(HttpRequest &request);
-
-    HttpResponse getLogs(HttpRequest &request);
+    LoggerInRotatingFile(std::string filename, int max_size, int max_files);
+    void info(const char *message, ...) override;
+    void warn(const char *message, ...) override;
+    void error(const char *message, ...) override;
 
 private:
-    DeployService *deploy_service;
-    Logger *logger;
-    Authenticator *authenticator;
-
-    bool isAuthorized(HttpRequest &request);
+    std::shared_ptr<spdlog::logger> logger;
 };
+

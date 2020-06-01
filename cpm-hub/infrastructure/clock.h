@@ -17,26 +17,17 @@
  */
 #pragma once
 
-#include <string>
+#include <stdint.h>
 
-#include <http/http.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
+using TimeS = int64_t;
+using TimeMs = int64_t;
 
-class ManagementApi {
-public:
-    ManagementApi(DeployService *deploy_service);
-
-    ManagementApi(DeployService *deploy_service, Authenticator *authenticator);
-
-    HttpResponse deploy(HttpRequest &request);
-
-    HttpResponse getLogs(HttpRequest &request);
-
-private:
-    DeployService *deploy_service;
-    Logger *logger;
-    Authenticator *authenticator;
-
-    bool isAuthorized(HttpRequest &request);
+enum TimeFormat {
+    TIME_FORMAT_ISO_8601
 };
+
+TimeMs nowMs();
+
+std::string timeAsString(TimeMs time, const char *format);
+
+std::string timeAsString(TimeS time);

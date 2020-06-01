@@ -17,12 +17,14 @@
  */
 #include <cest/cest.h>
 
+#include <logging/LoggerInConsole.h>
 #include <http/HttpServer.h>
 #include <http/HttpClient.h>
 
 using namespace cest;
 
 
+static LoggerInConsole test_logger;
 static HttpResponse get_bits_response;
 
 static HttpResponse getBits(HttpRequest request)
@@ -55,6 +57,10 @@ static HttpResponse throwsException(HttpRequest request)
 
 
 describe("HTTP server based on Cesanta Mongoose", []() {
+    beforeEach([]() {
+        logger = &test_logger;
+    });
+
     it("starts and stops an HTTP server", [&]() {
         HttpServer server;
         server.startAsync("127.0.0.1", 8000);

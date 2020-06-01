@@ -22,21 +22,22 @@
 
 using namespace cest;
 using namespace fakeit;
+using namespace std;
 
 
 class MockDeployService: public DeployService {
 public:
     MockDeployService(): DeployService(NULL) {}
 
-    void deploy(const std::string &payload, const std::string &version, const std::string &api_key) override {
+    void deploy(const string &payload, const string &version, const string &api_key) override {
         arg_payload = payload;
         arg_version = version;
         arg_api_key = api_key;
     }
 
-    std::string arg_payload;
-    std::string arg_version;
-    std::string arg_api_key;
+    string arg_payload;
+    string arg_version;
+    string arg_api_key;
 };
 
 
@@ -59,13 +60,26 @@ describe("Management API", []() {
         expect(mock_service.arg_api_key).toBe("cafecafe");
     });
 
-    it("deploy returns error 401 on authentication failure", []() {
+    it("returns error 401 on authentication failure when deploying", []() {
         HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
         HttpResponse response(200, "");
         Mock<DeployService> mock_service;
         ManagementApi api(&mock_service.get());
 
         request.headers.set("API_KEY", "cafecafe");
+        When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
+
+        response = api.deploy(request);
+
+        expect(response.status_code).toBe(401);
+    });
+
+    it("returns error 401 on authentication failure when deploying and API KEY is missing", []() {
+        HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
+        HttpResponse response(200, "");
+        Mock<DeployService> mock_service;
+        ManagementApi api(&mock_service.get());
+
         When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
 
         response = api.deploy(request);

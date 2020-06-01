@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
-
+#include <logging/Logger.h>
 #include <http/HttpServer.h>
 #include <http/http_headers.h>
 
@@ -53,11 +52,7 @@ void HttpServer::createConnection(const string &address, int port)
 
     connection = mg_bind_opt(&mgr, string_stream.str().c_str(), eventHandler, bind_opts);
 
-    if (security_options.security_enabled) {
-        cout << "Started server on https://" << string_stream.str() << endl;
-    } else {
-        cout << "Started server on http://" << string_stream.str() << endl;
-    }
+    INFO("Started server on http%s://%s", security_options.security_enabled ? "s" : "", string_stream.str().c_str());
 
     mg_set_protocol_http_websocket(connection);
 }
@@ -207,18 +202,14 @@ void HttpServer::logRequest(struct mg_connection *connection, const http_message
     local_time = localtime(&rawtime);
     strftime(current_time_string, sizeof(current_time_string), "%d/%b/%Y:%H:%M:%S %z", local_time);
 
-    cout
-        << client_address
-        << " -"
-        << " -"
-        << " [" << current_time_string << "]"
-        << " \"" << string(message->method.p, message->method.len)
-        << " " << string(message->uri.p, message->uri.len)
-        << " " << string(message->proto.p, message->proto.len)
-        << "\""
-        << " " << response.status_code
-        << " " << response.body.size()
-        << endl;
+    INFO("%s - - [%s] \"%s %s %s\" %d %d",
+         client_address,
+         current_time_string,
+         string(message->method.p, message->method.len).c_str(),
+         string(message->uri.p, message->uri.len).c_str(),
+         string(message->proto.p, message->proto.len).c_str(),
+         response.status_code,
+         response.body.size());
 }
 
 

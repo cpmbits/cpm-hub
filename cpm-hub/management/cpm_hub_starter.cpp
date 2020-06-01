@@ -25,6 +25,8 @@
 #include <bits/BitsRepositoryInFilesystem.h>
 #include <bits/BitsService.h>
 #include <bits/rest_api/BitsApi.h>
+#include <logging/LoggerInRotatingFile.h>
+#include <logging/LoggerInConsole.h>
 
 
 static Filesystem filesystem;
@@ -33,6 +35,7 @@ static BitsApi *bits_api;
 static HttpServer management_http_server;
 static ManagementApi *management_api;
 static HttpClient cpm_hub_auth_client;
+Logger *logger;
 
 
 void startServiceServer(ProgramOptions &options)
@@ -73,7 +76,7 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
     management_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
     deploy_service = new DeployService(&filesystem, management_authenticator, command_line);
-    management_api = new ManagementApi(deploy_service);
+    management_api = new ManagementApi(deploy_service, nullptr);
 
     installManagementRoutes(management_http_server, management_api);
     management_http_server.configureSecurity(options.security_options);
@@ -83,6 +86,12 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
 void startCpmHub(ProgramOptions &program_options, std::vector<std::string> command_line)
 {
+    if (!program_options.logger_file.empty()) {
+        logger = new LoggerInRotatingFile(program_options.logger_file, program_options.logger_max_file_size, program_options.logger_max_files);
+    } else {
+        logger = new LoggerInConsole();
+    }
+
     startServiceServer(program_options);
 
     startManagementServer(program_options, command_line);
