@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <stdarg.h>
+#include <cstdarg>
 #include <logging/LoggerInRotatingFile.h>
 
 using namespace std;
@@ -26,7 +26,7 @@ LoggerInRotatingFile::LoggerInRotatingFile(std::string filename, int max_size, i
 {
     logger = spdlog::rotating_logger_mt("cpm_hub_logger", filename, max_size, max_files);
     logger->set_pattern("%Y-%m-%d %H:%M:%S.%e %l - %v");
-    spdlog::flush_on(spdlog::level::info);
+    spdlog::flush_every(chrono::seconds(5));
 }
 
 

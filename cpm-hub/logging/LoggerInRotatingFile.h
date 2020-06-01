@@ -18,6 +18,7 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <logging/Logger.h>
 
 class LoggerInRotatingFile: public Logger {
