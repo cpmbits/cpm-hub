@@ -26,7 +26,6 @@ public:
     void info(const char *message, ...) override;
     void warn(const char *message, ...) override;
     void error(const char *message, ...) override;
-    std::vector<LogMessage> snapshot() override;
 
 private:
     std::shared_ptr<spdlog::logger> logger;

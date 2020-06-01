@@ -23,18 +23,16 @@ using namespace nlohmann;
 static NullAuthenticator unauthenticated;
 
 
-ManagementApi::ManagementApi(DeployService *deploy_service, Logger *logger)
+ManagementApi::ManagementApi(DeployService *deploy_service)
 {
     this->deploy_service = deploy_service;
-    this->logger = logger;
     this->authenticator = &unauthenticated;
 }
 
 
-ManagementApi::ManagementApi(DeployService *deploy_service, Logger *logger, Authenticator *authenticator)
+ManagementApi::ManagementApi(DeployService *deploy_service, Authenticator *authenticator)
 {
     this->deploy_service = deploy_service;
-    this->logger = logger;
     this->authenticator = authenticator;
 }
 
@@ -61,18 +59,7 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
 
 HttpResponse ManagementApi::getLogs(HttpRequest &request)
 {
-//    json json_logs = json::array();
-//
-//    if (!isAuthorized(request)) {
-//        return HttpResponse::unauthorized();
-//    }
-//
-//    for (std::string log: logger->snapshot()) {
-//        json_logs.push_back(log);
-//    }
-//
-//    return HttpResponse::ok(json_logs.dump());
-return HttpResponse::notFound();
+    return HttpResponse::notFound();
 }
 
 

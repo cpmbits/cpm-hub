@@ -17,20 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <stdarg.h>
-#include <logging/LoggerInRotatingFile.h>
+#include <iostream>
+#include <logging/LoggerInConsole.h>
 
 using namespace std;
 
 
-LoggerInRotatingFile::LoggerInRotatingFile(std::string filename, int max_size, int max_files)
-{
-    logger = spdlog::rotating_logger_mt("cpm_hub_logger", filename, max_size, max_files);
-    logger->set_pattern("%Y-%m-%d %H:%M:%S.%e %l - %v");
-    spdlog::flush_on(spdlog::level::info);
-}
-
-
-void LoggerInRotatingFile::info(const char *message, ...)
+void LoggerInConsole::info(const char *message, ...)
 {
     char formatted[512];
     va_list ap;
@@ -39,11 +32,11 @@ void LoggerInRotatingFile::info(const char *message, ...)
     vsprintf(formatted, message, ap);
     va_end(ap);
 
-    logger->info(formatted);
+    cout << formatted << endl;
 }
 
 
-void LoggerInRotatingFile::warn(const char *message, ...)
+void LoggerInConsole::warn(const char *message, ...)
 {
     char formatted[512];
     va_list ap;
@@ -52,11 +45,11 @@ void LoggerInRotatingFile::warn(const char *message, ...)
     vsprintf(formatted, message, ap);
     va_end(ap);
 
-    logger->warn(formatted);
+    cout << formatted << endl;
 }
 
 
-void LoggerInRotatingFile::error(const char *message, ...)
+void LoggerInConsole::error(const char *message, ...)
 {
     char formatted[512];
     va_list ap;
@@ -65,5 +58,5 @@ void LoggerInRotatingFile::error(const char *message, ...)
     vsprintf(formatted, message, ap);
     va_end(ap);
 
-    logger->error(formatted);
+    cout << formatted << endl;
 }

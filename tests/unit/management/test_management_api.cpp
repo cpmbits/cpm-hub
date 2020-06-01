@@ -49,8 +49,7 @@ describe("Management API", []() {
                             "}");
         HttpResponse response(200, "");
         MockDeployService mock_service;
-        Mock<Logger> mock_logger;
-        ManagementApi api(&mock_service, &mock_logger.get());
+        ManagementApi api(&mock_service);
 
         request.headers.set("API_KEY", "cafecafe");
 
@@ -65,8 +64,7 @@ describe("Management API", []() {
         HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
         HttpResponse response(200, "");
         Mock<DeployService> mock_service;
-        Mock<Logger> mock_logger;
-        ManagementApi api(&mock_service.get(), &mock_logger.get());
+        ManagementApi api(&mock_service.get());
 
         request.headers.set("API_KEY", "cafecafe");
         When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
@@ -76,70 +74,16 @@ describe("Management API", []() {
         expect(response.status_code).toBe(401);
     });
 
-    it("returns error 401 on authentication failure for missing API KEY when getting logs", []() {
-        HttpRequest request;
-        HttpResponse response;
+    it("returns error 401 on authentication failure when deploying and API KEY is missing", []() {
+        HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
+        HttpResponse response(200, "");
         Mock<DeployService> mock_service;
-        Mock<Logger> mock_logger;
-        Mock<Authenticator> mock_authenticator;
-        ManagementApi api(&mock_service.get(), &mock_logger.get(), &mock_authenticator.get());
+        ManagementApi api(&mock_service.get());
 
-        When(Method(mock_authenticator, authenticate)).Return(Optional<string>());
+        When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
 
-        response = api.getLogs(request);
+        response = api.deploy(request);
 
         expect(response.status_code).toBe(401);
-    });
-
-    it("returns error 401 on authentication failure for invalid API KEY when getting logs", []() {
-        HttpRequest request;
-        HttpResponse response;
-        Mock<DeployService> mock_service;
-        Mock<Logger> mock_logger;
-        Mock<Authenticator> mock_authenticator;
-        ManagementApi api(&mock_service.get(), &mock_logger.get(), &mock_authenticator.get());
-
-        request.headers.set("API_KEY", "cafecafe");
-        When(Method(mock_authenticator, authenticate)).Return(Optional<string>());
-
-        response = api.getLogs(request);
-
-        expect(response.status_code).toBe(401);
-    });
-
-    it("returns logs in logger as json when no logs are stored", []() {
-        HttpRequest request;
-        HttpResponse response;
-        Mock<DeployService> mock_service;
-        Mock<Logger> mock_logger;
-        Mock<Authenticator> mock_authenticator;
-        ManagementApi api(&mock_service.get(), &mock_logger.get(), &mock_authenticator.get());
-
-        request.headers.set("API_KEY", "cafecafe");
-        When(Method(mock_authenticator, authenticate)).Return(Optional<string>("admin"));
-        When(Method(mock_logger, snapshot)).Return(vector<string>());
-
-        response = api.getLogs(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("[]");
-    });
-
-    it("returns logs in logger as json when many logs are stored", []() {
-        HttpRequest request;
-        HttpResponse response;
-        Mock<DeployService> mock_service;
-        Mock<Logger> mock_logger;
-        Mock<Authenticator> mock_authenticator;
-        ManagementApi api(&mock_service.get(), &mock_logger.get(), &mock_authenticator.get());
-
-        request.headers.set("API_KEY", "cafecafe");
-        When(Method(mock_authenticator, authenticate)).Return(Optional<string>("admin"));
-        When(Method(mock_logger, snapshot)).Return(vector<string>{"log1", "log2"});
-
-        response = api.getLogs(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("[\"log1\",\"log2\"]");
     });
 });

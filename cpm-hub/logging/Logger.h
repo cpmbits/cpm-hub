@@ -22,6 +22,11 @@
 #include <infrastructure/clock.h>
 
 
+#define INFO(...)       logger->info(__VA_ARGS__)
+#define WARN(...)       logger->warn(__VA_ARGS__)
+#define ERROR(...)      logger->error(__VA_ARGS__)
+
+
 struct LogMessage {
     TimeMs time;
     enum {
@@ -38,6 +43,7 @@ public:
     virtual void info(const char *message, ...) = 0;
     virtual void warn(const char *message, ...) = 0;
     virtual void error(const char *message, ...) = 0;
-    virtual std::vector<LogMessage> snapshot() = 0;
 };
 
+
+extern Logger *logger;

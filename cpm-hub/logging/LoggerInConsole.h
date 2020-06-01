@@ -15,28 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#pragma once
 
-#include <logging/LoggerInRotatingFile.h>
-#include <management/rest_api/ManagementApi.h>
+#include <spdlog/spdlog.h>
+#include <logging/Logger.h>
 
-using namespace cest;
+class LoggerInConsole: public Logger {
+public:
+    void info(const char *message, ...) override;
+    void warn(const char *message, ...) override;
+    void error(const char *message, ...) override;
 
+private:
+    std::shared_ptr<spdlog::logger> logger;
+};
 
-describe("CPM Hub monitoring", []() {
-    it("allows popping all generated logs", []() {
-        Filesystem filesystem;
-        LoggerInRotatingFile logger;
-        DeployService deploy_service(&filesystem);
-        ManagementApi management_api(&deploy_service, &logger);
-        HttpRequest request;
-        HttpResponse response;
-
-        logger.info("First log message");
-
-        response = management_api.getLogs(request);
-
-        expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("[\"First log message\"]");
-    });
-});

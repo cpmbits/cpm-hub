@@ -25,6 +25,8 @@
 #include <bits/BitsRepositoryInFilesystem.h>
 #include <bits/BitsService.h>
 #include <bits/rest_api/BitsApi.h>
+#include <logging/LoggerInRotatingFile.h>
+#include <logging/LoggerInConsole.h>
 
 
 static Filesystem filesystem;
@@ -64,10 +66,6 @@ void startServiceServer(ProgramOptions &options)
     installServiceRoutes(service_http_server, bits_api);
     service_http_server.configureSecurity(options.security_options);
     service_http_server.startAsync("0.0.0.0", options.http_service_port);
-
-    if (!options.logger_file.empty()) {
-
-    }
 }
 
 
@@ -88,6 +86,12 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
 void startCpmHub(ProgramOptions &program_options, std::vector<std::string> command_line)
 {
+    if (!program_options.logger_file.empty()) {
+        logger = new LoggerInRotatingFile(program_options.logger_file, program_options.logger_max_file_size, program_options.logger_max_files);
+    } else {
+        logger = new LoggerInConsole();
+    }
+
     startServiceServer(program_options);
 
     startManagementServer(program_options, command_line);

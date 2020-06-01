@@ -25,9 +25,9 @@
 
 class ManagementApi {
 public:
-    ManagementApi(DeployService *deploy_service, Logger *logger);
+    ManagementApi(DeployService *deploy_service);
 
-    ManagementApi(DeployService *deploy_service, Logger *logger, Authenticator *authenticator);
+    ManagementApi(DeployService *deploy_service, Authenticator *authenticator);
 
     HttpResponse deploy(HttpRequest &request);
 
