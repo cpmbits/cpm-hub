@@ -20,10 +20,8 @@
 #include <string>
 
 
-#define kMAX_PASSWORD_LENGTH    64
-
-
 struct UserRegistrationData {
+    std::string invitation_token;
     std::string username;
     std::string password;
     std::string email;

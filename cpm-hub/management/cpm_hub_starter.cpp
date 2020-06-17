@@ -27,6 +27,7 @@
 #include <bits/rest_api/BitsApi.h>
 #include <logging/LoggerInRotatingFile.h>
 #include <logging/LoggerInConsole.h>
+#include <users/UsersRepositoryInMemory.h>
 
 
 static Filesystem filesystem;
@@ -34,6 +35,7 @@ static HttpServer service_http_server;
 static BitsApi *bits_api;
 static HttpServer management_http_server;
 static ManagementApi *management_api;
+static UsersApi *users_api;
 static HttpClient cpm_hub_auth_client;
 Logger *logger;
 
@@ -44,6 +46,8 @@ void startServiceServer(ProgramOptions &options)
     BitsRepository *bits_repository;
     Authenticator *bits_api_authenticator;
     BitsService *bits_service;
+    UsersService *users_service;
+    UsersRepository *users_repository;
 
     bit_index = new BitIndex();
     bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
@@ -63,7 +67,11 @@ void startServiceServer(ProgramOptions &options)
     bits_service = new BitsService(bits_repository);
     bits_api = new BitsApi(bits_service, bits_api_authenticator);
 
-    installServiceRoutes(service_http_server, bits_api);
+    users_repository = new UsersRepositoryInMemory();
+    users_service = new UsersService(users_repository, bits_api_authenticator);
+    users_api = new UsersApi(users_service);
+
+    installServiceRoutes(service_http_server, bits_api, users_api);
     service_http_server.configureSecurity(options.security_options);
     service_http_server.startAsync("0.0.0.0", options.http_service_port);
 }

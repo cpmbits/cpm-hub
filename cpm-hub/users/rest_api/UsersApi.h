@@ -24,12 +24,10 @@
 
 class UsersApi {
 public:
-    UsersApi(UsersService *users_service, Authenticator *authenticator);
+    UsersApi(UsersService *users_service);
 
     HttpResponse registerUser(HttpRequest &request);
 
 private:
     UsersService *users_service;
-
-    Authenticator *authenticator;
 };

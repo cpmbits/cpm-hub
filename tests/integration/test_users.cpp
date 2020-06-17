@@ -27,22 +27,21 @@ using namespace cest;
 
 
 describe("CPM Hub users management", []() {
-    it("registers a user when api_key is valid", [&]() {
-        HttpRequest request("{"
-            "\"username\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
+    it("registers a user when otp is valid", [&]() {
         TrivialAuthenticator management_authenticator;
         UsersRepositoryInMemory repository;
         NullAuthenticator service_authenticator;
         UsersService service(&repository, &service_authenticator);
-        UsersApi api(&service, &management_authenticator);
-        UserCredentials credentials = {"admin", "cafecafe"};
+        UsersApi api(&service);
+        HttpRequest request("{"
+                            "\"invitation_token\": \"cafecafe\","
+                            "\"username\": \"juancho\","
+                            "\"password\": \"123456\","
+                            "\"email\": \"juancho@encho.com\""
+                            "}");
+        HttpResponse response;
 
-        management_authenticator.addUser(credentials);
-        request.headers.set("API_KEY", "cafecafe");
+        request.headers.set("OTP", "cafecafe");
 
         response = api.registerUser(request);
 

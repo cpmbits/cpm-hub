@@ -33,6 +33,8 @@ public:
 
     virtual void addUser(UserCredentials &credentials);
 
+    virtual void addUserWithInvitation(UserCredentials &credentials, std::string invitation_token);
+
 private:
     std::string authentication_endpoint;
     std::string users_endpoint;

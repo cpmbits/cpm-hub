@@ -34,7 +34,7 @@ User UsersService::registerUser(UserRegistrationData &registration_data)
         throw UsernameAlreadyTaken(registration_data.username);
     }
 
-    this->authenticator->addUser(credentials);
+    this->authenticator->addUserWithInvitation(credentials, registration_data.invitation_token);
     this->users_repository->add(user);
 
     return user;
