@@ -35,6 +35,8 @@ public:
 
     bool validCredentials(UserCredentials &credentials);
 
+    virtual void addUserWithInvitation(UserCredentials &credentials, std::string invitation_token);
+
     void addUser(UserCredentials &credentials);
 
 private:

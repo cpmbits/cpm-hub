@@ -26,7 +26,7 @@ using namespace fakeit;
 
 
 describe("Users API", []() {
-    it("returns unauthorized when api key is not provided", []() {
+    it("returns bad request when invitation token is not provided", []() {
         HttpRequest request("{"
             "\"username\": \"juancho\","
             "\"password\": \"123456\","
@@ -37,59 +37,16 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get(), &authenticator);
+        UsersApi api(&mock_service.get());
 
         response = api.registerUser(request);
 
-        expect(response.status_code).toBe(401);
-    });
-
-    it("returns unauthorized when provided api key is invalid", []() {
-        HttpRequest request("{"
-            "\"username\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        struct UserRegistrationData registration_data;
-        User user("mengano");
-        Mock<UsersService> mock_service;
-        TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get(), &authenticator);
-
-        request.headers.set("API_KEY", "cafecafe");
-
-        response = api.registerUser(request);
-
-        expect(response.status_code).toBe(401);
-    });
-
-    it("returns unauthorized when provided api key is not valid admin api key", []() {
-        HttpRequest request("{"
-                            "\"username\": \"juancho\","
-                            "\"password\": \"123456\","
-                            "\"email\": \"juancho@encho.com\""
-                            "}");
-        HttpResponse response;
-        struct UserRegistrationData registration_data;
-        User user("mengano");
-        Mock<UsersService> mock_service;
-        TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get(), &authenticator);
-        UserCredentials user_credentials = {"user", "afecafec"};
-        UserCredentials admin_credentials = {"admin", "cafecafe"};
-
-        authenticator.addUser(user_credentials);
-        authenticator.addUser(admin_credentials);
-        request.headers.set("API_KEY", "afecafec");
-
-        response = api.registerUser(request);
-
-        expect(response.status_code).toBe(401);
+        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
     });
 
     it("uses the users service to register a user when provided api key is valid", []() {
         HttpRequest request("{"
+            "\"invitation_token\": \"cafecafe\","
             "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
@@ -99,21 +56,67 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get(), &authenticator);
-        UserCredentials credentials = {"admin", "cafecafe"};
+        UsersApi api(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             registration_data = data;
             return user;
         });
-        authenticator.addUser(credentials);
-        request.headers.set("API_KEY", "cafecafe");
 
         response = api.registerUser(request);
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(registration_data.invitation_token).toBe("cafecafe");
         expect(registration_data.username).toBe("juancho");
         expect(registration_data.password).toBe("123456");
         expect(registration_data.email).toBe("juancho@encho.com");
+    });
+
+    it("returns unauthenticated when register user raises invalid otp", []() {
+        HttpRequest request("{"
+            "\"invitation_token\": \"cafecafe\","
+            "\"username\": \"juancho\","
+            "\"password\": \"123456\","
+            "\"email\": \"juancho@encho.com\""
+        "}");
+        HttpResponse response;
+        struct UserRegistrationData registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get());
+
+        When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
+            throw InvalidInvitationToken();
+            return user;
+        });
+
+        response = api.registerUser(request);
+
+        expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
+    });
+
+    it("returns conflict when register user raises username already taken", []() {
+        HttpRequest request("{"
+            "\"invitation_token\": \"cafecafe\","
+            "\"username\": \"juancho\","
+            "\"password\": \"123456\","
+            "\"email\": \"juancho@encho.com\""
+        "}");
+        HttpResponse response;
+        struct UserRegistrationData registration_data;
+        User user("mengano");
+        Mock<UsersService> mock_service;
+        TrivialAuthenticator authenticator;
+        UsersApi api(&mock_service.get());
+
+        When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
+            throw UsernameAlreadyTaken("");
+            return user;
+        });
+
+        response = api.registerUser(request);
+
+        expect(response.status_code).toBe(HttpStatus::CONFLICT);
     });
 });

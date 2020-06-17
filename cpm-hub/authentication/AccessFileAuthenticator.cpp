@@ -83,3 +83,8 @@ bool AccessFileAuthenticator::validCredentials(UserCredentials &credentials)
 void AccessFileAuthenticator::addUser(UserCredentials &credentials)
 {
 }
+
+
+void AccessFileAuthenticator::addUserWithInvitation(UserCredentials &credentials, std::string invitation_token)
+{
+}

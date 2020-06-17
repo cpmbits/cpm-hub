@@ -23,8 +23,9 @@
 #include <http/HttpServer.h>
 #include <bits/rest_api/BitsApi.h>
 #include <management/rest_api/ManagementApi.h>
+#include <users/rest_api/UsersApi.h>
 
 
-void installServiceRoutes(HttpServer& http_server, BitsApi *bits_api);
+void installServiceRoutes(HttpServer &http_server, BitsApi *bits_api, UsersApi *users_api);
 
 void installManagementRoutes(HttpServer &http_server, ManagementApi *management_api);

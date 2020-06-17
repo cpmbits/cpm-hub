@@ -29,6 +29,8 @@ public:
     virtual bool validCredentials(UserCredentials &credentials) = 0;
 
     virtual void addUser(UserCredentials &credentials) = 0;
+
+    virtual void addUserWithInvitation(UserCredentials &credentials, std::string invitation_token) = 0;
 };
 
 
@@ -43,6 +45,8 @@ public:
     }
 
     void addUser(UserCredentials &credentials) {}
+
+    void addUserWithInvitation(UserCredentials &credentials, std::string invitation_token) {}
 };
 
 
@@ -50,6 +54,21 @@ class AuthenticationFailure: public std::exception {
 public:
     AuthenticationFailure() throw() {
         sprintf(message, "unauthorized");
+    }
+
+    const char *what() const throw () {
+        return message;
+    }
+
+private:
+    char message[256];
+};
+
+
+class InvalidInvitationToken: public std::exception {
+public:
+    InvalidInvitationToken() throw() {
+        sprintf(message, "invalid invitation token");
     }
 
     const char *what() const throw () {

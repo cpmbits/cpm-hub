@@ -46,3 +46,8 @@ bool TrivialAuthenticator::validCredentials(UserCredentials &credentials)
 {
     return false;
 }
+
+
+void TrivialAuthenticator::addUserWithInvitation(UserCredentials &credentials, std::string invitation_token)
+{
+}

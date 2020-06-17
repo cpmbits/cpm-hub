@@ -22,10 +22,9 @@ using namespace nlohmann;
 using namespace std;
 
 
-UsersApi::UsersApi(UsersService *users_service, Authenticator *authenticator)
+UsersApi::UsersApi(UsersService *users_service)
 {
     this->users_service = users_service;
-    this->authenticator = authenticator;
 }
 
 
@@ -33,27 +32,24 @@ HttpResponse UsersApi::registerUser(HttpRequest &request)
 {
     HttpResponse response(200, "");
     auto json = json::parse(request.body);
-    struct UserRegistrationData registration_data = {
-        json.at("username"),
-        json.at("password"),
-        json.at("email"),
-    };
+    struct UserRegistrationData registration_data;
     Optional<string> username;
 
-    if (!request.headers.has("API_KEY")) {
-        return HttpResponse::unauthorized();
-    }
+    try {
+        registration_data.invitation_token = json.at("invitation_token");
+        registration_data.username = json.at("username");
+        registration_data.password = json.at("password");
+        registration_data.email = json.at("email");
 
-    username = this->authenticator->authenticate(request.headers.get("API_KEY").c_str());
-    if (!username.isPresent()) {
-        return HttpResponse::unauthorized();
-    }
+        this->users_service->registerUser(registration_data);
 
-    if (username.value() != "admin") {
+    } catch (InvalidInvitationToken &) {
         return HttpResponse::unauthorized();
+    } catch (UsernameAlreadyTaken &) {
+        return HttpResponse::conflict();
+    } catch (json::out_of_range &) {
+        return HttpResponse::badRequest();
     }
-
-    this->users_service->registerUser(registration_data);
 
     return response;
 }

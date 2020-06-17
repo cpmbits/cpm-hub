@@ -88,3 +88,18 @@ void CpmHubAuthenticator::addUser(UserCredentials &credentials)
     this->client->post(this->users_endpoint, request);
 }
 
+
+void CpmHubAuthenticator::addUserWithInvitation(UserCredentials &credentials, std::string invitation_token)
+{
+    HttpRequest request(asJson(credentials));
+    HttpResponse response;
+
+    request.headers.set("Content-type", "application/json");
+    request.headers.set("OTP", invitation_token);
+    response = this->client->post(this->users_endpoint, request);
+
+    if (response.status_code == HttpStatus::UNAUTHORIZED) {
+        throw InvalidInvitationToken();
+    }
+}
+

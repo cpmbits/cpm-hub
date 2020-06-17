@@ -16,12 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <management/http_routes.h>
+#include <users/rest_api/UsersApi.h>
 
 
 using namespace std;
 
 
-void installServiceRoutes(HttpServer& http_server, BitsApi *bits_api)
+void installServiceRoutes(HttpServer &http_server, BitsApi *bits_api, UsersApi *users_api)
 {
     http_server.post("/bits", [bits_api](HttpRequest &request) -> HttpResponse {
         return bits_api->publishBit(request);
@@ -31,6 +32,9 @@ void installServiceRoutes(HttpServer& http_server, BitsApi *bits_api)
     });
     http_server.get("/bits/:bitName/:bitVersion", [bits_api](HttpRequest &request) -> HttpResponse {
         return bits_api->downloadBit(request);
+    });
+    http_server.post("/users", [users_api](HttpRequest &request) -> HttpResponse {
+        return users_api->registerUser(request);
     });
 }
 
