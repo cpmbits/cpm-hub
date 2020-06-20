@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <json/json.hpp>
-#include <users/rest_api/UsersApi.h>
+#include <users/rest_api/UsersHttpResource.h>
 
 using namespace nlohmann;
 using namespace std;
 
 
-UsersApi::UsersApi(UsersService *users_service)
+UsersHttpResource::UsersHttpResource(UsersService *users_service)
 {
     this->users_service = users_service;
 }
 
 
-HttpResponse UsersApi::registerUser(HttpRequest &request)
+HttpResponse UsersHttpResource::post(HttpRequest &request)
 {
     HttpResponse response(200, "");
     auto json = json::parse(request.body);

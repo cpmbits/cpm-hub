@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 
 #include <authentication/TrivialAuthenticator.h>
-#include <bits/rest_api/BitsApi.h>
+#include <bits/rest_api/BitsHttpResource.h>
 #include <bits/BitsRepositoryInMemory.h>
 
 using namespace cest;
@@ -36,9 +36,9 @@ describe("CPM Hub bits management", []() {
         HttpResponse response;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service);
+        BitsHttpResource api(&service);
 
-        response = api.publishBit(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("");
@@ -56,9 +56,9 @@ describe("CPM Hub bits management", []() {
         TrivialAuthenticator authenticator;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service, &authenticator);
+        BitsHttpResource api(&service, &authenticator);
 
-        response = api.publishBit(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
@@ -74,9 +74,9 @@ describe("CPM Hub bits management", []() {
         HttpResponse response;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service);
+        BitsHttpResource api(&service);
 
-        api.publishBit(request);
+        api.post(request);
 
         response = api.listBits(request);
 
@@ -89,11 +89,11 @@ describe("CPM Hub bits management", []() {
         HttpResponse response;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service);
+        BitsHttpResource api(&service);
 
         request.parameters.set("bitName", "cest");
 
-        response = api.downloadBit(request);
+        response = api.get(request);
 
         expect(response.status_code).toBe(HttpStatus::NOT_FOUND);
     });
@@ -110,12 +110,12 @@ describe("CPM Hub bits management", []() {
         HttpResponse response;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service);
+        BitsHttpResource api(&service);
 
-        api.publishBit(publish_request);
+        api.post(publish_request);
 
         download_request.parameters.set("bitName", "cest");
-        response = api.downloadBit(download_request);
+        response = api.get(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
@@ -133,13 +133,13 @@ describe("CPM Hub bits management", []() {
         HttpResponse response;
         BitsRepositoryInMemory repository;
         BitsService service(&repository);
-        BitsApi api(&service);
+        BitsHttpResource api(&service);
 
-        api.publishBit(publish_request);
+        api.post(publish_request);
 
         download_request.parameters.set("bitName", "cest");
         download_request.parameters.set("bitVersion", "1.0");
-        response = api.downloadBit(download_request);
+        response = api.get(download_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");

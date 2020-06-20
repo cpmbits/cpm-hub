@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <management/rest_api/ManagementApi.h>
+#include <management/rest_api/ManagementHttpResource.h>
 
 using namespace cest;
 using namespace fakeit;
@@ -49,11 +49,11 @@ describe("Management API", []() {
                             "}");
         HttpResponse response(200, "");
         MockDeployService mock_service;
-        ManagementApi api(&mock_service);
+        ManagementHttpResource api(&mock_service);
 
         request.headers.set("API_KEY", "cafecafe");
 
-        response = api.deploy(request);
+        response = api.post(request);
 
         expect(mock_service.arg_payload).toBe("123456789");
         expect(mock_service.arg_version).toBe("987654321");
@@ -64,12 +64,12 @@ describe("Management API", []() {
         HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
         HttpResponse response(200, "");
         Mock<DeployService> mock_service;
-        ManagementApi api(&mock_service.get());
+        ManagementHttpResource api(&mock_service.get());
 
         request.headers.set("API_KEY", "cafecafe");
         When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
 
-        response = api.deploy(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(401);
     });
@@ -78,11 +78,11 @@ describe("Management API", []() {
         HttpRequest request("{\"payload\":\"123456789\",\"version\":\"987654321\"}");
         HttpResponse response(200, "");
         Mock<DeployService> mock_service;
-        ManagementApi api(&mock_service.get());
+        ManagementHttpResource api(&mock_service.get());
 
         When(Method(mock_service, deploy)).Throw(AuthenticationFailure());
 
-        response = api.deploy(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(401);
     });

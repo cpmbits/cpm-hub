@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <json/json.hpp>
-#include <bits/rest_api/BitsApi.h>
+#include <bits/rest_api/BitsHttpResource.h>
 #include <bits/BitsService.h>
 #include <authentication/UserCredentials.h>
 
@@ -26,20 +26,20 @@ using namespace std;
 static NullAuthenticator unauthenticated;
 
 
-BitsApi::BitsApi(BitsService *bits_service) {
+BitsHttpResource::BitsHttpResource(BitsService *bits_service) {
     this->bits_service = bits_service;
     this->authenticator = &unauthenticated;
 }
 
 
-BitsApi::BitsApi(BitsService *bits_service, Authenticator *authenticator)
+BitsHttpResource::BitsHttpResource(BitsService *bits_service, Authenticator *authenticator)
 {
     this->bits_service = bits_service;
     this->authenticator = authenticator;
 }
 
 
-HttpResponse BitsApi::publishBit(HttpRequest &request)
+HttpResponse BitsHttpResource::post(HttpRequest &request)
 {
     auto json = json::parse(request.body);
     Optional<string> user;
@@ -61,7 +61,7 @@ HttpResponse BitsApi::publishBit(HttpRequest &request)
 }
 
 
-HttpResponse BitsApi::listBits(HttpRequest &request)
+HttpResponse BitsHttpResource::listBits(HttpRequest &request)
 {
     HttpResponse response;
     json json_bits = json::array();
@@ -86,7 +86,7 @@ static string asJson(Bit bit)
 }
 
 
-HttpResponse BitsApi::downloadBit(HttpRequest &request)
+HttpResponse BitsHttpResource::get(HttpRequest &request)
 {
     Optional<Bit> bit;
 
@@ -97,6 +97,7 @@ HttpResponse BitsApi::downloadBit(HttpRequest &request)
                 request.parameters.get("bitName"),
                 request.parameters.get("bitVersion"));
     }
+
     if (!bit.isPresent()) {
         return HttpResponse(HttpStatus::NOT_FOUND, "");
     }

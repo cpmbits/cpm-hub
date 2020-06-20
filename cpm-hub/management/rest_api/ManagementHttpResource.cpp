@@ -16,28 +16,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <json/json.hpp>
-#include <management/rest_api/ManagementApi.h>
+#include <management/rest_api/ManagementHttpResource.h>
 
 using namespace nlohmann;
 
 static NullAuthenticator unauthenticated;
 
 
-ManagementApi::ManagementApi(DeployService *deploy_service)
+ManagementHttpResource::ManagementHttpResource(DeployService *deploy_service)
 {
     this->deploy_service = deploy_service;
     this->authenticator = &unauthenticated;
 }
 
 
-ManagementApi::ManagementApi(DeployService *deploy_service, Authenticator *authenticator)
+ManagementHttpResource::ManagementHttpResource(DeployService *deploy_service, Authenticator *authenticator)
 {
     this->deploy_service = deploy_service;
     this->authenticator = authenticator;
 }
 
 
-HttpResponse ManagementApi::deploy(HttpRequest &request)
+HttpResponse ManagementHttpResource::post(HttpRequest &request)
 {
     auto json = json::parse(request.body);
 
@@ -57,13 +57,7 @@ HttpResponse ManagementApi::deploy(HttpRequest &request)
 }
 
 
-HttpResponse ManagementApi::getLogs(HttpRequest &request)
-{
-    return HttpResponse::notFound();
-}
-
-
-bool ManagementApi::isAuthorized(HttpRequest &request)
+bool ManagementHttpResource::isAuthorized(HttpRequest &request)
 {
     return request.headers.has("API_KEY") &&
            authenticator->authenticate(request.headers.get("API_KEY").c_str()).isPresent();

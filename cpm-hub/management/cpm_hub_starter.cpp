@@ -20,11 +20,11 @@
 #include <http/HttpServer.h>
 #include <management/cpm_hub_starter.h>
 #include <management/DeployService.h>
-#include <management/rest_api/ManagementApi.h>
+#include <management/rest_api/ManagementHttpResource.h>
 #include <management/http_routes.h>
 #include <bits/BitsRepositoryInFilesystem.h>
 #include <bits/BitsService.h>
-#include <bits/rest_api/BitsApi.h>
+#include <bits/rest_api/BitsHttpResource.h>
 #include <logging/LoggerInRotatingFile.h>
 #include <logging/LoggerInConsole.h>
 #include <users/UsersRepositoryInMemory.h>
@@ -32,10 +32,10 @@
 
 static Filesystem filesystem;
 static HttpServer service_http_server;
-static BitsApi *bits_api;
+static BitsHttpResource *bits_resource;
 static HttpServer management_http_server;
-static ManagementApi *management_api;
-static UsersApi *users_api;
+static ManagementHttpResource *management_resource;
+static UsersHttpResource *users_resource;
 static HttpClient cpm_hub_auth_client;
 Logger *logger;
 
@@ -44,7 +44,7 @@ void startServiceServer(ProgramOptions &options)
 {
     BitIndex *bit_index;
     BitsRepository *bits_repository;
-    Authenticator *bits_api_authenticator;
+    Authenticator *bits_resource_authenticator;
     BitsService *bits_service;
     UsersService *users_service;
     UsersRepository *users_repository;
@@ -53,25 +53,25 @@ void startServiceServer(ProgramOptions &options)
     bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
     switch (options.authenticator_type) {
     case ProgramOptions::UNAUTHENTICATED:
-        bits_api_authenticator = new NullAuthenticator();
+        bits_resource_authenticator = new NullAuthenticator();
         break;
 
     case ProgramOptions::CPM_HUB_AUTHENTICATOR:
-        bits_api_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
+        bits_resource_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
         break;
 
     case ProgramOptions::ACCESS_FILE_AUTHENTICATOR:
-        bits_api_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
+        bits_resource_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
         break;
     }
     bits_service = new BitsService(bits_repository);
-    bits_api = new BitsApi(bits_service, bits_api_authenticator);
+    bits_resource = new BitsHttpResource(bits_service, bits_resource_authenticator);
 
     users_repository = new UsersRepositoryInMemory();
-    users_service = new UsersService(users_repository, bits_api_authenticator);
-    users_api = new UsersApi(users_service);
+    users_service = new UsersService(users_repository, bits_resource_authenticator);
+    users_resource = new UsersHttpResource(users_service);
 
-    installServiceRoutes(service_http_server, bits_api, users_api);
+    installServiceRoutes(service_http_server, bits_resource, users_resource);
     service_http_server.configureSecurity(options.security_options);
     service_http_server.startAsync("0.0.0.0", options.http_service_port);
 }
@@ -84,9 +84,9 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
     management_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
     deploy_service = new DeployService(&filesystem, management_authenticator, command_line);
-    management_api = new ManagementApi(deploy_service, nullptr);
+    management_resource = new ManagementHttpResource(deploy_service, nullptr);
 
-    installManagementRoutes(management_http_server, management_api);
+    installManagementRoutes(management_http_server, management_resource);
     management_http_server.configureSecurity(options.security_options);
     management_http_server.start("0.0.0.0", options.http_management_port);
 }

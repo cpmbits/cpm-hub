@@ -20,7 +20,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <bits/rest_api/BitsApi.h>
+#include <bits/rest_api/BitsHttpResource.h>
 #include <bits/BitsService.h>
 
 using namespace cest;
@@ -40,11 +40,11 @@ describe("Bits API", []() {
         HttpResponse response;
         Bit bit("");
         Mock<BitsService> mock_service;
-        BitsApi api(&mock_service.get());
+        BitsHttpResource api(&mock_service.get());
 
         When(Method(mock_service, publishBit)).Return(bit);
 
-        response = api.publishBit(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("");
@@ -67,11 +67,11 @@ describe("Bits API", []() {
         HttpResponse response;
         Mock<BitsService> mock_service;
         Mock<Authenticator> mock_authenticator;
-        BitsApi api(&mock_service.get(), &mock_authenticator.get());
+        BitsHttpResource api(&mock_service.get(), &mock_authenticator.get());
 
         When(Method(mock_authenticator, validCredentials)).Return(false);
 
-        response = api.publishBit(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
@@ -82,7 +82,7 @@ describe("Bits API", []() {
         Bit bit("cest");
         list<Bit> bits {bit};
         Mock<BitsService> mock_service;
-        BitsApi api(&mock_service.get());
+        BitsHttpResource api(&mock_service.get());
 
         When(Method(mock_service, allBits)).Return(bits);
 
@@ -96,13 +96,13 @@ describe("Bits API", []() {
         HttpRequest request;
         HttpResponse response;
         Mock<BitsService> mock_service;
-        BitsApi api(&mock_service.get());
+        BitsHttpResource api(&mock_service.get());
         Optional<Bit> no_bit;
 
         request.parameters.set("bitName", "cest");
         When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(no_bit);
 
-        response = api.downloadBit(request);
+        response = api.get(request);
 
         Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(404);
@@ -112,14 +112,14 @@ describe("Bits API", []() {
         HttpRequest request;
         HttpResponse response;
         Mock<BitsService> mock_service;
-        BitsApi api(&mock_service.get());
+        BitsHttpResource api(&mock_service.get());
         Optional<Bit> cest_bit;
 
         request.parameters.set("bitName", "cest");
         cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
         When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(cest_bit);
 
-        response = api.downloadBit(request);
+        response = api.get(request);
 
         Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
@@ -134,7 +134,7 @@ describe("Bits API", []() {
         HttpRequest request;
         HttpResponse response;
         Mock<BitsService> mock_service;
-        BitsApi api(&mock_service.get());
+        BitsHttpResource api(&mock_service.get());
         Optional<Bit> cest_bit;
 
         request.parameters.set("bitName", "cest");
@@ -142,7 +142,7 @@ describe("Bits API", []() {
         cest_bit = Bit("cest", "1.1", "user", "ABCDEabcde");
         When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(cest_bit);
 
-        response = api.downloadBit(request);
+        response = api.get(request);
 
         Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string, string)).Using("cest", "1.1"));
         expect(response.status_code).toBe(200);

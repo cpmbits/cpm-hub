@@ -17,7 +17,7 @@
  */
 #include <cest/cest.h>
 
-#include <users/rest_api/UsersApi.h>
+#include <users/rest_api/UsersHttpResource.h>
 #include <users/UsersService.h>
 #include <users/UsersRepositoryInMemory.h>
 #include <http/http.h>
@@ -32,7 +32,7 @@ describe("CPM Hub users management", []() {
         UsersRepositoryInMemory repository;
         NullAuthenticator service_authenticator;
         UsersService service(&repository, &service_authenticator);
-        UsersApi api(&service);
+        UsersHttpResource api(&service);
         HttpRequest request("{"
                             "\"invitation_token\": \"cafecafe\","
                             "\"username\": \"juancho\","
@@ -43,7 +43,7 @@ describe("CPM Hub users management", []() {
 
         request.headers.set("OTP", "cafecafe");
 
-        response = api.registerUser(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(200);
     });
