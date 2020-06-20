@@ -19,6 +19,7 @@
 
 #include <functional>
 #include <map>
+#include <list>
 #include <string>
 #include <thread>
 
@@ -26,6 +27,7 @@
 
 #include <http/http.h>
 #include <http/Endpoint.h>
+#include "HttpResource.h"
 
 
 typedef std::function<HttpResponse(HttpRequest &)> ServerCallback;
@@ -34,13 +36,9 @@ class HttpServer {
 public:
     HttpServer();
 
+    void addResource(Endpoint endpoint, HttpResource *resource);
+
     void configureSecurity(struct HttpSecurityOptions &options);
-
-    void get(std::string path, ServerCallback callback);
-
-    void post(std::string path, ServerCallback callback);
-
-    void put(std::string path, ServerCallback callback);
 
     void startAsync(std::string address, int port);
 
@@ -56,14 +54,14 @@ private:
     struct mg_mgr mgr;
     struct mg_connection *connection;
     std::thread *server_thread;
-    std::map<Endpoint, ServerCallback> gets;
-    std::map<Endpoint, ServerCallback> posts;
-    std::map<Endpoint, ServerCallback> puts;
     struct HttpSecurityOptions security_options;
+    std::map<Endpoint, HttpResource *> resources;
 
     void serve();
 
-    ServerCallback parseRequest(struct http_message *message, HttpRequest &request);
+    HttpRequest parseRequest(struct http_message *message);
+
+    HttpResponse dispatchRequest(HttpRequest &request);
 
     void digestHeaders(struct http_message *message, HttpRequest &request);
 

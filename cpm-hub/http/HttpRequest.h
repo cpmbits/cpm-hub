@@ -22,6 +22,7 @@
 
 
 struct HttpRequest {
+    std::string path;
     std::string method;
     std::string body;
     struct HttpParameterMap parameters;

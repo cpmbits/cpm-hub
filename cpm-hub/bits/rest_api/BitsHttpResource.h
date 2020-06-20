@@ -17,15 +17,25 @@
  */
 #pragma once
 
-#include <vector>
-#include <string>
+#include <authentication/Authenticator.h>
+#include <bits/BitsService.h>
+#include <authentication/UserCredentials.h>
+#include <http/HttpResource.h>
 
-#include <http/HttpServer.h>
-#include <bits/rest_api/BitsHttpResource.h>
-#include <management/rest_api/ManagementHttpResource.h>
-#include <users/rest_api/UsersHttpResource.h>
+class BitsHttpResource: public HttpResource {
+public:
+    BitsHttpResource(BitsService *bits_service);
 
+    BitsHttpResource(BitsService *bits_service, Authenticator *authenticator);
 
-void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resource, UsersHttpResource *users_resource);
+    HttpResponse post(HttpRequest &request);
 
-void installManagementRoutes(HttpServer &http_server, ManagementHttpResource *management_resource);
+    HttpResponse get(HttpRequest &request);
+
+    HttpResponse listBits(HttpRequest &request);
+
+private:
+    BitsService *bits_service;
+
+    Authenticator *authenticator;
+};

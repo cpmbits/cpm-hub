@@ -18,7 +18,7 @@
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
-#include <users/rest_api/UsersApi.h>
+#include <users/rest_api/UsersHttpResource.h>
 #include <authentication/TrivialAuthenticator.h>
 
 using namespace cest;
@@ -37,9 +37,9 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get());
+        UsersHttpResource api(&mock_service.get());
 
-        response = api.registerUser(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
     });
@@ -56,14 +56,14 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get());
+        UsersHttpResource api(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             registration_data = data;
             return user;
         });
 
-        response = api.registerUser(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(registration_data.invitation_token).toBe("cafecafe");
@@ -84,14 +84,14 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get());
+        UsersHttpResource api(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             throw InvalidInvitationToken();
             return user;
         });
 
-        response = api.registerUser(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
@@ -108,14 +108,14 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersApi api(&mock_service.get());
+        UsersHttpResource api(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             throw UsernameAlreadyTaken("");
             return user;
         });
 
-        response = api.registerUser(request);
+        response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::CONFLICT);
     });

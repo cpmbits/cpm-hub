@@ -95,68 +95,52 @@ void HttpServer::start(std::string address, int port)
 }
 
 
-void HttpServer::post(string path, ServerCallback callback)
+void HttpServer::addResource(Endpoint endpoint, HttpResource *resource)
 {
-    this->posts.insert(make_pair(Endpoint(path), callback));
+    this->resources.insert(make_pair(endpoint, resource));
 }
 
 
-void HttpServer::get(string path, ServerCallback callback)
+HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
 {
-    this->gets.insert(make_pair(Endpoint(path), callback));
-}
+    HttpResource *resource = nullptr;
 
-
-void HttpServer::put(string path, ServerCallback callback)
-{
-    this->puts.insert(make_pair(Endpoint(path), callback));
-}
-
-
-static HttpResponse notFound(HttpRequest request)
-{
-    return HttpResponse(404, "");
-}
-
-
-static HttpResponse badRequest(HttpRequest request)
-{
-    return HttpResponse(400, "");
-}
-
-
-ServerCallback HttpServer::parseRequest(struct http_message *message, HttpRequest &request)
-{
-    map<Endpoint, ServerCallback> *callbacks;
-    ServerCallback server_callback = notFound;
-    string method(message->method.p, message->method.len);
-    string endpoint(message->uri.p, message->uri.len);
-
-    request.body = string(message->body.p, message->body.len);
-
-    if (method == "GET") {
-        callbacks = &this->gets;
-    } else if (method == "POST") {
-        callbacks = &this->posts;
-    } else if (method == "PUT") {
-        callbacks = &this->puts;
-    } else {
-        return badRequest;
-    }
-
-    for (pair<Endpoint, ServerCallback> iter: *callbacks) {
+    for (pair<Endpoint, HttpResource *> iter: this->resources) {
         Optional<struct HttpParameterMap> match;
-        match = iter.first.match(endpoint);
+        match = iter.first.match(request.path);
         if (match.isPresent()) {
-            server_callback = iter.second;
+            resource = iter.second;
             request.parameters = match.value();
             break;
         }
     }
 
+    if (!resource) {
+        return HttpResponse::notFound();
+    }
+
+    if (request.method == "GET") {
+        return resource->get(request);
+    } else if (request.method == "POST") {
+        return resource->post(request);
+    } else if (request.method == "PUT") {
+        return resource->put(request);
+    }
+
+    return HttpResponse::badRequest();
+}
+
+
+HttpRequest HttpServer::parseRequest(struct http_message *message)
+{
+    HttpRequest request;
+
+    request.body = string(message->body.p, message->body.len);
+    request.method = string(message->method.p, message->method.len);
+    request.path = string(message->uri.p, message->uri.len);
     digestHeaders(message, request);
 
-    return server_callback;
+    return request;
 }
 
 
@@ -174,11 +158,10 @@ void HttpServer::digestHeaders(struct http_message *message, HttpRequest &reques
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpResponse response;
-    HttpRequest request;
-    ServerCallback callback = this->parseRequest(message, request);
+    HttpRequest request = this->parseRequest(message);
 
     try {
-        response = callback(request);
+        response = this->dispatchRequest(request);
     } catch (exception &e) {
         response = HttpResponse(500, "");
     }

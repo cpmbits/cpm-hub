@@ -17,16 +17,16 @@
  */
 #pragma once
 
-#include <http/http.h>
+#include <http/HttpResource.h>
 #include <users/UsersService.h>
 #include <authentication/Authenticator.h>
 
 
-class UsersApi {
+class UsersHttpResource: public HttpResource {
 public:
-    UsersApi(UsersService *users_service);
+    UsersHttpResource(UsersService *users_service);
 
-    HttpResponse registerUser(HttpRequest &request);
+    HttpResponse post(HttpRequest &request);
 
 private:
     UsersService *users_service;

@@ -16,32 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <management/http_routes.h>
-#include <users/rest_api/UsersApi.h>
+#include <users/rest_api/UsersHttpResource.h>
 
 
 using namespace std;
 
 
-void installServiceRoutes(HttpServer &http_server, BitsApi *bits_api, UsersApi *users_api)
+void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resource, UsersHttpResource *users_resource)
 {
-    http_server.post("/bits", [bits_api](HttpRequest &request) -> HttpResponse {
-        return bits_api->publishBit(request);
-    });
-    http_server.get("/bits/:bitName", [bits_api](HttpRequest &request) -> HttpResponse {
-        return bits_api->downloadBit(request);
-    });
-    http_server.get("/bits/:bitName/:bitVersion", [bits_api](HttpRequest &request) -> HttpResponse {
-        return bits_api->downloadBit(request);
-    });
-    http_server.post("/users", [users_api](HttpRequest &request) -> HttpResponse {
-        return users_api->registerUser(request);
-    });
+    http_server.addResource(Endpoint("/bits"), bits_resource);
+    http_server.addResource(Endpoint("/bits/:bitName"), bits_resource);
+    http_server.addResource(Endpoint("/bits/:bitName/:bitVersion"), bits_resource);
+    http_server.addResource(Endpoint("/users"), users_resource);
 }
 
 
-void installManagementRoutes(HttpServer &http_server, ManagementApi *management_api)
+void installManagementRoutes(HttpServer &http_server, ManagementHttpResource *management_resource)
 {
-    http_server.post("/deploy", [management_api](HttpRequest &request) -> HttpResponse {
-        return management_api->deploy(request);
-    });
+    http_server.addResource(Endpoint("/deployu"), management_resource);
 }

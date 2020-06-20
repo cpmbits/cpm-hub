@@ -17,26 +17,11 @@
  */
 #pragma once
 
-#include <string>
+#include <events/Event.h>
 
-#include <http/http.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
-
-class ManagementApi {
-public:
-    ManagementApi(DeployService *deploy_service);
-
-    ManagementApi(DeployService *deploy_service, Authenticator *authenticator);
-
-    HttpResponse deploy(HttpRequest &request);
-
-    HttpResponse getLogs(HttpRequest &request);
-
-private:
-    DeployService *deploy_service;
-    Logger *logger;
-    Authenticator *authenticator;
-
-    bool isAuthorized(HttpRequest &request);
+struct BitDownloadEvent: public Event {
+    std::string source_ip;
+    std::string bit_name;
+    std::string version;
+    int bit_size;
 };
