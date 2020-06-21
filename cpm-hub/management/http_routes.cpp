@@ -33,5 +33,4 @@ void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resour
 
 void installManagementRoutes(HttpServer &http_server, ManagementHttpResource *management_resource)
 {
-    http_server.addResource(Endpoint("/deployu"), management_resource);
 }

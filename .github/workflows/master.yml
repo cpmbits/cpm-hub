@@ -32,8 +32,3 @@ jobs:
         with:
           name: cpm-hub
           path: build/cpm-hub
-
-      - name: Deploy
-        if: success()
-        run: |
-          ./scripts/deploy.py -k ${{ secrets.deploy_key }} build/cpm-hub ${{ secrets.deploy_url }}
