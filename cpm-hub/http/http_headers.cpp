@@ -21,12 +21,16 @@
 using namespace std;
 
 
-string encodeHeaders(HttpRequest request)
+string encodeHeaders(HttpParameterMap headers)
 {
     ostringstream encoded;
 
-    for (auto pair=request.headers.begin(); pair!=request.headers.end(); pair++) {
-        encoded << pair->first << ": " << pair->second << "\r\n";
+    for (auto pair=headers.begin(); pair!=headers.end(); pair++) {
+        if (pair != headers.begin()) {
+            encoded << "\r\n" << pair->first << ": " << pair->second;
+        } else {
+            encoded << pair->first << ": " << pair->second;
+        }
     }
 
     return encoded.str();

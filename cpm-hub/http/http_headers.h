@@ -18,8 +18,8 @@
 #pragma once
 
 #include <string>
-#include <http/http.h>
+#include <http/HttpParameterMap.h>
 
 
-std::string encodeHeaders(HttpRequest request);
+std::string encodeHeaders(HttpParameterMap headers);
 

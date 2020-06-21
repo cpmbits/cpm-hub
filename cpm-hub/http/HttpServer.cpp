@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <iostream>
 #include <logging/Logger.h>
 #include <http/HttpServer.h>
 #include <http/http_headers.h>
@@ -23,6 +24,7 @@
 using namespace std;
 
 static void eventHandler(struct mg_connection *connection, int event, void *data);
+static void digestHeaders(struct http_message *message, HttpRequest &request);
 
 
 HttpServer::HttpServer()
@@ -125,6 +127,8 @@ HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
         return resource->post(request);
     } else if (request.method == "PUT") {
         return resource->put(request);
+    } else if (request.method == "OPTIONS") {
+        return resource->options(request);
     }
 
     return HttpResponse::badRequest();
@@ -144,7 +148,7 @@ HttpRequest HttpServer::parseRequest(struct http_message *message)
 }
 
 
-void HttpServer::digestHeaders(struct http_message *message, HttpRequest &request)
+static void digestHeaders(struct http_message *message, HttpRequest &request)
 {
     for (int i=0; message->header_names[i].len > 0; ++i) {
         request.headers.set(
@@ -166,10 +170,11 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
         response = HttpResponse(500, "");
     }
 
-    mg_send_head(connection, response.status_code, response.body.size(), "");
+    mg_send_head(connection, response.status_code, response.body.size(), encodeHeaders(response.headers).c_str());
     mg_printf(connection, "%s", response.body.c_str());
 
     logRequest(connection, message, response);
+
 }
 
 
