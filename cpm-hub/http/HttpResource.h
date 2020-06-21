@@ -41,6 +41,20 @@ public:
     }
 
     virtual HttpResponse options(HttpRequest &request) {
-        return HttpResponse::notFound();
+        HttpResponse response = HttpResponse::noContent();
+        if (request.headers.has("Access-Control-Request-Method")) {
+            response.headers.set("Access-Control-Allow-Methods", allow_methods);
+        }
+        if (request.headers.has("Origin")) {
+            response.headers.set("Access-Control-Allow-Origin", origin);
+        }
+        if (request.headers.has("Access-Control-Request-Headers")) {
+            response.headers.set("Access-Control-Allow-Headers", "*");
+        }
+        return response;
     }
+
+    std::string allow_methods = "";
+    std::string allow_headers = "*";
+    std::string origin;
 };

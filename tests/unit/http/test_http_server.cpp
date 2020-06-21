@@ -258,12 +258,12 @@ describe("HTTP server using resources", []() {
         HttpClient client;
         HttpRequest request;
         HttpResponse response;
+        HttpResource resource;
 
         request.headers.set("Access-Control-Request-Method", "POST");
         request.headers.set("Access-Control-Request-Headers", "origin");
         request.headers.set("Origin", "https://cpmbits.com");
-        test_resource->options_response = HttpResponse::cors("*", "GET, POST");
-        server.addResource(Endpoint("/bits"), test_resource);
+        server.addResource(Endpoint("/bits"), &resource);
         server.startAsync("127.0.0.1", 8000);
 
         response = client.method("http://127.0.0.1:8000/bits", HttpRequest(""), "OPTIONS");

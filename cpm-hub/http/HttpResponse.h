@@ -69,6 +69,13 @@ struct HttpResponse {
         return response;
     }
 
+    static HttpResponse noContent() {
+        HttpResponse response;
+        response.status_code = HttpStatus::NO_CONTENT;
+        response.body = "";
+        return response;
+    }
+
     static HttpResponse cors(std::string origin, std::string methods) {
         HttpResponse response;
         response.status_code = HttpStatus::NO_CONTENT;
