@@ -40,10 +40,15 @@ public:
         return put_response;
     }
 
+    HttpResponse options(HttpRequest &request) {
+        return options_response;
+    }
+
     HttpRequest post_request;
     HttpResponse get_response;
     HttpResponse post_response;
     HttpResponse put_response;
+    HttpResponse options_response;
 };
 
 class ResourceGetThrowsException: public HttpResource {
@@ -142,6 +147,42 @@ describe("HTTP server using resources", []() {
 
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("hello");
+
+        server.stop();
+    });
+
+    it("calls OPTIONS method callback when receiving a request", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpResponse response;
+
+        test_resource->options_response = HttpResponse::ok("GET, POST, PUT");
+        server.addResource(Endpoint("/bits"), test_resource);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.method("http://127.0.0.1:8000/bits", HttpRequest(""), "OPTIONS");
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("GET, POST, PUT");
+
+        server.stop();
+    });
+
+    it("gets response with headers", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpResponse response;
+
+        test_resource->options_response = HttpResponse::ok("");
+        test_resource->options_response.headers.set("header", "value");
+        server.addResource(Endpoint("/bits"), test_resource);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.method("http://127.0.0.1:8000/bits", HttpRequest(""), "OPTIONS");
+
+        expect(response.status_code).toBe(200);
+        expect(response.body).toBe("");
+        expect(response.headers.get("header")).toBe("value");
 
         server.stop();
     });

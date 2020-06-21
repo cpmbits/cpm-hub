@@ -20,10 +20,12 @@
 #include <string>
 
 #include <http/http_status_codes.h>
+#include <http/HttpParameterMap.h>
 
 struct HttpResponse {
     int status_code;
     std::string body;
+    struct HttpParameterMap headers;
 
     HttpResponse()
     {

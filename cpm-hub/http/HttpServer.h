@@ -63,8 +63,6 @@ private:
 
     HttpResponse dispatchRequest(HttpRequest &request);
 
-    void digestHeaders(struct http_message *message, HttpRequest &request);
-
     void createConnection(const std::string &address, int port);
 
     mg_bind_opts configureBindOpts() const;

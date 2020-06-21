@@ -21,28 +21,28 @@
 
 
 describe("HTTP headers encoder", []() {
-    it("encodes request with no headers", []() {
-        HttpRequest request;
-        expect(encodeHeaders(request)).toBe("");
+    it("encodes no headers", []() {
+        HttpParameterMap headers;
+        expect(encodeHeaders(headers)).toBe("");
     });
 
-    it("encodes request with a single header", []() {
-        HttpRequest request;
+    it("encodes a single header", []() {
+        HttpParameterMap headers;
 
-        request.headers.set("header1", "value1");
+        headers.set("header1", "value1");
 
-        expect(encodeHeaders(request)).toBe("header1: value1\r\n");
+        expect(encodeHeaders(headers)).toBe("header1: value1");
     });
 
-    it("encodes request with a many headers", []() {
-        HttpRequest request;
+    it("encodes many headers", []() {
+        HttpParameterMap headers;
 
-        request.headers.set("header1", "value1");
-        request.headers.set("header2", "value2");
+        headers.set("header1", "value1");
+        headers.set("header2", "value2");
 
-        expect(encodeHeaders(request)).toBe(
+        expect(encodeHeaders(headers)).toBe(
             "header1: value1\r\n"
-            "header2: value2\r\n"
+            "header2: value2"
         );
     });
 });

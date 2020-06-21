@@ -39,4 +39,8 @@ public:
     virtual HttpResponse patch(HttpRequest &request) {
         return HttpResponse::notFound();
     }
+
+    virtual HttpResponse options(HttpRequest &request) {
+        return HttpResponse::notFound();
+    }
 };

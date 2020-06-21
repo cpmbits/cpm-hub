@@ -18,42 +18,11 @@
 #include <http/HttpClient.h>
 #include <http/http_headers.h>
 
+using namespace std;
+
 
 static void eventHandler(struct mg_connection *connection, int event, void *data);
-
-
-HttpResponse HttpClient::post(std::string url, HttpRequest request)
-{
-    struct mg_connection *connection;
-
-    mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "POST", eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
-    mg_set_protocol_http_websocket(connection);
-
-    request_pending = true;
-    while (request_pending) {
-        mg_mgr_poll(&mgr, 100);
-    }
-
-    return this->response;
-}
-
-
-HttpResponse HttpClient::put(std::string url, HttpRequest request)
-{
-    struct mg_connection *connection;
-
-    mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "PUT", eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
-    mg_set_protocol_http_websocket(connection);
-
-    request_pending = true;
-    while (request_pending) {
-        mg_mgr_poll(&mgr, 100);
-    }
-
-    return this->response;
-}
+static void digestHeaders(struct http_message *message, HttpResponse &response);
 
 
 HttpResponse HttpClient::method(std::string url, HttpRequest request, std::string method)
@@ -61,7 +30,12 @@ HttpResponse HttpClient::method(std::string url, HttpRequest request, std::strin
     struct mg_connection *connection;
 
     mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, method.c_str(), eventHandler, url.c_str(), encodeHeaders(request).c_str(), request.body.c_str());
+    connection = mg_connect_http(&mgr,
+            method.c_str(),
+            eventHandler,
+            url.c_str(),
+            (encodeHeaders(request.headers) + "\r\n").c_str(),
+            request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
     request_pending = true;
@@ -73,20 +47,21 @@ HttpResponse HttpClient::method(std::string url, HttpRequest request, std::strin
 }
 
 
+HttpResponse HttpClient::post(std::string url, HttpRequest request)
+{
+    return this->method(url, request, "POST");
+}
+
+
+HttpResponse HttpClient::put(std::string url, HttpRequest request)
+{
+    return this->method(url, request, "PUT");
+}
+
+
 HttpResponse HttpClient::get(std::string url, HttpRequest request)
 {
-    struct mg_connection *connection;
-
-    mg_mgr_init(&mgr, this);
-    connection = mg_connect_http(&mgr, "GET", eventHandler, url.c_str(), encodeHeaders(request).c_str(), NULL);
-    mg_set_protocol_http_websocket(connection);
-
-    request_pending = true;
-    while (request_pending) {
-        mg_mgr_poll(&mgr, 100);
-    }
-
-    return this->response;
+    return this->method(url, request, "GET");
 }
 
 
@@ -94,6 +69,17 @@ void HttpClient::responseArrived(HttpResponse response)
 {
     this->response = response;
     this->request_pending = false;
+}
+
+
+static void digestHeaders(struct http_message *message, HttpResponse &response)
+{
+    for (int i=0; message->header_names[i].len > 0; ++i) {
+        response.headers.set(
+                string(message->header_names[i].p, message->header_names[i].len),
+                string(message->header_values[i].p, message->header_values[i].len)
+        );
+    }
 }
 
 
@@ -115,6 +101,7 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
     case MG_EV_HTTP_REPLY:
         response.status_code = message->resp_code;
         response.body.assign(message->body.p, message->body.len);
+        digestHeaders(message, response);
         client->responseArrived(response);
         connection->flags |= MG_F_SEND_AND_CLOSE;
         break;
