@@ -260,13 +260,15 @@ describe("HTTP server using resources", []() {
         HttpResponse response;
         HttpResource resource;
 
+        resource.allow_methods = "GET, POST";
+        resource.allow_origin = "*";
         request.headers.set("Access-Control-Request-Method", "POST");
         request.headers.set("Access-Control-Request-Headers", "origin");
         request.headers.set("Origin", "https://cpmbits.com");
         server.addResource(Endpoint("/bits"), &resource);
         server.startAsync("127.0.0.1", 8000);
 
-        response = client.method("http://127.0.0.1:8000/bits", HttpRequest(""), "OPTIONS");
+        response = client.method("http://127.0.0.1:8000/bits", request, "OPTIONS");
 
         expect(response.status_code).toBe(HttpStatus::NO_CONTENT);
         expect(response.body).toBe("");

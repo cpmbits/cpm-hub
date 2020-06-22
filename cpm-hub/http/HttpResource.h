@@ -44,17 +44,20 @@ public:
         HttpResponse response = HttpResponse::noContent();
         if (request.headers.has("Access-Control-Request-Method")) {
             response.headers.set("Access-Control-Allow-Methods", allow_methods);
+            response.headers.set("Access-Control-Max-Age", "86400");
         }
         if (request.headers.has("Origin")) {
-            response.headers.set("Access-Control-Allow-Origin", origin);
+            response.headers.set("Access-Control-Allow-Origin", allow_origin);
+            response.headers.set("Access-Control-Max-Age", "86400");
         }
         if (request.headers.has("Access-Control-Request-Headers")) {
-            response.headers.set("Access-Control-Allow-Headers", "*");
+            response.headers.set("Access-Control-Allow-Headers", allow_headers);
+            response.headers.set("Access-Control-Max-Age", "86400");
         }
         return response;
     }
 
     std::string allow_methods = "";
     std::string allow_headers = "*";
-    std::string origin;
+    std::string allow_origin;
 };
