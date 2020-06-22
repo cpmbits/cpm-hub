@@ -95,7 +95,7 @@ describe("HTTP server using resources", []() {
 
         response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
-        expect(response.status_code).toBe(404);
+        expect(response.status_code).toBe(HttpStatus::NOT_FOUND);
 
         server.stop();
     });
@@ -111,7 +111,7 @@ describe("HTTP server using resources", []() {
 
         response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("hello");
 
         server.stop();
@@ -128,7 +128,7 @@ describe("HTTP server using resources", []() {
 
         response = client.post("http://127.0.0.1:8000/bits", HttpRequest(""));
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("hello");
 
         server.stop();
@@ -145,7 +145,7 @@ describe("HTTP server using resources", []() {
 
         response = client.put("http://127.0.0.1:8000/bits", HttpRequest(""));
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("hello");
 
         server.stop();
@@ -162,7 +162,7 @@ describe("HTTP server using resources", []() {
 
         response = client.method("http://127.0.0.1:8000/bits", HttpRequest(""), "OPTIONS");
 
-        expect(response.status_code).toBe(200);
+        expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("GET, POST, PUT");
 
         server.stop();
@@ -216,7 +216,7 @@ describe("HTTP server using resources", []() {
 
         response = client.method("http://127.0.0.1:8000/bits", HttpRequest("post data"), "CONNECT");
 
-        expect(response.status_code).toBe(400);
+        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
 
         server.stop();
     });
@@ -232,7 +232,7 @@ describe("HTTP server using resources", []() {
 
         response = client.post("http://127.0.0.1:8000/bits", HttpRequest("post data"));
 
-        expect(response.status_code).toBe(404);
+        expect(response.status_code).toBe(HttpStatus::NOT_FOUND);
 
         server.stop();
     });
@@ -248,7 +248,33 @@ describe("HTTP server using resources", []() {
 
         response = client.get("http://127.0.0.1:8000/bits", HttpRequest(""));
 
-        expect(response.status_code).toBe(500);
+        expect(response.status_code).toBe(HttpStatus::INTERNAL_SERVER_ERROR);
+
+        server.stop();
+    });
+
+    it("handles CORS pre-flight request", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpRequest request;
+        HttpResponse response;
+        HttpResource resource;
+
+        resource.allow_methods = "GET, POST";
+        resource.allow_origin = "*";
+        request.headers.set("Access-Control-Request-Method", "POST");
+        request.headers.set("Access-Control-Request-Headers", "origin");
+        request.headers.set("Origin", "https://cpmbits.com");
+        server.addResource(Endpoint("/bits"), &resource);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.method("http://127.0.0.1:8000/bits", request, "OPTIONS");
+
+        expect(response.status_code).toBe(HttpStatus::NO_CONTENT);
+        expect(response.body).toBe("");
+        expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
+        expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST");
+        expect(response.headers.get("Access-Control-Max-Age")).toBe("86400");
 
         server.stop();
     });

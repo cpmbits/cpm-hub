@@ -68,4 +68,21 @@ struct HttpResponse {
         response.body = body;
         return response;
     }
+
+    static HttpResponse noContent() {
+        HttpResponse response;
+        response.status_code = HttpStatus::NO_CONTENT;
+        response.body = "";
+        return response;
+    }
+
+    static HttpResponse cors(std::string origin, std::string methods) {
+        HttpResponse response;
+        response.status_code = HttpStatus::NO_CONTENT;
+        response.body = "";
+        response.headers.set("Access-Control-Allow-Origin", origin);
+        response.headers.set("Access-Control-Allow-Methods", methods);
+        response.headers.set("Access-Control-Max-Age", "86400");
+        return response;
+    }
 };
