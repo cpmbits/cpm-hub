@@ -25,6 +25,8 @@ using namespace std;
 UsersHttpResource::UsersHttpResource(UsersService *users_service)
 {
     this->users_service = users_service;
+    this->allow_origin = "*";
+    this->allow_methods = "POST";
 }
 
 
