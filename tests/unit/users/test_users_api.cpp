@@ -25,7 +25,15 @@ using namespace cest;
 using namespace fakeit;
 
 
-describe("Users API", []() {
+describe("Users HTTP Resource", []() {
+    it("reports allowed origin and methods", []() {
+        Mock<UsersService> mock_service;
+        UsersHttpResource users_resource(&mock_service.get());
+
+        expect(users_resource.allow_methods).toBe("POST");
+        expect(users_resource.allow_origin).toBe("*");
+    });
+
     it("returns bad request when invitation token is not provided", []() {
         HttpRequest request("{"
             "\"username\": \"juancho\","
@@ -33,13 +41,13 @@ describe("Users API", []() {
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
-        struct UserRegistrationData registration_data;
+        UserRegistrationData registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersHttpResource api(&mock_service.get());
+        UsersHttpResource users_resource(&mock_service.get());
 
-        response = api.post(request);
+        response = users_resource.post(request);
 
         expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
     });
@@ -52,18 +60,18 @@ describe("Users API", []() {
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
-        struct UserRegistrationData registration_data;
+        UserRegistrationData registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersHttpResource api(&mock_service.get());
+        UsersHttpResource users_resource(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             registration_data = data;
             return user;
         });
 
-        response = api.post(request);
+        response = users_resource.post(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(registration_data.invitation_token).toBe("cafecafe");
@@ -72,7 +80,7 @@ describe("Users API", []() {
         expect(registration_data.email).toBe("juancho@encho.com");
     });
 
-    it("returns unauthenticated when register user raises invalid otp", []() {
+    it("returns unauthenticated when register user raises invalid invitation token", []() {
         HttpRequest request("{"
             "\"invitation_token\": \"cafecafe\","
             "\"username\": \"juancho\","
@@ -80,18 +88,18 @@ describe("Users API", []() {
             "\"email\": \"juancho@encho.com\""
         "}");
         HttpResponse response;
-        struct UserRegistrationData registration_data;
+        UserRegistrationData registration_data;
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersHttpResource api(&mock_service.get());
+        UsersHttpResource users_resource(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             throw InvalidInvitationToken();
             return user;
         });
 
-        response = api.post(request);
+        response = users_resource.post(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
     });
@@ -108,14 +116,14 @@ describe("Users API", []() {
         User user("mengano");
         Mock<UsersService> mock_service;
         TrivialAuthenticator authenticator;
-        UsersHttpResource api(&mock_service.get());
+        UsersHttpResource users_resource(&mock_service.get());
 
         When(Method(mock_service, registerUser)).AlwaysDo([&](struct UserRegistrationData &data) {
             throw UsernameAlreadyTaken("");
             return user;
         });
 
-        response = api.post(request);
+        response = users_resource.post(request);
 
         expect(response.status_code).toBe(HttpStatus::CONFLICT);
     });
