@@ -46,15 +46,18 @@ public:
             response.headers.set("Access-Control-Allow-Methods", allow_methods);
             response.headers.set("Access-Control-Max-Age", "86400");
         }
-        if (request.headers.has("Origin")) {
-            response.headers.set("Access-Control-Allow-Origin", allow_origin);
-            response.headers.set("Access-Control-Max-Age", "86400");
-        }
         if (request.headers.has("Access-Control-Request-Headers")) {
             response.headers.set("Access-Control-Allow-Headers", allow_headers);
             response.headers.set("Access-Control-Max-Age", "86400");
         }
         return response;
+    }
+
+    void handleCors(HttpRequest &request, HttpResponse &response) {
+        if (request.headers.has("Origin")) {
+            response.headers.set("Access-Control-Allow-Origin", allow_origin);
+            response.headers.set("Access-Control-Max-Age", "86400");
+        }
     }
 
     std::string allow_methods = "";

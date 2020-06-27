@@ -26,7 +26,8 @@ using namespace std;
 static NullAuthenticator unauthenticated;
 
 
-BitsHttpResource::BitsHttpResource(BitsService *bits_service) {
+BitsHttpResource::BitsHttpResource(BitsService *bits_service)
+{
     this->bits_service = bits_service;
     this->authenticator = &unauthenticated;
 }
