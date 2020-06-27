@@ -253,7 +253,7 @@ describe("HTTP server using resources", []() {
         server.stop();
     });
 
-    it("handles CORS pre-flight request", []() {
+    it("handles CORS pre-flight request in OPTIONS method", []() {
         HttpServer server;
         HttpClient client;
         HttpRequest request;
@@ -275,6 +275,29 @@ describe("HTTP server using resources", []() {
         expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
         expect(response.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST");
         expect(response.headers.get("Access-Control-Max-Age")).toBe("86400");
+
+        server.stop();
+    });
+
+    it("handles CORS pre-flight request in POST method", []() {
+        HttpServer server;
+        HttpClient client;
+        HttpRequest request;
+        HttpResponse response;
+        TestHttpResource resource;
+
+        resource.allow_methods = "GET, POST";
+        resource.allow_origin = "*";
+        resource.post_response = HttpResponse::ok("");
+        request.headers.set("Origin", "https://cpmbits.com");
+        server.addResource(Endpoint("/bits"), &resource);
+        server.startAsync("127.0.0.1", 8000);
+
+        response = client.post("http://127.0.0.1:8000/bits", request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(response.body).toBe("");
+        expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
 
         server.stop();
     });

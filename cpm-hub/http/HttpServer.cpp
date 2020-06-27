@@ -106,6 +106,7 @@ void HttpServer::addResource(Endpoint endpoint, HttpResource *resource)
 HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
 {
     HttpResource *resource = nullptr;
+    HttpResponse response;
 
     for (pair<Endpoint, HttpResource *> iter: this->resources) {
         Optional<struct HttpParameterMap> match;
@@ -122,16 +123,20 @@ HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
     }
 
     if (request.method == "GET") {
-        return resource->get(request);
+        response = resource->get(request);
     } else if (request.method == "POST") {
-        return resource->post(request);
+        response = resource->post(request);
     } else if (request.method == "PUT") {
-        return resource->put(request);
+        response = resource->put(request);
     } else if (request.method == "OPTIONS") {
-        return resource->options(request);
+        response = resource->options(request);
+    } else {
+        return HttpResponse::badRequest();
     }
 
-    return HttpResponse::badRequest();
+    resource->handleCors(request, response);
+
+    return response;
 }
 
 
