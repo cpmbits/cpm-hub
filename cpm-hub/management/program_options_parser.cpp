@@ -35,9 +35,11 @@ static ProgramOptions parseIniFile(string &ini_file)
     INIReader ini_reader(ini_file);
 
     program_options.bits_directory = ini_reader.Get("Service", "bits_directory", ".");
+    program_options.http_service_ip = ini_reader.Get("Service", "ip_bind", "127.0.0.1");
     program_options.http_service_port = ini_reader.GetInteger("Service", "port", 8000);
     program_options.authenticator_type = string_to_authenticator_type[ini_reader.Get("Service", "authentication", "unauthenticated")];
     program_options.cpm_hub_url = ini_reader.Get("Service", "cpm_hub_url", "http://localhost:1234");
+    program_options.http_management_ip = ini_reader.Get("Management", "ip_bind", "127.0.0.1");
     program_options.http_management_port = ini_reader.GetInteger("Management", "port", 8001);
     program_options.security_options.security_enabled = ini_reader.GetBoolean("Management", "security_enabled", false);
     program_options.security_options.certificate_file = ini_reader.Get("Management", "certificate_file", "certificate.pem");

@@ -73,7 +73,7 @@ void startServiceServer(ProgramOptions &options)
 
     installServiceRoutes(service_http_server, bits_resource, users_resource);
     service_http_server.configureSecurity(options.security_options);
-    service_http_server.startAsync("0.0.0.0", options.http_service_port);
+    service_http_server.startAsync(options.http_service_ip, options.http_service_port);
 }
 
 
@@ -88,7 +88,7 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 
     installManagementRoutes(management_http_server, management_resource);
     management_http_server.configureSecurity(options.security_options);
-    management_http_server.start("0.0.0.0", options.http_management_port);
+    management_http_server.start(options.http_management_ip, options.http_management_port);
 }
 
 
