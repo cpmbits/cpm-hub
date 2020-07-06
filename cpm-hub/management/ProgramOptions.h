@@ -31,7 +31,9 @@ struct ProgramOptions {
     AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
     std::string cpm_hub_url = "http://localhost:1234";
+    std::string http_service_ip = "127.0.0.1";
     int http_service_port = 8000;
+    std::string http_management_ip = "127.0.0.1";
     int http_management_port = 8001;
     HttpSecurityOptions security_options;
 
