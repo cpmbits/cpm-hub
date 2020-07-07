@@ -67,5 +67,5 @@ private:
 
     mg_bind_opts configureBindOpts() const;
 
-    void logRequest(struct mg_connection *connection, const http_message *message, const HttpResponse &response) const;
+    void logRequest(struct mg_connection *connection, const http_message *message, const HttpRequest &request, const HttpResponse &response) const;
 };

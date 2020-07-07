@@ -36,7 +36,7 @@ void KpiSinkInfluxDb::newMeasure(string kpi, double value, map <string, string> 
     HttpClient client;
     HttpRequest request(this->formatMessage(move(kpi), value, move(tags), time));
 
-    request.parameters.set("db", this->database);
+    request.query_parameters.set("db", this->database);
 
     client.post(this->influxdb_write_url, request);
 }
@@ -53,7 +53,7 @@ string KpiSinkInfluxDb::formatMessage(string kpi, double value, map<string, stri
     }
 
     stream << " value=" << value;
-    stream << " " << time.count();//chrono::duration_cast<chrono::nanoseconds>(now.time_since_epoch()).count();
+    stream << " " << time.count();
 
     return stream.str();
 }

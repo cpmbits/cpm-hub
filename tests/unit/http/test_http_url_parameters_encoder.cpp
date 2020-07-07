@@ -17,13 +17,13 @@
  */
 #include <cest/cest.h>
 
-#include <http/http_url_parameters_encoder.h>
+#include <http/http_query_parameters_encoder.h>
 
 
 describe("HTTP url parameters encoder", []() {
     it("encodes no parameters", []() {
         HttpParameterMap parameters;
-        expect(encodeUrlParameters(parameters)).toBe("");
+        expect(encodeQueryParameters(parameters)).toBe("");
     });
 
     it("encodes a single header", []() {
@@ -31,7 +31,7 @@ describe("HTTP url parameters encoder", []() {
 
         parameters.set("parameter1", "value1");
 
-        expect(encodeUrlParameters(parameters)).toBe("?parameter1=value1");
+        expect(encodeQueryParameters(parameters)).toBe("?parameter1=value1");
     });
 
     it("encodes many parameters", []() {
@@ -40,6 +40,6 @@ describe("HTTP url parameters encoder", []() {
         parameters.set("parameter1", "value1");
         parameters.set("parameter2", "value2");
 
-        expect(encodeUrlParameters(parameters)).toBe("?parameter1=value1&parameter2=value2");
+        expect(encodeQueryParameters(parameters)).toBe("?parameter1=value1&parameter2=value2");
     });
 });

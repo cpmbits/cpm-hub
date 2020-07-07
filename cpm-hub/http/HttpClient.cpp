@@ -17,7 +17,7 @@
  */
 #include <http/HttpClient.h>
 #include <http/http_headers_encoder.h>
-#include <http/http_url_parameters_encoder.h>
+#include <http/http_query_parameters_encoder.h>
 
 using namespace std;
 
@@ -29,7 +29,7 @@ static void digestHeaders(struct http_message *message, HttpResponse &response);
 HttpResponse HttpClient::method(std::string url, HttpRequest request, std::string method)
 {
     struct mg_connection *connection;
-    string url_with_parameters = url + encodeUrlParameters(request.parameters);
+    string url_with_parameters = url + encodeQueryParameters(request.query_parameters);
     string headers_string = request.headers.count() > 0 ? encodeHeaders(request.headers) + "\r\n" : "";
 
     mg_mgr_init(&mgr, this);
@@ -85,7 +85,6 @@ static void digestHeaders(struct http_message *message, HttpResponse &response)
     }
 }
 
-
 static void eventHandler(struct mg_connection *connection, int event, void *data)
 {
     HttpClient *client = (HttpClient *)connection->mgr->user_data;
@@ -107,6 +106,15 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
         digestHeaders(message, response);
         client->responseArrived(response);
         connection->flags |= MG_F_SEND_AND_CLOSE;
+        break;
+
+    case MG_EV_HTTP_CHUNK:
+        if (message->resp_code == HttpStatus::NO_CONTENT) {
+            response.status_code = message->resp_code;
+            digestHeaders(message, response);
+            client->responseArrived(response);
+            connection->flags |= MG_F_SEND_AND_CLOSE;
+        }
         break;
 
     case MG_EV_CLOSE:

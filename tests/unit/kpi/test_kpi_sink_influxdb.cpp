@@ -47,7 +47,7 @@ describe("KpiSinkInfluxDb", []() {
 
     it("formats the request for influxdb when no tags are used", []() {
         KpiSinkInfluxDb sink("", "mydb");
-        std::chrono::nanoseconds now {1250};
+        chrono::nanoseconds now {1250};
 
         expect(
             sink.formatMessage("kpi", 1.25, map<string, string>(), now))
@@ -57,7 +57,7 @@ describe("KpiSinkInfluxDb", []() {
 
     it("formats the request for influxdb when tags are used", []() {
         KpiSinkInfluxDb sink("", "mydb");
-        std::chrono::nanoseconds now {1250};
+        chrono::nanoseconds now {1250};
         map<string, string> tags = {
             {"ip", "127.0.0.1"},
             {"status_code", "204"}
@@ -73,7 +73,7 @@ describe("KpiSinkInfluxDb", []() {
         HttpServer server;
         FakeInfluxDb fake_influxdb;
         KpiSinkInfluxDb sink("http://127.0.0.1:8000", "mydb");
-        std::chrono::nanoseconds now {1250};
+        chrono::nanoseconds now {1250};
         map<string, string> tags = {
                 {"ip", "127.0.0.1"},
                 {"status_code", "204"}
@@ -86,7 +86,7 @@ describe("KpiSinkInfluxDb", []() {
         sink.newMeasure("kpi", 1.25, tags, now);
 
         expect(fake_influxdb.post_request.body).toBe("kpi,ip=127.0.0.1,status_code=204 value=1.25 1250");
-//        expect(fake_influxdb.post_request.parameters.get("db")).toBe("mydb");
+        expect(fake_influxdb.post_request.query_parameters.get("db")).toBe("mydb");
 
         server.stop();
     });

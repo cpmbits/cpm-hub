@@ -17,21 +17,8 @@
  */
 #pragma once
 
-#include <string>
-#include <http/HttpParameterMap.h>
+#include <kpi/KpiSink.h>
 
+void configureKpiSink(KpiSink *sink);
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
-
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
-};
+void recordKpi(std::string kpi, double value, std::map<std::string, std::string> tags);

@@ -28,8 +28,7 @@ public:
 };
 
 
-class KpiSinkNone {
+class KpiSinkNone: public KpiSink {
 public:
-    void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags) {
-    }
+    void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time) {}
 };
