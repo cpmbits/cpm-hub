@@ -18,13 +18,16 @@
 #include <iostream>
 #include <logging/Logger.h>
 #include <http/HttpServer.h>
-#include <http/http_headers.h>
+#include <http/http_headers_encoder.h>
+#include <boost/algorithm/string.hpp>
+#include <kpi/kpi.h>
 
 
 using namespace std;
 
 static void eventHandler(struct mg_connection *connection, int event, void *data);
 static void digestHeaders(struct http_message *message, HttpRequest &request);
+static void digestQueryString(struct http_message *message, HttpRequest &request);
 
 
 HttpServer::HttpServer()
@@ -140,16 +143,34 @@ HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
 }
 
 
-HttpRequest HttpServer::parseRequest(struct http_message *message)
+HttpRequest HttpServer::parseRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpRequest request;
 
+    digestHeaders(message, request);
+    digestQueryString(message, request);
     request.body = string(message->body.p, message->body.len);
     request.method = string(message->method.p, message->method.len);
     request.path = string(message->uri.p, message->uri.len);
-    digestHeaders(message, request);
+    request.protocol = string(message->proto.p, message->proto.len);
 
     return request;
+}
+
+
+static void digestQueryString(struct http_message *message, HttpRequest &request)
+{
+    string query_string = string(message->query_string.p, message->query_string.len);
+    vector<string> fragments;
+
+    boost::split(fragments, query_string, boost::is_any_of("&"));
+    for(auto&& fragment: fragments) {
+        vector<string> parameter_value;
+        boost::split(parameter_value, fragment, boost::is_any_of("="));
+        if (parameter_value.size() == 2) {
+            request.query_parameters.set(parameter_value.at(0), parameter_value.at(1));
+        }
+    }
 }
 
 
@@ -167,7 +188,7 @@ static void digestHeaders(struct http_message *message, HttpRequest &request)
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpResponse response;
-    HttpRequest request = this->parseRequest(message);
+    HttpRequest request = this->parseRequest(connection, message);
 
     try {
         response = this->dispatchRequest(request);
@@ -178,12 +199,11 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     mg_send_head(connection, response.status_code, response.body.size(), encodeHeaders(response.headers).c_str());
     mg_printf(connection, "%s", response.body.c_str());
 
-    logRequest(connection, message, response);
-
+    logRequest(connection, message, request, response);
 }
 
 
-void HttpServer::logRequest(struct mg_connection *connection, const http_message *message, const HttpResponse &response) const
+void HttpServer::logRequest(struct mg_connection *connection, const http_message *message, const HttpRequest &request, const HttpResponse &response) const
 {
     char client_address[INET6_ADDRSTRLEN];
     time_t rawtime;
@@ -195,6 +215,14 @@ void HttpServer::logRequest(struct mg_connection *connection, const http_message
     local_time = localtime(&rawtime);
     strftime(current_time_string, sizeof(current_time_string), "%d/%b/%Y:%H:%M:%S %z", local_time);
 
+    recordKpi("http_request",
+        1.0,
+        map<string, string>{
+            {"path", request.path},
+            {"method", request.method},
+            {"status", to_string(response.status_code)},
+            {"ip", to_string(response.status_code)}
+    });
     INFO("%s - - [%s] \"%s %s %s\" %d %d",
          client_address,
          current_time_string,

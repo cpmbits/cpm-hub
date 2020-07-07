@@ -17,32 +17,29 @@
  */
 #include <cest/cest.h>
 
-#include <http/http_headers.h>
+#include <http/http_query_parameters_encoder.h>
 
 
-describe("HTTP headers encoder", []() {
-    it("encodes no headers", []() {
-        HttpParameterMap headers;
-        expect(encodeHeaders(headers)).toBe("");
+describe("HTTP url parameters encoder", []() {
+    it("encodes no parameters", []() {
+        HttpParameterMap parameters;
+        expect(encodeQueryParameters(parameters)).toBe("");
     });
 
     it("encodes a single header", []() {
-        HttpParameterMap headers;
+        HttpParameterMap parameters;
 
-        headers.set("header1", "value1");
+        parameters.set("parameter1", "value1");
 
-        expect(encodeHeaders(headers)).toBe("header1: value1");
+        expect(encodeQueryParameters(parameters)).toBe("?parameter1=value1");
     });
 
-    it("encodes many headers", []() {
-        HttpParameterMap headers;
+    it("encodes many parameters", []() {
+        HttpParameterMap parameters;
 
-        headers.set("header1", "value1");
-        headers.set("header2", "value2");
+        parameters.set("parameter1", "value1");
+        parameters.set("parameter2", "value2");
 
-        expect(encodeHeaders(headers)).toBe(
-            "header1: value1\r\n"
-            "header2: value2"
-        );
+        expect(encodeQueryParameters(parameters)).toBe("?parameter1=value1&parameter2=value2");
     });
 });

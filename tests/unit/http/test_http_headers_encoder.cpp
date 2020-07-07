@@ -15,23 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <cest/cest.h>
 
-#include <string>
-#include <http/HttpParameterMap.h>
+#include <http/http_headers_encoder.h>
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+describe("HTTP headers encoder", []() {
+    it("encodes no headers", []() {
+        HttpParameterMap headers;
+        expect(encodeHeaders(headers)).toBe("");
+    });
 
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
-};
+    it("encodes a single header", []() {
+        HttpParameterMap headers;
+
+        headers.set("header1", "value1");
+
+        expect(encodeHeaders(headers)).toBe("header1: value1");
+    });
+
+    it("encodes many headers", []() {
+        HttpParameterMap headers;
+
+        headers.set("header1", "value1");
+        headers.set("header2", "value2");
+
+        expect(encodeHeaders(headers)).toBe(
+            "header1: value1\r\n"
+            "header2: value2"
+        );
+    });
+});

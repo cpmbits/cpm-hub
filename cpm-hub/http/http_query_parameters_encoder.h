@@ -21,17 +21,5 @@
 #include <http/HttpParameterMap.h>
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+std::string encodeQueryParameters(HttpParameterMap parameters);
 
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
-};

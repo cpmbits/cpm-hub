@@ -17,21 +17,18 @@
  */
 #pragma once
 
+#include <chrono>
+#include <map>
 #include <string>
-#include <http/HttpParameterMap.h>
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+class KpiSink {
+public:
+    virtual void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time) = 0;
+};
 
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
+
+class KpiSinkNone: public KpiSink {
+public:
+    void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time) {}
 };

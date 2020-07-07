@@ -8,6 +8,7 @@ packages:
     cpm-hub/users:
     cpm-hub/authentication:
     cpm-hub/logging:
+    cpm-hub/kpi:
 compile_flags: ['-std=c++11', '-g']
 bits:
     mongoose: '6.16'

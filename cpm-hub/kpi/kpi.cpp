@@ -15,23 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <utility>
 
-#include <string>
-#include <http/HttpParameterMap.h>
+#include <kpi/kpi.h>
+
+using namespace std;
+
+static KpiSinkNone no_sink;
+static KpiSink *kpi_sink = &no_sink;
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+void configureKpiSink(KpiSink *sink)
+{
+    kpi_sink = sink;
+}
 
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
-};
+
+void recordKpi(string kpi, double value, map<string, string> tags)
+{
+    kpi_sink->newMeasure(
+            move(kpi),
+            value,
+            move(tags),
+            chrono::duration_cast<chrono::nanoseconds>(chrono::system_clock::now().time_since_epoch())
+    );
+}

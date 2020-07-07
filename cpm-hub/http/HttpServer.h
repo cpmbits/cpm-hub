@@ -59,7 +59,7 @@ private:
 
     void serve();
 
-    HttpRequest parseRequest(struct http_message *message);
+    HttpRequest parseRequest(struct mg_connection *connection, struct http_message *message);
 
     HttpResponse dispatchRequest(HttpRequest &request);
 
@@ -67,5 +67,5 @@ private:
 
     mg_bind_opts configureBindOpts() const;
 
-    void logRequest(struct mg_connection *connection, const http_message *message, const HttpResponse &response) const;
+    void logRequest(struct mg_connection *connection, const http_message *message, const HttpRequest &request, const HttpResponse &response) const;
 };

@@ -15,23 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#include <sstream>
+#include <http/http_headers_encoder.h>
 
-#include <string>
-#include <http/HttpParameterMap.h>
+using namespace std;
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap query_parameters;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+string encodeHeaders(HttpParameterMap headers)
+{
+    ostringstream encoded;
 
-    HttpRequest(std::string _body="") {
-        body = _body;
+    for (auto pair=headers.begin(); pair!=headers.end(); pair++) {
+        if (pair == headers.begin()) {
+            encoded << pair->first << ": " << pair->second;
+        } else {
+            encoded << "\r\n" << pair->first << ": " << pair->second;
+        }
     }
-};
+
+    return encoded.str();
+}

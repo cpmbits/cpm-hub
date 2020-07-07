@@ -27,6 +27,11 @@ struct ProgramOptions {
         CPM_HUB_AUTHENTICATOR,
     };
 
+    enum KpiSinkType {
+        NO_KPIS,
+        INFLUXDB,
+    };
+
     std::string bits_directory = ".";
     AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
@@ -40,4 +45,8 @@ struct ProgramOptions {
     std::string logger_file;
     int logger_max_file_size;
     int logger_max_files;
+
+    KpiSinkType kpi_sink = NO_KPIS;
+    std::string influxdb_db = "mydb";
+    std::string influxdb_url = "http://localhost:1234";
 };

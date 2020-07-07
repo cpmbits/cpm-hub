@@ -16,20 +16,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <sstream>
-#include <http/http_headers.h>
+#include <http/http_headers_encoder.h>
 
 using namespace std;
 
 
-string encodeHeaders(HttpParameterMap headers)
+string encodeQueryParameters(HttpParameterMap parameters)
 {
     ostringstream encoded;
 
-    for (auto pair=headers.begin(); pair!=headers.end(); pair++) {
-        if (pair != headers.begin()) {
-            encoded << "\r\n" << pair->first << ": " << pair->second;
+    for (auto pair=parameters.begin(); pair != parameters.end(); pair++) {
+        if (pair != parameters.begin()) {
+            encoded << "&" << pair->first << "=" << pair->second;
         } else {
-            encoded << pair->first << ": " << pair->second;
+            encoded << "?" << pair->first << "=" << pair->second;
         }
     }
 

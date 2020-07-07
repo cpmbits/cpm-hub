@@ -28,6 +28,8 @@
 #include <logging/LoggerInRotatingFile.h>
 #include <logging/LoggerInConsole.h>
 #include <users/UsersRepositoryInMemory.h>
+#include <kpi/KpiSinkInfluxDb.h>
+#include <kpi/kpi.h>
 
 
 static Filesystem filesystem;
@@ -52,16 +54,17 @@ void startServiceServer(ProgramOptions &options)
     bit_index = new BitIndex();
     bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
     switch (options.authenticator_type) {
-    case ProgramOptions::UNAUTHENTICATED:
-        bits_resource_authenticator = new NullAuthenticator();
-        break;
-
     case ProgramOptions::CPM_HUB_AUTHENTICATOR:
         bits_resource_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
         break;
 
     case ProgramOptions::ACCESS_FILE_AUTHENTICATOR:
         bits_resource_authenticator = new AccessFileAuthenticator(&filesystem, options.access_file);
+        break;
+
+    case ProgramOptions::UNAUTHENTICATED:
+    default:
+        bits_resource_authenticator = new NullAuthenticator();
         break;
     }
     bits_service = new BitsService(bits_repository);
@@ -98,6 +101,10 @@ void startCpmHub(ProgramOptions &program_options, std::vector<std::string> comma
         logger = new LoggerInRotatingFile(program_options.logger_file, program_options.logger_max_file_size, program_options.logger_max_files);
     } else {
         logger = new LoggerInConsole();
+    }
+
+    if (program_options.kpi_sink == ProgramOptions::INFLUXDB) {
+        configureKpiSink(new KpiSinkInfluxDb(program_options.influxdb_url, program_options.influxdb_db));
     }
 
     startServiceServer(program_options);
