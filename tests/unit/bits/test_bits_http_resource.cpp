@@ -43,6 +43,7 @@ describe("Bits API", []() {
         BitsHttpResource api(&mock_service.get());
 
         When(Method(mock_service, publishBit)).Return(bit);
+        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(Optional<Bit>());
 
         response = api.post(request);
 
@@ -74,6 +75,31 @@ describe("Bits API", []() {
         response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
+    });
+
+    it("returns error 409 when publishing a bit and version already exists", [&]() {
+        HttpRequest request("{"
+                            "\"bit_name\": \"cest\","
+                            "\"version\": \"1.0\","
+                            "\"payload\": \"ABCDEabcde\","
+                            "\"username\": \"john_doe\","
+                            "\"password\": \"pass\""
+                            "}");
+        HttpResponse response;
+        Mock<BitsService> mock_service;
+        Mock<Authenticator> mock_authenticator;
+        BitsHttpResource api(&mock_service.get(), &mock_authenticator.get());
+        Optional<Bit> cest_bit;
+
+        request.parameters.set("bitName", "cest");
+        cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
+
+        When(Method(mock_authenticator, validCredentials)).Return(true);
+        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(cest_bit);
+
+        response = api.post(request);
+
+        expect(response.status_code).toBe(HttpStatus::CONFLICT);
     });
 
     it("uses the bit service to list the available bits", [&]() {

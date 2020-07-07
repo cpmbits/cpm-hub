@@ -56,6 +56,10 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
     publication_data.user_name = json.at("username");
     publication_data.payload = json.at("payload");
 
+    if (this->bits_service->find(publication_data.bit_name, publication_data.version).isPresent()) {
+        return HttpResponse::conflict();
+    }
+
     bits_service->publishBit(publication_data);
 
     return HttpResponse::ok("");
