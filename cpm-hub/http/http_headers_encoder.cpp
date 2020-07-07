@@ -26,11 +26,11 @@ string encodeHeaders(HttpParameterMap headers)
     ostringstream encoded;
 
     for (auto pair=headers.begin(); pair!=headers.end(); pair++) {
-//        if (pair != headers.begin()) {
-        encoded << "\r\n" << pair->first << ": " << pair->second;
-//        } else {
-//            encoded << pair->first << ": " << pair->second;
-//        }
+        if (pair == headers.begin()) {
+            encoded << pair->first << ": " << pair->second;
+        } else {
+            encoded << "\r\n" << pair->first << ": " << pair->second;
+        }
     }
 
     return encoded.str();

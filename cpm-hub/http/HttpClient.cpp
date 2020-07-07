@@ -30,13 +30,14 @@ HttpResponse HttpClient::method(std::string url, HttpRequest request, std::strin
 {
     struct mg_connection *connection;
     string url_with_parameters = url + encodeUrlParameters(request.parameters);
+    string headers_string = request.headers.count() > 0 ? encodeHeaders(request.headers) + "\r\n" : "";
 
     mg_mgr_init(&mgr, this);
     connection = mg_connect_http(&mgr,
             method.c_str(),
             eventHandler,
             url_with_parameters.c_str(),
-            encodeHeaders(request.headers).c_str(),
+            headers_string.c_str(),
             request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 
