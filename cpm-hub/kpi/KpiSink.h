@@ -15,23 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <sstream>
-#include <http/http_headers.h>
+#pragma once
 
-using namespace std;
+#include <chrono>
+#include <map>
+#include <string>
 
 
-string encodeHeaders(HttpParameterMap headers)
-{
-    ostringstream encoded;
+class KpiSink {
+public:
+    virtual void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time) = 0;
+};
 
-    for (auto pair=headers.begin(); pair!=headers.end(); pair++) {
-        if (pair != headers.begin()) {
-            encoded << "\r\n" << pair->first << ": " << pair->second;
-        } else {
-            encoded << pair->first << ": " << pair->second;
-        }
+
+class KpiSinkNone {
+public:
+    void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags) {
     }
-
-    return encoded.str();
-}
+};

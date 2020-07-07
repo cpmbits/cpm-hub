@@ -18,7 +18,7 @@
 #include <iostream>
 #include <logging/Logger.h>
 #include <http/HttpServer.h>
-#include <http/http_headers.h>
+#include <http/http_headers_encoder.h>
 
 
 using namespace std;
@@ -140,14 +140,15 @@ HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
 }
 
 
-HttpRequest HttpServer::parseRequest(struct http_message *message)
+HttpRequest HttpServer::parseRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpRequest request;
 
+    digestHeaders(message, request);
     request.body = string(message->body.p, message->body.len);
     request.method = string(message->method.p, message->method.len);
     request.path = string(message->uri.p, message->uri.len);
-    digestHeaders(message, request);
+    request.protocol = string(message->proto.p, message->proto.len);
 
     return request;
 }
@@ -167,7 +168,7 @@ static void digestHeaders(struct http_message *message, HttpRequest &request)
 void HttpServer::serveRequest(struct mg_connection *connection, struct http_message *message)
 {
     HttpResponse response;
-    HttpRequest request = this->parseRequest(message);
+    HttpRequest request = this->parseRequest(connection, message);
 
     try {
         response = this->dispatchRequest(request);
@@ -179,7 +180,6 @@ void HttpServer::serveRequest(struct mg_connection *connection, struct http_mess
     mg_printf(connection, "%s", response.body.c_str());
 
     logRequest(connection, message, response);
-
 }
 
 

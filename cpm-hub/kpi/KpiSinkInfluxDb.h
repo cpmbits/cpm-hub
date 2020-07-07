@@ -17,20 +17,20 @@
  */
 #pragma once
 
-#include <string>
-#include <http/HttpParameterMap.h>
+#include <kpi/KpiSink.h>
 
 
-struct HttpRequest {
-    std::string path;
-    std::string method;
-    std::string body;
-    std::string protocol;
-    std::string client_ip;
-    struct HttpParameterMap parameters;
-    struct HttpParameterMap headers;
+class KpiSinkInfluxDb: public KpiSink {
+public:
+    KpiSinkInfluxDb(std::string influxdb_url, std::string database);
 
-    HttpRequest(std::string _body="") {
-        body = _body;
-    }
+    void newMeasure(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time);
+
+    std::string formatMessage(std::string kpi, double value, std::map<std::string, std::string> tags, std::chrono::nanoseconds time);
+
+private:
+    std::string influxdb_url;
+    std::string influxdb_write_url;
+    std::string database;
 };
+

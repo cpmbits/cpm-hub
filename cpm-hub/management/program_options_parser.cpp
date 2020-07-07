@@ -28,6 +28,11 @@ map<string, ProgramOptions::AuthenticatorType> string_to_authenticator_type = {
         {"cpm_hub_auth", ProgramOptions::CPM_HUB_AUTHENTICATOR},
 };
 
+map<string, ProgramOptions::KpiSinkType> string_to_kpi_sink = {
+        {"no_kpis", ProgramOptions::NO_KPIS},
+        {"influxdb", ProgramOptions::INFLUXDB},
+};
+
 
 static ProgramOptions parseIniFile(string &ini_file)
 {
@@ -49,6 +54,10 @@ static ProgramOptions parseIniFile(string &ini_file)
     program_options.logger_file = ini_reader.Get("Logging", "logger_file", "cpmhub.log");
     program_options.logger_max_file_size = ini_reader.GetInteger("Logging", "logger_max_file_size", 1024*1024);
     program_options.logger_max_files = ini_reader.GetInteger("Logging", "logger_max_files", 10);
+
+    program_options.kpi_sink = string_to_kpi_sink[ini_reader.Get("KPI", "sink", "no_kpis")];
+    program_options.influxdb_url = ini_reader.Get("KPI", "influxdb_url", "http://localhost:1234");
+    program_options.influxdb_db = ini_reader.Get("KPI", "influxdb_db", "mydb");
 
     return program_options;
 }

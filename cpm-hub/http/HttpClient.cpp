@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <http/HttpClient.h>
-#include <http/http_headers.h>
+#include <http/http_headers_encoder.h>
+#include <http/http_url_parameters_encoder.h>
 
 using namespace std;
 
@@ -28,13 +29,14 @@ static void digestHeaders(struct http_message *message, HttpResponse &response);
 HttpResponse HttpClient::method(std::string url, HttpRequest request, std::string method)
 {
     struct mg_connection *connection;
+    string url_with_parameters = url + encodeUrlParameters(request.parameters);
 
     mg_mgr_init(&mgr, this);
     connection = mg_connect_http(&mgr,
             method.c_str(),
             eventHandler,
-            url.c_str(),
-            (encodeHeaders(request.headers) + "\r\n").c_str(),
+            url_with_parameters.c_str(),
+            encodeHeaders(request.headers).c_str(),
             request.body.c_str());
     mg_set_protocol_http_websocket(connection);
 

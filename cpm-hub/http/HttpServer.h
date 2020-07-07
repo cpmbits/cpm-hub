@@ -59,7 +59,7 @@ private:
 
     void serve();
 
-    HttpRequest parseRequest(struct http_message *message);
+    HttpRequest parseRequest(struct mg_connection *connection, struct http_message *message);
 
     HttpResponse dispatchRequest(HttpRequest &request);
 
