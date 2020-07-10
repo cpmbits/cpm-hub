@@ -80,7 +80,7 @@ describe("Bits Repository in file system", []() {
         BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
         Optional<Bit> bit;
 
-        bit = repository.find("cest");
+        bit = repository.bitBy("cest");
 
         expect(bit.isPresent()).toBe(false);
     });
@@ -101,7 +101,7 @@ describe("Bits Repository in file system", []() {
 
         repository.add(cest_bit);
 
-        bit = repository.find("cest");
+        bit = repository.bitBy("cest");
 
         expect(bit.isPresent()).toBe(true);
         expect(bit.value().metadata.name).toBe("cest");
@@ -137,7 +137,7 @@ describe("Bits Repository in file system", []() {
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
         repository.restore(".");
-        bit = repository.find("cest");
+        bit = repository.bitBy("cest");
 
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.0");
@@ -159,7 +159,7 @@ describe("Bits Repository in file system", []() {
         When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
         repository.restore(".");
-        bit = repository.find("cest");
+        bit = repository.bitBy("cest");
 
         expect(bit.value().metadata.name).toBe("cest");
         expect(bit.value().metadata.version).toBe("1.0");
@@ -183,7 +183,7 @@ describe("Bits Repository in file system", []() {
 
         repository.add(cest_bit);
 
-        bit = repository.find("cest", "1.1");
+        bit = repository.bitBy("cest", "1.1");
 
         Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.1"));
         expect(bit.isPresent()).toBe(true);
@@ -206,7 +206,7 @@ describe("Bits Repository in file system", []() {
 
         repository.add(cest_bit);
 
-        bit = repository.find("cest", "1.0");
+        bit = repository.bitBy("cest", "1.0");
 
         Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.0"));
         expect(bit.isPresent()).toBe(false);

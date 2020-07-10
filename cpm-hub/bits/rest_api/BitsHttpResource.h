@@ -38,4 +38,8 @@ private:
     BitsService *bits_service;
 
     Authenticator *authenticator;
+
+    HttpResponse searchForBit(HttpRequest &request);
+
+    HttpResponse getBit(HttpRequest &request);
 };

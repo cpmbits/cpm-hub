@@ -63,9 +63,9 @@ describe("Bits Service", []() {
         Optional<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string))).Return(bit);
 
-        auto found_bit = bits_service.find("cest");
+        auto found_bit = bits_service.bitBy("cest");
 
         expect(found_bit.value().metadata.name).toBe("cest");
     });
@@ -76,9 +76,9 @@ describe("Bits Service", []() {
         Optional<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string, string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string, string))).Return(bit);
 
-        auto found_bit = bits_service.find("cest", "1.1");
+        auto found_bit = bits_service.bitBy("cest", "1.1");
 
         expect(found_bit.value().metadata.name).toBe("cest");
     });

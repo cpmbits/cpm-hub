@@ -144,4 +144,28 @@ describe("CPM Hub bits management", []() {
         expect(response.status_code).toBe(HttpStatus::OK);
         expect(response.body).toBe("{\"bit_name\":\"cest\",\"payload\":\"ABCDEabcde\",\"version\":\"1.0\"}");
     });
+
+    it("searches bits whose name contains given text and returns found bits metadata", [&]() {
+        HttpRequest publish_request("{"
+                                    "\"bit_name\": \"cest\","
+                                    "\"version\": \"1.0\","
+                                    "\"payload\": \"ABCDEabcde\","
+                                    "\"username\": \"john_doe\","
+                                    "\"password\": \"12345\""
+                                    "}");
+        HttpRequest search_request;
+        HttpResponse response;
+        BitsRepositoryInMemory repository;
+        BitsService service(&repository);
+        BitsHttpResource api(&service);
+
+        // Given
+        api.post(publish_request);
+        search_request.query_parameters.set("name", "cest");
+
+        response = api.get(search_request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        expect(response.body).toBe("[{\"name\":\"cest\",\"author\":\"john_doe\"}]");
+    });
 });

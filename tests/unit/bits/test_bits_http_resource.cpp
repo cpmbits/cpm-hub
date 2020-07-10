@@ -43,7 +43,7 @@ describe("Bits API", []() {
         BitsHttpResource api(&mock_service.get());
 
         When(Method(mock_service, publishBit)).Return(bit);
-        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(Optional<Bit>());
+        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(Optional<Bit>());
 
         response = api.post(request);
 
@@ -95,27 +95,11 @@ describe("Bits API", []() {
         cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
 
         When(Method(mock_authenticator, validCredentials)).Return(true);
-        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(cest_bit);
 
         response = api.post(request);
 
         expect(response.status_code).toBe(HttpStatus::CONFLICT);
-    });
-
-    it("uses the bit service to list the available bits", [&]() {
-        HttpRequest request("");
-        HttpResponse response;
-        Bit bit("cest");
-        list<Bit> bits {bit};
-        Mock<BitsService> mock_service;
-        BitsHttpResource api(&mock_service.get());
-
-        When(Method(mock_service, allBits)).Return(bits);
-
-        response = api.listBits(request);
-
-        expect(response.status_code).toBe(200);
-        expect(response.body).toBe("[{\"bit_name\":\"cest\"}]");
     });
         
     it("returns error 404 when downloading a bit that is not found", [&]() {
@@ -126,11 +110,11 @@ describe("Bits API", []() {
         Optional<Bit> no_bit;
 
         request.parameters.set("bitName", "cest");
-        When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(no_bit);
+        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string))).Return(no_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(404);
     });
             
@@ -143,11 +127,11 @@ describe("Bits API", []() {
 
         request.parameters.set("bitName", "cest");
         cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, find, Optional<Bit>(string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string))).Return(cest_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
             "\"bit_name\":\"cest\","
@@ -166,16 +150,37 @@ describe("Bits API", []() {
         request.parameters.set("bitName", "cest");
         request.parameters.set("bitVersion", "1.1");
         cest_bit = Bit("cest", "1.1", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, find, Optional<Bit>(string, string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(cest_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, find, Optional<Bit>(string, string)).Using("cest", "1.1"));
+        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string)).Using("cest", "1.1"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
            "\"bit_name\":\"cest\","
            "\"payload\":\"ABCDEabcde\","
            "\"version\":\"1.1\""
         "}");
+    });
+
+    it("uses the bit service to search for bits based on given criteria", [&]() {
+        HttpRequest request;
+        HttpResponse response;
+        Mock<BitsService> mock_service;
+        BitsHttpResource api(&mock_service.get());
+        std::list<BitMetadata> one_bit_found = {
+            BitMetadata("cest", "pepe", "1.0"),
+        };
+
+        request.query_parameters.set("name", "cest");
+        When(Method(mock_service, search)).Return(one_bit_found);
+
+        response = api.get(request);
+
+        expect(response.status_code).toBe(HttpStatus::OK);
+        Verify(Method(mock_service, search).Matching([](BitSearchQuery search_query) {
+            return search_query.name == "cest";
+        }));
+        expect(response.body).toBe("[{\"author\":\"pepe\",\"name\":\"cest\"}]");
     });
 });
