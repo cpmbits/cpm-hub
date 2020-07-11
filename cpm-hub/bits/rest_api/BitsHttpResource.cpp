@@ -143,7 +143,15 @@ HttpResponse BitsHttpResource::searchForBit(HttpRequest &request)
     list<BitMetadata> bits_found;
     BitSearchQuery search_query;
 
+    if (!request.query_parameters.has("name")) {
+        return HttpResponse::badRequest();
+    }
+
     search_query.name = request.query_parameters.get("name");
+    if (search_query.name.empty()) {
+        return HttpResponse::badRequest();
+    }
+
     bits_found = this->bits_service->search(search_query);
 
     return HttpResponse::ok(bitSearchResultsAsJson(bits_found));

@@ -183,4 +183,27 @@ describe("Bits API", []() {
         }));
         expect(response.body).toBe("[{\"author\":\"pepe\",\"name\":\"cest\"}]");
     });
+
+    it("returns bad request when search query does not contain 'name' parameter", [&]() {
+        HttpRequest request;
+        HttpResponse response;
+        Mock<BitsService> mock_service;
+        BitsHttpResource api(&mock_service.get());
+
+        response = api.get(request);
+
+        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
+    });
+
+    it("returns bad request when 'name' parameter in search query is empty", [&]() {
+        HttpRequest request;
+        HttpResponse response;
+        Mock<BitsService> mock_service;
+        BitsHttpResource api(&mock_service.get());
+
+        request.query_parameters.set("name", "");
+        response = api.get(request);
+
+        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
+    });
 });
