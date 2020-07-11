@@ -59,5 +59,5 @@ Optional<Bit> BitsService::bitBy(std::string bit_name, std::string version)
 
 std::list<BitMetadata> BitsService::search(BitSearchQuery search_query)
 {
-    return std::list<BitMetadata>();
+    return bits_repository->search(search_query);
 }

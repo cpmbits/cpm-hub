@@ -166,6 +166,6 @@ describe("CPM Hub bits management", []() {
         response = api.get(search_request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(response.body).toBe("[{\"name\":\"cest\",\"author\":\"john_doe\"}]");
+        expect(response.body).toBe("[{\"author\":\"john_doe\",\"name\":\"cest\"}]");
     });
 });

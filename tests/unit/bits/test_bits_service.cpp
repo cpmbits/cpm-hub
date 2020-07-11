@@ -82,4 +82,19 @@ describe("Bits Service", []() {
 
         expect(found_bit.value().metadata.name).toBe("cest");
     });
+
+    it("uses the repository to search for a bit by name", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Bit bit("cest");
+        std::list<BitMetadata> search_results {bit.metadata};
+        BitSearchQuery search_query{"cest"};
+
+        When(Method(mock_repository, search)).Return(search_results);
+
+        search_results = bits_service.search(search_query);
+
+        expect(search_results.size()).toBe(1);
+        expect(search_results.front().name).toBe("cest");
+    });
 });
