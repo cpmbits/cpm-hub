@@ -224,6 +224,7 @@ describe("Bits Repository in file system", []() {
         When(Method(mock_filesystem, writeFile)).AlwaysReturn();
         When(Method(mock_filesystem, readFile))
                 .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}");
+        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
 
         repository.add(cest_bit);
 
