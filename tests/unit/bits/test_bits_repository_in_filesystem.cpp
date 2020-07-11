@@ -211,4 +211,25 @@ describe("Bits Repository in file system", []() {
         Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.0"));
         expect(bit.isPresent()).toBe(false);
     });
+
+    it("returns search results with one bit when search matches", [&]() {
+        Mock<Filesystem> mock_filesystem;
+        BitIndex bit_index;
+        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
+        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
+        list<BitMetadata> search_results;
+
+        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
+        When(Method(mock_filesystem, directoryExists)).Return(true);
+        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+        When(Method(mock_filesystem, readFile))
+                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}");
+
+        repository.add(cest_bit);
+
+        search_results = repository.search(BitSearchQuery{"cest"});
+
+        expect(search_results.size()).toBe(1);
+        expect(search_results.front().name).toBe("cest");
+    });
 });

@@ -89,7 +89,7 @@ void BitsRepositoryInFilesystem::saveMetadata(const string& name, const string& 
 }
 
 
-Optional<Bit> BitsRepositoryInFilesystem::bitBy(std::string name)
+Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name)
 {
     Optional<Bit> bit;
     Optional<string> index_directory;
@@ -117,7 +117,7 @@ string BitsRepositoryInFilesystem::latestVersionDirectory(string base_directory)
 }
 
 
-Optional<Bit> BitsRepositoryInFilesystem::bitBy(std::string name, std::string version)
+Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name, string version)
 {
     Optional<Bit> bit;
     Optional<string> base_directory;
@@ -176,7 +176,17 @@ void BitsRepositoryInFilesystem::restore(string directory)
 }
 
 
-std::list<BitMetadata> BitsRepositoryInFilesystem::search(BitSearchQuery search_query)
+list<BitMetadata> BitsRepositoryInFilesystem::search(BitSearchQuery search_query)
 {
-    return std::list<BitMetadata>();
+    list<BitMetadata> search_results;
+    list<BitIndexEntry> index_results;
+    string bit_directory;
+
+    index_results = this->index->search(search_query);
+    for (auto &bit_entry: index_results) {
+        bit_directory = latestVersionDirectory(this->directory + "/" + bit_entry.directory);
+        search_results.push_back(this->loadMetadata(bit_entry.name, bit_directory));
+    }
+
+    return search_results;
 }

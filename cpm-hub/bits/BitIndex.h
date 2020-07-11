@@ -24,9 +24,11 @@
 #include <infrastructure/Optional.h>
 #include <infrastructure/Filesystem.h>
 #include <bits/BitMetadata.h>
+#include <bits/BitSearchQuery.h>
 
 
 struct BitIndexEntry {
+    std::string name;
     std::string username;
     std::string directory;
 };
@@ -41,6 +43,8 @@ public:
     virtual std::string serialize();
 
     virtual void restore(std::string serialized);
+
+    virtual std::list<BitIndexEntry> search(BitSearchQuery search_query);
 
 private:
     const std::string index_version = "1";

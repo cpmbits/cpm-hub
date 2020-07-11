@@ -89,4 +89,28 @@ describe("Bits Repository in file system", []() {
         expect(bit_index.find("cest").value()).toBe("user/cest/1.0");
         expect(bit_index.find("fakeit").value()).toBe("user/fakeit/3.1");
     });
+
+    it("returns zero bits when search has no matches", [&]() {
+        BitIndex bit_index;
+        std::list<BitIndexEntry> search_results;
+        BitSearchQuery search_query{"name"};
+
+        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+
+        search_results = bit_index.search(search_query);
+
+        expect(search_results.size()).toBe(0);
+    });
+
+    it("returns search with one result when searching for bits based on name and one matches", [&]() {
+        BitIndex bit_index;
+        std::list<BitIndexEntry> search_results;
+        BitSearchQuery search_query{"cest"};
+
+        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+
+        search_results = bit_index.search(search_query);
+
+        expect(search_results.size()).toBe(1);
+    });
 });
