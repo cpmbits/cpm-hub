@@ -21,6 +21,7 @@
 #include <list>
 
 #include <infrastructure/Optional.h>
+#include <bits/BitSearchQuery.h>
 #include <bits/Bit.h>
 
 
@@ -28,9 +29,11 @@ class BitsRepository {
 public:
     virtual void add(Bit &bit) = 0;
 
-    virtual Optional<Bit> find(std::string name) = 0;
+    virtual Optional<Bit> bitBy(std::string name) = 0;
 
-    virtual Optional<Bit> find(std::string name, std::string version) = 0;
+    virtual Optional<Bit> bitBy(std::string name, std::string version) = 0;
 
-    virtual std::list<Bit>allBits() = 0;
+    virtual std::list<BitMetadata> search(BitSearchQuery search_query) = 0;
+
+    virtual std::list<Bit> allBits() = 0;
 };

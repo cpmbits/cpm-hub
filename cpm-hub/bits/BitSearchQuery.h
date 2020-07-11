@@ -17,26 +17,8 @@
  */
 #pragma once
 
-#include <map>
-#include <list>
 #include <string>
-#include <bits/BitsRepository.h>
 
-
-class BitsRepositoryInMemory: public BitsRepository {
-public:
-    virtual void add(Bit &bit);
-
-    virtual Optional<Bit> bitBy(std::string name);
-
-    virtual Optional<Bit> bitBy(std::string name, std::string version);
-
-    virtual std::list<Bit> allBits();
-
-    virtual std::list<BitMetadata> search(BitSearchQuery search_query);
-
-private:
-    std::map<std::string, std::list<Bit>> bits;
-
-    bool bitExists(const Bit &bit) const;
+struct BitSearchQuery {
+    std::string name;
 };

@@ -45,13 +45,19 @@ list<Bit> BitsService::allBits()
 }
 
 
-Optional<Bit> BitsService::find(std::string bit_name)
+Optional<Bit> BitsService::bitBy(std::string bit_name)
 {
-    return bits_repository->find(bit_name);
+    return bits_repository->bitBy(bit_name);
 }
 
 
-Optional<Bit> BitsService::find(std::string bit_name, std::string version)
+Optional<Bit> BitsService::bitBy(std::string bit_name, std::string version)
 {
-    return bits_repository->find(bit_name, version);
+    return bits_repository->bitBy(bit_name, version);
+}
+
+
+std::list<BitMetadata> BitsService::search(BitSearchQuery search_query)
+{
+    return bits_repository->search(search_query);
 }

@@ -43,7 +43,7 @@ bool BitsRepositoryInMemory::bitExists(const Bit &bit) const
 }
 
 
-Optional<Bit> BitsRepositoryInMemory::find(string name)
+Optional<Bit> BitsRepositoryInMemory::bitBy(string name)
 {
     Optional<Bit> bit;
 
@@ -57,7 +57,7 @@ Optional<Bit> BitsRepositoryInMemory::find(string name)
 }
 
 
-Optional<Bit> BitsRepositoryInMemory::find(string name, string version)
+Optional<Bit> BitsRepositoryInMemory::bitBy(string name, string version)
 {
     Optional<Bit> bit;
 
@@ -86,4 +86,18 @@ list<Bit> BitsRepositoryInMemory::allBits()
     }
 
     return stored_bits;
+}
+
+
+list<BitMetadata> BitsRepositoryInMemory::search(BitSearchQuery search_query)
+{
+    list<BitMetadata> found_bits;
+
+    for (auto &bit_map: this->bits) {
+        if (bit_map.first.find(search_query.name) != string::npos) {
+            found_bits.push_back(bit_map.second.front().metadata);
+        }
+    }
+
+    return found_bits;
 }

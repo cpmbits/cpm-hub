@@ -56,7 +56,7 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
     publication_data.user_name = json.at("username");
     publication_data.payload = json.at("payload");
 
-    if (this->bits_service->find(publication_data.bit_name, publication_data.version).isPresent()) {
+    if (this->bits_service->bitBy(publication_data.bit_name, publication_data.version).isPresent()) {
         return HttpResponse::conflict();
     }
 
@@ -80,25 +80,35 @@ HttpResponse BitsHttpResource::listBits(HttpRequest &request)
 }
 
 
-static string asJson(Bit bit)
+HttpResponse BitsHttpResource::get(HttpRequest &request)
+{
+    if (!request.parameters.has("bitName")) {
+        return searchForBit(request);
+    } else {
+        return getBit(request);
+    }
+}
+
+
+static string bitAsJson(Bit &bit)
 {
     json json_bit = {
-        {"bit_name", bit.metadata.name},
-        {"version", bit.metadata.version},
-        {"payload", bit.payload}
+            {"bit_name", bit.metadata.name},
+            {"version", bit.metadata.version},
+            {"payload", bit.payload}
     };
     return json_bit.dump();
 }
 
 
-HttpResponse BitsHttpResource::get(HttpRequest &request)
+HttpResponse BitsHttpResource::getBit(HttpRequest &request)
 {
     Optional<Bit> bit;
 
     if (!request.parameters.has("bitVersion")) {
-        bit = bits_service->find(request.parameters.get("bitName"));
+        bit = this->bits_service->bitBy(request.parameters.get("bitName"));
     } else {
-        bit = bits_service->find(
+        bit = this->bits_service->bitBy(
                 request.parameters.get("bitName"),
                 request.parameters.get("bitVersion"));
     }
@@ -107,5 +117,42 @@ HttpResponse BitsHttpResource::get(HttpRequest &request)
         return HttpResponse(HttpStatus::NOT_FOUND, "");
     }
 
-    return HttpResponse(HttpStatus::OK, asJson(bit.value()));
+    return HttpResponse::ok(bitAsJson(bit.value()));
+}
+
+
+static string bitSearchResultsAsJson(list<BitMetadata> &bits_found)
+{
+    HttpResponse response;
+    json json_bits = json::array();
+
+    for (auto &bit : bits_found) {
+        json json_bit = {
+            {"name", bit.name},
+            {"author", bit.user_name}
+        };
+        json_bits.push_back(json_bit);
+    }
+
+    return json_bits.dump();
+}
+
+
+HttpResponse BitsHttpResource::searchForBit(HttpRequest &request)
+{
+    list<BitMetadata> bits_found;
+    BitSearchQuery search_query;
+
+    if (!request.query_parameters.has("name")) {
+        return HttpResponse::badRequest();
+    }
+
+    search_query.name = request.query_parameters.get("name");
+    if (search_query.name.empty()) {
+        return HttpResponse::badRequest();
+    }
+
+    bits_found = this->bits_service->search(search_query);
+
+    return HttpResponse::ok(bitSearchResultsAsJson(bits_found));
 }

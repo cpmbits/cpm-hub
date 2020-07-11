@@ -46,7 +46,7 @@ describe("Bits Repository in Memory", []() {
         BitsRepositoryInMemory repository;
         Optional<Bit> bit;
 
-        bit = repository.find("cest");
+        bit = repository.bitBy("cest");
 
         expect(bit.isPresent()).toBe(false);
     });
@@ -58,7 +58,7 @@ describe("Bits Repository in Memory", []() {
 
         repository.add(bit);
 
-        stored_bit = repository.find("cest");
+        stored_bit = repository.bitBy("cest");
 
         expect(stored_bit.value().metadata.name).toBe(bit.metadata.name);
     });
@@ -71,7 +71,7 @@ describe("Bits Repository in Memory", []() {
         repository.add(cest_bit);
         repository.add(fakeit_bit);
 
-        stored_bit = repository.find("fakeit");
+        stored_bit = repository.bitBy("fakeit");
 
         expect(stored_bit.value().metadata.name).toBe(fakeit_bit.metadata.name);
     });
@@ -84,12 +84,12 @@ describe("Bits Repository in Memory", []() {
         cest_bit.metadata.version = "1.0";
         repository.add(cest_bit);
 
-        stored_bit = repository.find("cest", "1.1");
+        stored_bit = repository.bitBy("cest", "1.1");
 
         expect(stored_bit.isPresent()).toBe(false);
     });
 
-    it("finds a bit given version when it's stored", [&]() {
+    it("gets a bit given version when it's stored", [&]() {
         BitsRepositoryInMemory repository;
         Bit cest_bit_1_0("cest");
         Bit cest_bit_1_1("cest");
@@ -100,13 +100,13 @@ describe("Bits Repository in Memory", []() {
         cest_bit_1_0.metadata.version = "1.0";
         repository.add(cest_bit_1_0);
 
-        stored_bit = repository.find("cest", "1.1");
+        stored_bit = repository.bitBy("cest", "1.1");
 
         expect(stored_bit.isPresent()).toBe(true);
         expect(stored_bit.value().metadata.version).toBe("1.1");
     });
 
-    it("finds the latest version of a bit when many are stored but version is not specified", [&]() {
+    it("gets the latest version of a bit when many are stored but version is not specified", [&]() {
         BitsRepositoryInMemory repository;
         Bit cest_bit_1_0("cest");
         Bit cest_bit_1_1("cest");
@@ -117,9 +117,31 @@ describe("Bits Repository in Memory", []() {
         cest_bit_1_0.metadata.version = "1.0";
         repository.add(cest_bit_1_0);
 
-        stored_bit = repository.find("cest");
+        stored_bit = repository.bitBy("cest");
 
         expect(stored_bit.isPresent()).toBe(true);
         expect(stored_bit.value().metadata.version).toBe("1.1");
+    });
+
+    it("returns empty list when searching for bits and repository is empty", []() {
+        BitsRepositoryInMemory repository;
+        BitSearchQuery search_query;
+
+        expect(repository.search(search_query).size()).toBe(0);
+    });
+
+    it("returns list with bit found when searching for bits and repository contains one matching bit", []() {
+        BitsRepositoryInMemory repository;
+        Bit cest_bit("cest");
+        BitSearchQuery search_query;
+        std::list<BitMetadata> found_bits;
+
+        search_query.name = "cest";
+        repository.add(cest_bit);
+
+        found_bits = repository.search(search_query);
+
+        expect(found_bits.size()).toBe(1);
+        expect(found_bits.front().name).toBe("cest");
     });
 });

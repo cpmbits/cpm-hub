@@ -63,9 +63,9 @@ describe("Bits Service", []() {
         Optional<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string))).Return(bit);
 
-        auto found_bit = bits_service.find("cest");
+        auto found_bit = bits_service.bitBy("cest");
 
         expect(found_bit.value().metadata.name).toBe("cest");
     });
@@ -76,10 +76,25 @@ describe("Bits Service", []() {
         Optional<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, find, Optional<Bit>(string, string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string, string))).Return(bit);
 
-        auto found_bit = bits_service.find("cest", "1.1");
+        auto found_bit = bits_service.bitBy("cest", "1.1");
 
         expect(found_bit.value().metadata.name).toBe("cest");
+    });
+
+    it("uses the repository to search for a bit by name", [&]() {
+        Mock<BitsRepository> mock_repository;
+        BitsService bits_service(&mock_repository.get());
+        Bit bit("cest");
+        std::list<BitMetadata> search_results {bit.metadata};
+        BitSearchQuery search_query{"cest"};
+
+        When(Method(mock_repository, search)).Return(search_results);
+
+        search_results = bits_service.search(search_query);
+
+        expect(search_results.size()).toBe(1);
+        expect(search_results.front().name).toBe("cest");
     });
 });

@@ -23,9 +23,9 @@ using namespace std;
 using namespace nlohmann;
 
 
-void BitIndex::indexBit(string name, string username, std::string directory)
+void BitIndex::indexBit(string name, string username, string directory)
 {
-    BitIndexEntry index_entry = {username, directory};
+    BitIndexEntry index_entry = {name, username, directory};
 
     this->bits[name] = index_entry;
 }
@@ -64,7 +64,7 @@ string BitIndex::serialize()
 }
 
 
-void BitIndex::restore(std::string serialized)
+void BitIndex::restore(string serialized)
 {
     auto json = json::parse(serialized);
 
@@ -81,7 +81,7 @@ void BitIndex::restore(std::string serialized)
 }
 
 
-void BitIndex::restoreFromVersion0(std::string serialized)
+void BitIndex::restoreFromVersion0(string serialized)
 {
     auto json = json::parse(serialized);
 
@@ -92,4 +92,17 @@ void BitIndex::restoreFromVersion0(std::string serialized)
         boost::split(tokens, directory, boost::is_any_of("/"));
         this->indexBit(element.key(), tokens.at(0), tokens.at(0)+"/"+tokens.at(1));
     }
+}
+
+list<BitIndexEntry> BitIndex::search(BitSearchQuery search_query)
+{
+    list<BitIndexEntry> found_bits;
+
+    for (auto &bit_map: this->bits) {
+        if (bit_map.first.find(search_query.name) != string::npos) {
+            found_bits.push_back(bit_map.second);
+        }
+    }
+
+    return found_bits;
 }

@@ -32,9 +32,11 @@ public:
 
     virtual void add(Bit &bit);
 
-    virtual Optional<Bit> find(std::string name);
+    virtual Optional<Bit> bitBy(std::string name);
 
-    virtual Optional<Bit> find(std::string name, std::string version);
+    virtual Optional<Bit> bitBy(std::string name, std::string version);
+
+    virtual std::list<BitMetadata> search(BitSearchQuery search_query);
 
     virtual std::list<Bit> allBits();
 
