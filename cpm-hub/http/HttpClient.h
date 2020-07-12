@@ -29,6 +29,7 @@ public:
     virtual HttpResponse put(std::string url, HttpRequest request);
     virtual HttpResponse method(std::string url, HttpRequest request, std::string method);
     virtual void responseArrived(HttpResponse response);
+    virtual void connectionClosed();
 
 private:
     bool request_pending;
