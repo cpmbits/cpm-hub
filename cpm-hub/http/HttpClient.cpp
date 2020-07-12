@@ -46,6 +46,8 @@ HttpResponse HttpClient::method(std::string url, HttpRequest request, std::strin
         mg_mgr_poll(&mgr, 100);
     }
 
+    mg_mgr_free(&mgr);
+
     return this->response;
 }
 
@@ -75,9 +77,16 @@ void HttpClient::responseArrived(HttpResponse response)
 }
 
 
+void HttpClient::connectionClosed()
+{
+    this->request_pending = false;
+}
+
+
 static void digestHeaders(struct http_message *message, HttpResponse &response)
 {
-    for (int i=0; message->header_names[i].len > 0; ++i) {
+    for (int i=0; message->header_names[i].len >//        client->responseArrived(response);
+ 0; ++i) {
         response.headers.set(
                 string(message->header_names[i].p, message->header_names[i].len),
                 string(message->header_values[i].p, message->header_values[i].len)
@@ -105,7 +114,7 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
         response.body.assign(message->body.p, message->body.len);
         digestHeaders(message, response);
         client->responseArrived(response);
-        connection->flags |= MG_F_SEND_AND_CLOSE;
+        connection->flags |= MG_F_CLOSE_IMMEDIATELY;
         break;
 
     case MG_EV_HTTP_CHUNK:
@@ -118,7 +127,7 @@ static void eventHandler(struct mg_connection *connection, int event, void *data
         break;
 
     case MG_EV_CLOSE:
-        client->responseArrived(response);
+        client->connectionClosed();
         break;
 
     default:
