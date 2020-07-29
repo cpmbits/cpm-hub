@@ -9,6 +9,7 @@ packages:
     cpm-hub/authentication:
     cpm-hub/logging:
     cpm-hub/kpi:
+    cpm-hub/database:
 compile_flags: ['-std=c++11', '-g']
 bits:
     mongoose: '6.16'
@@ -17,6 +18,7 @@ bits:
     blake3: '1.0'
     inih: '1.0'
     spdlog: '1.6.1'
+    sqlite3: '3.32.3'
 test_bits:
     fakeit: '2.0.5'
     cest: '1.0'
