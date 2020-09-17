@@ -19,6 +19,8 @@
 
 #include <string>
 #include <list>
+#include <map>
+#include <utility>
 
 struct SqlColumn {
     std::string type;
@@ -26,6 +28,9 @@ struct SqlColumn {
 };
 
 struct SqlField {
+    SqlField(std::string column, std::string value) : column(std::move(column)), value(std::move(value))
+    {}
+
     std::string column;
     std::string value;
 };
@@ -36,16 +41,16 @@ enum SqlSelectFlavour {
 };
 
 
-using SqlRow = std::list<SqlField>;
+using SqlRow = std::map<std::string, std::string>;
 
 class SqlDatabase {
 public:
-    virtual void execute(std::string query);
+    virtual void execute(std::string query) = 0;
 
-    virtual void createTable(std::string table, std::list<SqlColumn> columns) = 0;
+    virtual void createTable(std::string query) = 0;
 
-    virtual void insert(std::string table, std::list<SqlField> fields) = 0;
+    virtual void insert(std::string query) = 0;
 
-    virtual std::list<SqlRow> select(std::string table, SqlSelectFlavour flavour, std::list<SqlField> fields) = 0;
+    virtual std::list<SqlRow> select(std::string query) = 0;
 };
 

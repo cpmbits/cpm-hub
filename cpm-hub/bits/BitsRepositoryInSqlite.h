@@ -17,27 +17,27 @@
  */
 #pragma once
 
-#include <sqlite3/sqlite3.h>
-#include <database/SqlDatabase.h>
+#include <bits/BitsRepository.h>
+#include <database/Sqlite3SqlDatabase.h>
+
+#include <utility>
 
 
-class Sqlite3SqlDatabase: public SqlDatabase {
+class BitsRepositoryInSqlite: public BitsRepository {
 public:
-    Sqlite3SqlDatabase(std::string file);
+     BitsRepositoryInSqlite(std::string filename);
 
-    ~Sqlite3SqlDatabase();
+    void add(Bit &bit);
 
-    virtual void execute(std::string query);
+    Optional<Bit> bitBy(std::string name);
 
-    virtual void createTable(std::string query);
+    Optional<Bit> bitBy(std::string name, std::string version);
 
-    virtual void insert(std::string query);
+    std::list<BitMetadata> search(BitSearchQuery search_query);
 
-    virtual std::list<SqlRow> select(std::string query);
+    std::list<Bit> allBits();
 
 private:
-    std::string file_path;
-
-    sqlite3 *handle;
+    Sqlite3SqlDatabase database;
 };
 

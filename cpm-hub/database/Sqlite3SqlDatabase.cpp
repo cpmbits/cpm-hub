@@ -15,39 +15,71 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <sstream>
-#include <boost/algorithm/string/join.hpp>
+#include <iostream>
 #include <database/Sqlite3SqlDatabase.h>
 
 using namespace std;
 
 
+Sqlite3SqlDatabase::~Sqlite3SqlDatabase()
+{
+    sqlite3_close(this->handle);
+}
+
+
 Sqlite3SqlDatabase::Sqlite3SqlDatabase(string file)
 {
     this->file_path = file;
+    sqlite3_open(file.c_str(), &this->handle);
 }
 
 
-void Sqlite3SqlDatabase::createTable(string table, list<SqlColumn> columns)
+void Sqlite3SqlDatabase::execute(string query)
 {
-    stringstream query;
-    list<string> fields;
+    char *error_message = nullptr;
 
-    for (auto &column: columns) {
-        fields.emplace_back(column.name + " " + column.type);
+    sqlite3_exec(this->handle, query.c_str(), nullptr, nullptr, &error_message);
+}
+
+
+void Sqlite3SqlDatabase::createTable(string query)
+{
+    char *error_message = nullptr;
+
+    sqlite3_exec(this->handle, query.c_str(), nullptr, nullptr, &error_message);
+}
+
+
+void Sqlite3SqlDatabase::insert(string query)
+{
+    char *error_message = nullptr;
+
+    sqlite3_exec(this->handle, query.c_str(), nullptr, nullptr, &error_message);
+}
+
+
+static int addRow(void *arg, int num_columns, char **values, char **names)
+{
+    auto *rows = (list<SqlRow> *)arg;
+    SqlRow row;
+
+    for (int i=0; i<num_columns; ++i) {
+        row[names[i]] = values[i];
     }
-    query << "CREATE TABLE " << table << " (";
-    query << boost::algorithm::join(fields, ",") << ");";
+    rows->emplace_back(row);
+
+    return 0;
 }
 
 
-void Sqlite3SqlDatabase::insert(string table, list<SqlField> fields)
+list<SqlRow> Sqlite3SqlDatabase::select(string query)
 {
+    list<SqlRow> rows;
+    char *error_message = nullptr;
 
+    sqlite3_exec(this->handle, query.c_str(), addRow, (void *)&rows, &error_message);
+
+    return rows;
 }
 
 
-list<SqlRow> Sqlite3SqlDatabase::select(string table, SqlSelectFlavour flavour, list<SqlField> fields)
-{
-    return list<SqlRow>();
-}

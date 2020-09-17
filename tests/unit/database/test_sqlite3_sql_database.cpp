@@ -24,14 +24,26 @@ using namespace std;
 
 
 describe("Sqlite3 Database", []() {
-    it("operates a sqlite3 database in memory", []() {
+    it("finds a sqlite3 database row after insertion", []() {
         list<SqlRow> selectResult;
         Sqlite3SqlDatabase database(":memory:");
 
-        database.createTable("table", {{"column1", "varchar(255)"}, {"column2", "varchar(255)"}});
-        database.insert("table", {{"column1", "value1"}, {"column2", "value2"}});
-        selectResult = database.select("table", WHERE, {{"column1", "value1"}});
+        database.createTable("CREATE TABLE users (name varchar(255), age int)");
+        database.insert("INSERT INTO users VALUES ('fulano', 18)");
+        selectResult = database.select("SELECT * FROM users");
 
         expect(selectResult.size()).toBe(1);
+        expect(selectResult.front()["name"]).toBe("fulano");
+        expect(selectResult.front()["age"]).toBe("18");
+    });
+
+    it("gets an empty list when select finds zero elements", []() {
+        list<SqlRow> selectResult;
+        Sqlite3SqlDatabase database(":memory:");
+
+        database.createTable("CREATE TABLE users (name varchar(255), age int)");
+        selectResult = database.select("SELECT * FROM users");
+
+        expect(selectResult.size()).toBe(0);
     });
 });
