@@ -15,106 +15,134 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-#include <fakeit/fakeit.hpp>
+#include <mocks/cpputest.h>
+#include <mocks/MockFilesystem.h>
 
 #include <authentication/AccessFileAuthenticator.h>
 
-using namespace cest;
-using namespace fakeit;
 using namespace std;
 
 
-describe("AccessFileAuthenticator", []() {
-    it("allows setting the access file name", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
+TEST_GROUP(AccessFileAuthenticator) {
+    void teardown()
+    {
+        mock().clear();
+    }
+};
 
-        access_file_authenticator.setAccessFile(".access");
-    });
 
-    it("returns empty when authenticating api_key and access file is empty", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return("");
+TEST_WITH_MOCK(AccessFileAuthenticator, allows_setting_the_access_file_name)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
 
-        username = access_file_authenticator.authenticate("any_api_key");
+    access_file_authenticator.setAccessFile(".access");
+}
 
-        expect(username.isPresent()).toBe(false);
-    });
 
-    it("returns empty when authenticating api_key and user in file does not match", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_key_and_access_file_is_empty)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return("another_api_key: username");
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+              .withParameter("file_name", ".access")
+              .andReturnValue("");
 
-        username = access_file_authenticator.authenticate("one_api_key");
+    username = access_file_authenticator.authenticate("any_api_key");
 
-        expect(username.isPresent()).toBe(false);
-    });
+    ASSERT_FALSE(username.isPresent());
+}
 
-    it("returns username when authenticating api_key and user in file matches api key", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return("one_api_key:username");
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_key_and_user_in_file_does_not_match)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
 
-        username = access_file_authenticator.authenticate("one_api_key");
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+              .withParameter("file_name", ".access")
+              .andReturnValue("another_api_key: username");
 
-        expect(username.isPresent()).toBe(true);
-        expect(username.value()).toBe("username");
-    });
+    username = access_file_authenticator.authenticate("one_api_key");
 
-    it("returns username when authenticating api_key and user in file with whitespace matches api key", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
+    ASSERT_FALSE(username.isPresent());
+}
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return("\n one_api_key :  username \n\n");
 
-        username = access_file_authenticator.authenticate("one_api_key");
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api_key_and_user_in_file_matches_api_key)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
 
-        expect(username.isPresent()).toBe(true);
-        expect(username.value()).toBe("username");
-    });
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+              .withParameter("file_name", ".access")
+              .andReturnValue("one_api_key:username");
 
-    it("returns username when authenticating api_key and one of the users matches api key", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
+    username = access_file_authenticator.authenticate("one_api_key");
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return(
-                "bob_api_key:  bob\n    "
-                "alice_api_key:  alice\n");
+    ASSERT_TRUE(username.isPresent());
+    ASSERT_STRING_EQUALS("username", username.value());
+}
 
-        username = access_file_authenticator.authenticate("alice_api_key");
 
-        expect(username.isPresent()).toBe(true);
-        expect(username.value()).toBe("alice");
-    });
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api_key_and_user_in_file_with_whitespace_matches_api_key)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
 
-    it("returns empty when authenticating api_key and none of the users matches api key", []() {
-        Mock<Filesystem> mock_filesystem;
-        AccessFileAuthenticator access_file_authenticator(&mock_filesystem.get());
-        Optional<string> username;
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+            .withParameter("file_name", ".access")
+            .andReturnValue("\n one_api_key :  username \n\n");
 
-        access_file_authenticator.setAccessFile(".access");
-        When(Method(mock_filesystem, readFile)).Return(
-                "bob_api_key:  bob\n    "
-                "alice_api_key:  alice\n");
+    username = access_file_authenticator.authenticate("one_api_key");
 
-        username = access_file_authenticator.authenticate("paul_api_key");
+    ASSERT_TRUE(username.isPresent());
+    ASSERT_STRING_EQUALS("username", username.value());
+}
 
-        expect(username.isPresent()).toBe(false);
-    });
-});
+
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api_key_and_one_of_the_users_matches_api_key)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
+
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+            .withParameter("file_name", ".access")
+            .andReturnValue("bob_api_key:  bob\n    "
+                            "alice_api_key:  alice\n");
+
+    username = access_file_authenticator.authenticate("alice_api_key");
+
+    ASSERT_TRUE(username.isPresent());
+    ASSERT_STRING_EQUALS("alice", username.value());
+}
+
+
+TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_key_and_none_of_the_users_matches_api_key)
+{
+    MockFilesystem filesystem;
+    AccessFileAuthenticator access_file_authenticator(&filesystem);
+    Optional<string> username;
+
+    access_file_authenticator.setAccessFile(".access");
+    filesystem.expect("readFile")
+            .withParameter("file_name", ".access")
+            .andReturnValue("bob_api_key:  bob\n    "
+                            "alice_api_key:  alice\n");
+
+    username = access_file_authenticator.authenticate("paul_api_key");
+
+    ASSERT_FALSE(username.isPresent());
+}

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-// curl -i -XPOST 'http://localhost:8086/write?db=mydb' --data-binary "cpu_load_short,host=server01,region=us-west value=0.1 $(date '+%s%N')"
 #include <sstream>
 #include <kpi/KpiSinkInfluxDb.h>
 #include <http/HttpClient.h>
@@ -31,7 +30,7 @@ KpiSinkInfluxDb::KpiSinkInfluxDb(string influxdb_url, string database)
 }
 
 
-void KpiSinkInfluxDb::newMeasure(string kpi, double value, map <string, string> tags, chrono::nanoseconds time)
+void KpiSinkInfluxDb::newMeasure(string kpi, double value, map<string, string> tags, chrono::nanoseconds time)
 {
     HttpClient client;
     HttpRequest request(this->formatMessage(move(kpi), value, move(tags), time));
