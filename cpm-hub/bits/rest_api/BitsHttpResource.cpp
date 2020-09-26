@@ -66,6 +66,16 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
 }
 
 
+HttpResponse BitsHttpResource::get(HttpRequest &request)
+{
+    if (!request.parameters.has("bitName")) {
+        return searchForBit(request);
+    } else {
+        return getBit(request);
+    }
+}
+
+
 HttpResponse BitsHttpResource::listBits(HttpRequest &request)
 {
     HttpResponse response;
@@ -77,16 +87,6 @@ HttpResponse BitsHttpResource::listBits(HttpRequest &request)
     }
 
     return HttpResponse::ok(json_bits.dump());
-}
-
-
-HttpResponse BitsHttpResource::get(HttpRequest &request)
-{
-    if (!request.parameters.has("bitName")) {
-        return searchForBit(request);
-    } else {
-        return getBit(request);
-    }
 }
 
 
