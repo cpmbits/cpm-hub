@@ -105,9 +105,9 @@ TEST_WITH_MOCK(CpmHubAuthenticator, sends_request_to_authentication_service_when
 
     authenticator.addUserWithInvitation(credentials, "invitation_token");
 
-    ASSERT_STRING_EQUALS(http_client.last_request.body, "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}");
-    ASSERT_STRING_EQUALS(http_client.last_request.headers.get("Content-type"), "application/json");
-    ASSERT_STRING_EQUALS(http_client.last_request.headers.get("OTP"), "invitation_token");
+    ASSERT_STRING(http_client.last_request.body, "{\"password\":\"7be1b497736a4478f45a07661468dd282edc01d31a403641dd3e2a07cac4fc05\",\"username\":\"user\"}");
+    ASSERT_STRING(http_client.last_request.headers.get("Content-type"), "application/json");
+    ASSERT_STRING(http_client.last_request.headers.get("OTP"), "invitation_token");
 }
 
 

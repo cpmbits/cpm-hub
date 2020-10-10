@@ -90,7 +90,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
     username = access_file_authenticator.authenticate("one_api_key");
 
     ASSERT_TRUE(username.isPresent());
-    ASSERT_STRING_EQUALS("username", username.value());
+    ASSERT_STRING("username", username.value());
 }
 
 
@@ -108,7 +108,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
     username = access_file_authenticator.authenticate("one_api_key");
 
     ASSERT_TRUE(username.isPresent());
-    ASSERT_STRING_EQUALS("username", username.value());
+    ASSERT_STRING("username", username.value());
 }
 
 
@@ -127,7 +127,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
     username = access_file_authenticator.authenticate("alice_api_key");
 
     ASSERT_TRUE(username.isPresent());
-    ASSERT_STRING_EQUALS("alice", username.value());
+    ASSERT_STRING("alice", username.value());
 }
 
 

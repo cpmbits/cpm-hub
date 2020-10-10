@@ -15,102 +15,149 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
-#include <fakeit/fakeit.hpp>
-
 #include <bits/BitIndex.h>
 
-using namespace cest;
-using namespace fakeit;
+#include <mocks/cpputest.h>
+
 using namespace std;
 
 
-describe("Bits Repository in file system", []() {
-    it("indexes one bit", [&]() {
-        BitIndex bit_index;
+TEST_GROUP(BitIndex)
+{
+};
 
-        bit_index.indexBit("cest", std::string(), "user/cest");
 
-        expect(bit_index.serialize()).toBe(
-            "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"\"}}"
-        );
-    });
+TEST_WITH_MOCK(BitIndex, indexes_one_bit)
+{
+    BitIndex bit_index;
 
-    it("indexes many bits", [&]() {
-        BitIndex bit_index;
+    bit_index.indexBit("cest", std::string(), "user/cest");
 
-        bit_index.indexBit("cest", std::string(), "user/cest");
-        bit_index.indexBit("fakeit", std::string(), "user/fakeit");
+    ASSERT_STRING(
+        "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"\"}}",
+        bit_index.serialize()
+    );
+}
 
-        expect(bit_index.serialize()).toBe(
-            "{"
-              "\"__version__\":\"1\","
-              "\"cest\":{"
-                "\"directory\":\"user/cest\","
-                "\"username\":\"\"},"
-              "\"fakeit\":{"
-                "\"directory\":\"user/fakeit\","
-                "\"username\":\"\""
-              "}"
-            "}"
-        );
-    });
 
-    it("fails to find a bit when it's not indexed", [&]() {
-        BitIndex bit_index;
-        Optional<string> directory;
+TEST_WITH_MOCK(BitIndex, indexes_many_bits)
+{
+    BitIndex bit_index;
 
-        directory = bit_index.find("cest");
+    bit_index.indexBit("cest", std::string(), "user/cest");
+    bit_index.indexBit("fakeit", std::string(), "user/fakeit");
 
-        expect(directory.isPresent()).toBe(false);
-    });
-
-    it("finds an indexed bit", [&]() {
-        BitIndex bit_index;
-        Optional<string> directory;
-
-        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
-        bit_index.indexBit("fakeit", std::string(), "user/fakeit/3.1");
-
-        expect(bit_index.find("cest").value()).toBe("user/cest/1.0");
-        expect(bit_index.find("fakeit").value()).toBe("user/fakeit/3.1");
-    });
-
-    if("loads the index from serialized dump", []() {
-        BitIndex bit_index;
-        string serialized(
+    ASSERT_STRING(
         "{"
-            "\"cest\":\"user/cest/1.0\","
-            "\"fakeit\":\"user/fakeit/3.1\""
-        "}");
+             "\"__version__\":\"1\","
+             "\"cest\":{"
+                 "\"directory\":\"user/cest\","
+                 "\"username\":\""
+             "\"},"
+             "\"fakeit\":{"
+                 "\"directory\":\"user/fakeit\","
+                 "\"username\":\"\""
+             "}"
+        "}",
+        bit_index.serialize()
+    );
+}
 
-        bit_index.restore(serialized);
 
-        expect(bit_index.find("cest").value()).toBe("user/cest/1.0");
-        expect(bit_index.find("fakeit").value()).toBe("user/fakeit/3.1");
-    });
+TEST_WITH_MOCK(BitIndex, fails_to_find_a_bit_when_it_is_not_indexed)
+{
+    BitIndex bit_index;
+    Optional<string> directory;
 
-    it("returns zero bits when search has no matches", [&]() {
-        BitIndex bit_index;
-        std::list<BitIndexEntry> search_results;
-        BitSearchQuery search_query{"name"};
+    directory = bit_index.find("cest");
 
-        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+    ASSERT_FALSE(directory.isPresent());
+}
 
-        search_results = bit_index.search(search_query);
 
-        expect(search_results.size()).toBe(0);
-    });
+TEST_WITH_MOCK(BitIndex, finds_an_indexed_bit)
+{
+    BitIndex bit_index;
+    Optional<string> directory;
 
-    it("returns search with one result when searching for bits based on name and one matches", [&]() {
-        BitIndex bit_index;
-        std::list<BitIndexEntry> search_results;
-        BitSearchQuery search_query{"cest"};
+    bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+    bit_index.indexBit("fakeit", std::string(), "user/fakeit/3.1");
 
-        bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+    ASSERT_STRING("user/cest/1.0", bit_index.find("cest").value());
+    ASSERT_STRING("user/fakeit/3.1", bit_index.find("fakeit").value());
+}
 
-        search_results = bit_index.search(search_query);
 
-        expect(search_results.size()).toBe(1);
-    });
-});
+TEST_WITH_MOCK(BitIndex, loads_the_index_from_serialized_dump)
+{
+    BitIndex bit_index;
+    string serialized(
+    "{"
+        "\"cest\":\"user/cest/1.0\","
+        "\"fakeit\":\"user/fakeit/3.1\""
+    "}");
+
+    bit_index.restore(serialized);
+
+    ASSERT_STRING("user/cest", bit_index.find("cest").value());
+    ASSERT_STRING("user/fakeit", bit_index.find("fakeit").value());
+}
+
+
+TEST_WITH_MOCK(BitIndex, returns_zero_bits_when_search_has_no_matches)
+{
+    BitIndex bit_index;
+    std::list<BitIndexEntry> search_results;
+    BitSearchQuery search_query{"name"};
+
+    bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+
+    search_results = bit_index.search(search_query);
+
+    ASSERT_EQUAL(0, search_results.size());
+}
+
+
+TEST_WITH_MOCK(BitIndex, returns_search_with_one_result_when_searching_for_bits_based_on_name_and_one_matches)
+{
+    BitIndex bit_index;
+    std::list<BitIndexEntry> search_results;
+    BitSearchQuery search_query{"cest"};
+
+    bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+
+    search_results = bit_index.search(search_query);
+
+    ASSERT_EQUAL(1, search_results.size());
+}
+
+
+TEST_WITH_MOCK(BitIndex, returns_all_bits_in_index_with_one_bit_indexed)
+{
+    BitIndex bit_index;
+    std::list<BitIndexEntry> all_indexed_bits;
+
+    bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+
+    all_indexed_bits = bit_index.allIndexedBits();
+
+    ASSERT_EQUAL(1, all_indexed_bits.size());
+    ASSERT_STRING("cest", all_indexed_bits.front().name);
+}
+
+
+TEST_WITH_MOCK(BitIndex, returns_all_bits_in_index_with_many_bits_indexed)
+{
+    BitIndex bit_index;
+    std::list<BitIndexEntry> all_indexed_bits;
+
+    bit_index.indexBit("cest", std::string(), "user/cest/1.0");
+    bit_index.indexBit("boost", std::string(), "user/boost/2.0");
+
+    all_indexed_bits = bit_index.allIndexedBits();
+
+    ASSERT_EQUAL(2, all_indexed_bits.size());
+    ASSERT_STRING("boost", all_indexed_bits.front().name);
+    ASSERT_STRING("cest", next(all_indexed_bits.begin())->name);
+}
+
