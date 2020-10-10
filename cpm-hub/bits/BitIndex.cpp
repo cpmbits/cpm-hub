@@ -106,3 +106,15 @@ list<BitIndexEntry> BitIndex::search(BitSearchQuery search_query)
 
     return found_bits;
 }
+
+
+std::list<BitIndexEntry> BitIndex::allIndexedBits()
+{
+    std::list<BitIndexEntry> all_indexed_bits;
+
+    for (auto &bit_map: this->bits) {
+        all_indexed_bits.push_back(bit_map.second);
+    }
+
+    return all_indexed_bits;
+}

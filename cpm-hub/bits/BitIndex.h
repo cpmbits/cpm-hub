@@ -46,6 +46,8 @@ public:
 
     virtual std::list<BitIndexEntry> search(BitSearchQuery search_query);
 
+    virtual std::list<BitIndexEntry> allIndexedBits();
+
 private:
     const std::string index_version = "1";
     Filesystem *filesystem;
