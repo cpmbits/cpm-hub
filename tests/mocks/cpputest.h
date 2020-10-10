@@ -22,9 +22,10 @@
 #include "CppUTestExt/MockSupport.h"
 
 
-#define ASSERT_TRUE(condition)                  CHECK(condition)
-#define ASSERT_FALSE(condition)                 CHECK_FALSE(condition)
-#define ASSERT_STRING_EQUALS(expected, actual)  STRCMP_EQUAL(std::string(expected).c_str(), std::string(actual).c_str())
+#define ASSERT_TRUE(condition)                          CHECK(condition)
+#define ASSERT_FALSE(condition)                         CHECK_FALSE(condition)
+#define ASSERT_STRING_EQUALS(expected, actual)          STRCMP_EQUAL(std::string(expected).c_str(), std::string(actual).c_str())
+#define ASSERT_THROWS(expected_exception, expression)   CHECK_THROWS(expected_exception, expression)
 
 
 #define TEST_WITH_MOCK(testGroup, testName) \

@@ -34,4 +34,8 @@ struct HttpRequest {
     HttpRequest(std::string _body="") {
         body = _body;
     }
+
+    void withHeader(const std::string &name, const std::string &value) {
+        headers.set(name, value);
+    }
 };
