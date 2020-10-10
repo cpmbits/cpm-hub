@@ -23,7 +23,8 @@
 using namespace std;
 
 
-TEST_GROUP(AccessFileAuthenticator) {
+TEST_GROUP(AccessFileAuthenticator)
+{
     void teardown()
     {
         mock().clear();
