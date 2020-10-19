@@ -15,222 +15,245 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <mocks/cpputest.h>
 #include <fakeit/fakeit.hpp>
 
 #include <base64/base64.h>
 #include <bits/BitIndex.h>
 #include <bits/BitsRepositoryInFilesystem.h>
 
-using namespace cest;
-using namespace fakeit;
 using namespace std;
+using namespace fakeit;
+
+TEST_GROUP(BitsRepositoryInFilesystem)
+{
+};
 
 
-describe("Bits Repository in file system", []() {
-    it("stores and indexes one bit", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, stores_and_indexes_one_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, writeFile)).AlwaysReturn();
 
-        repository.add(bit);
+    repository.add(bit);
 
-        Verify(Method(mock_filesystem, createDirectory).Using("./user/cest/1.0"));
-        Verify(Method(mock_filesystem, writeFile).Using("./user/cest/1.0/cest.zip", "bit payload"));
-        Verify(Method(mock_filesystem, writeFile).Using(
-            "./user/cest/1.0/cest.json", 
-            "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
-        ));
-        Verify(Method(mock_filesystem, writeFile).Using(
-            "./index.json",
-            "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
-        ));
-    });
+    Verify(Method(filesystem, createDirectory).Using("./user/cest/1.0"));
+    Verify(Method(filesystem, writeFile).Using(
+        "./user/cest/1.0/cest.zip",
+        "bit payload"
+    ));
+    Verify(Method(filesystem, writeFile).Using(
+        "./user/cest/1.0/cest.json",
+        "{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}"
+    ));
+    Verify(Method(filesystem, writeFile).Using(
+        "./index.json",
+        "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
+    ));
+}
 
-    it("stores a new version of a given bit", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit bit("cest", "0.1", "user", "Yml0IHBheWxvYWQ=");
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        repository.add(bit);
-        bit = Bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, stores_a_new_version_of_a_given_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit bit("cest", "0.1", "user", "Yml0IHBheWxvYWQ=");
 
-        repository.add(bit);
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, writeFile)).AlwaysReturn();
+    repository.add(bit);
+    bit = Bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
 
-        Verify(Method(mock_filesystem, writeFile).Using(
-            "./index.json",
-            "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
-        )).AtLeastOnce();
-        Verify(Method(mock_filesystem, writeFile).Using(
-            "./index.json",
-            "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
-        )).AtLeastOnce();
-    });
+    repository.add(bit);
 
-    it("doesn't find a non existent bit", []() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Optional<Bit> bit;
+    Verify(Method(filesystem, writeFile).Using(
+        "./index.json",
+        "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
+    )).AtLeastOnce();
+    Verify(Method(filesystem, writeFile).Using(
+        "./index.json",
+        "{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}"
+    )).AtLeastOnce();
+}
 
-        bit = repository.bitBy("cest");
 
-        expect(bit.isPresent()).toBe(false);
-    });
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, does_not_find_a_non_existent_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Optional<Bit> bit;
 
-    it("finds an indexed bit", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
-        Optional<Bit> bit;
+    bit = repository.bitBy("cest");
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"user/cest/1.0"});
-        When(Method(mock_filesystem, readFile))
-                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("bit payload");
+    ASSERT_FALSE(bit.isPresent());
+}
 
-        repository.add(cest_bit);
 
-        bit = repository.bitBy("cest");
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit cest_bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
+    Optional<Bit> bit;
 
-        expect(bit.isPresent()).toBe(true);
-        expect(bit.value().metadata.name).toBe("cest");
-        expect(bit.value().metadata.version).toBe("1.0");
-        expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
-    });
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, writeFile)).AlwaysReturn();
+    When(Method(filesystem, listDirectories)).Return(list<string>{"user/cest/1.0"});
+    When(Method(filesystem, readFile))
+            .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
+            .Return("bit payload");
 
-    it("doesn't restore index when repository doesn't have an index file", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Optional<Bit> bit;
-        Optional<string> directory;
+    repository.add(cest_bit);
 
-        When(Method(mock_filesystem, fileExists)).Return(false);
+    bit = repository.bitBy("cest");
 
-        repository.restore(".");
-    });
+    ASSERT_TRUE(bit.isPresent());
+    ASSERT_STRING("cest", bit.value().metadata.name);
+    ASSERT_STRING("1.0", bit.value().metadata.version);
+    ASSERT_STRING("user", bit.value().metadata.user_name);
+    ASSERT_STRING("Yml0IHBheWxvYWQ=", bit.value().payload);
+}
 
-    it("finds an indexed bit after index was restored from filesystem from version 0", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Optional<Bit> bit;
-        Optional<string> directory;
 
-        When(Method(mock_filesystem, fileExists)).Return(true);
-        When(Method(mock_filesystem, readFile))
-                .Return("{\"cest\":\"user/cest/1.0\"}")
-                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("bit payload");
-        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, does_not_restore_index_when_repository_does_not_have_an_index_file)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Optional<Bit> bit;
+    Optional<string> directory;
 
-        repository.restore(".");
-        bit = repository.bitBy("cest");
+    When(Method(filesystem, fileExists)).Return(false);
 
-        expect(bit.value().metadata.name).toBe("cest");
-        expect(bit.value().metadata.version).toBe("1.0");
-        expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
-    });
+    repository.restore(".");
+}
 
-    it("finds an indexed bit after index was restored from filesystem from version 1", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Optional<Bit> bit;
 
-        When(Method(mock_filesystem, fileExists)).Return(true);
-        When(Method(mock_filesystem, readFile))
-                .Return("{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}")
-                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
-                .Return("bit payload");
-        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit_after_index_was_restored_from_filesystem_from_version_0)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Optional<Bit> bit;
+    Optional<string> directory;
 
-        repository.restore(".");
-        bit = repository.bitBy("cest");
+    When(Method(filesystem, fileExists)).Return(true);
+    When(Method(filesystem, readFile))
+            .Return("{\"cest\":\"user/cest/1.0\"}")
+            .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
+            .Return("bit payload");
+    When(Method(filesystem, listDirectories)).Return(list<string>{"1.0"});
 
-        expect(bit.value().metadata.name).toBe("cest");
-        expect(bit.value().metadata.version).toBe("1.0");
-        expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
-    });
+    repository.restore(".");
+    bit = repository.bitBy("cest");
 
-    it("finds given version of an indexed bit", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
-        Optional<Bit> bit;
+    ASSERT_STRING("cest", bit.value().metadata.name);
+    ASSERT_STRING("1.0", bit.value().metadata.version);
+    ASSERT_STRING("user", bit.value().metadata.user_name);
+    ASSERT_STRING("Yml0IHBheWxvYWQ=", bit.value().payload);
+}
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, directoryExists)).Return(true);
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        When(Method(mock_filesystem, readFile))
-                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}")
-                .Return("bit payload");
 
-        repository.add(cest_bit);
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit_after_index_was_restored_from_filesystem_from_version_1)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Optional<Bit> bit;
 
-        bit = repository.bitBy("cest", "1.1");
+    When(Method(filesystem, fileExists)).Return(true);
+    When(Method(filesystem, readFile))
+            .Return("{\"__version__\":\"1\",\"cest\":{\"directory\":\"user/cest\",\"username\":\"user\"}}")
+            .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.0\"}")
+            .Return("bit payload");
+    When(Method(filesystem, listDirectories)).Return(list<string>{"1.0"});
 
-        Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.1"));
-        expect(bit.isPresent()).toBe(true);
-        expect(bit.value().metadata.name).toBe("cest");
-        expect(bit.value().metadata.version).toBe("1.1");
-        expect(bit.value().metadata.user_name).toBe("user");
-        expect(bit.value().payload).toBe("Yml0IHBheWxvYWQ=");
-    });
+    repository.restore(".");
+    bit = repository.bitBy("cest");
 
-    it("fails to find non existent version of a bit", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
-        Optional<Bit> bit;
+    ASSERT_STRING("cest", bit.value().metadata.name);
+    ASSERT_STRING("1.0", bit.value().metadata.version);
+    ASSERT_STRING("user", bit.value().metadata.user_name);
+    ASSERT_STRING("Yml0IHBheWxvYWQ=", bit.value().payload);
+}
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, directoryExists)).Return(false);
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
 
-        repository.add(cest_bit);
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_given_version_of_an_indexed_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
+    Optional<Bit> bit;
 
-        bit = repository.bitBy("cest", "1.0");
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, directoryExists)).Return(true);
+    When(Method(filesystem, writeFile)).AlwaysReturn();
+    When(Method(filesystem, readFile))
+            .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}")
+            .Return("bit payload");
 
-        Verify(Method(mock_filesystem, directoryExists).Using("./user/cest/1.0"));
-        expect(bit.isPresent()).toBe(false);
-    });
+    repository.add(cest_bit);
 
-    it("returns search results with one bit when search matches", [&]() {
-        Mock<Filesystem> mock_filesystem;
-        BitIndex bit_index;
-        BitsRepositoryInFilesystem repository(&mock_filesystem.get(), &bit_index);
-        Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
-        list<BitMetadata> search_results;
+    bit = repository.bitBy("cest", "1.1");
 
-        When(Method(mock_filesystem, createDirectory)).AlwaysReturn();
-        When(Method(mock_filesystem, directoryExists)).Return(true);
-        When(Method(mock_filesystem, writeFile)).AlwaysReturn();
-        When(Method(mock_filesystem, readFile))
-                .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}");
-        When(Method(mock_filesystem, listDirectories)).Return(list<string>{"1.0"});
+    Verify(Method(filesystem, directoryExists).Using("./user/cest/1.1"));
+    ASSERT_TRUE(bit.isPresent());
+    ASSERT_STRING("cest", bit.value().metadata.name);
+    ASSERT_STRING("1.1", bit.value().metadata.version);
+    ASSERT_STRING("user", bit.value().metadata.user_name);
+    ASSERT_STRING("Yml0IHBheWxvYWQ=", bit.value().payload);
+}
 
-        repository.add(cest_bit);
 
-        search_results = repository.search(BitSearchQuery{"cest"});
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, fails_to_find_non_existent_version_of_a_bit)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
+    Optional<Bit> bit;
 
-        expect(search_results.size()).toBe(1);
-        expect(search_results.front().name).toBe("cest");
-    });
-});
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, directoryExists)).Return(false);
+    When(Method(filesystem, writeFile)).AlwaysReturn();
+
+    repository.add(cest_bit);
+
+    bit = repository.bitBy("cest", "1.0");
+
+    Verify(Method(filesystem, directoryExists).Using("./user/cest/1.0"));
+    ASSERT_FALSE(bit.isPresent());
+}
+
+
+TEST_WITH_MOCK(BitsRepositoryInFilesystem, returns_search_results_with_one_bit_when_search_matches)
+{
+    Mock<Filesystem> filesystem;
+    BitIndex bit_index;
+    BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
+    Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
+    list<BitMetadata> search_results;
+
+    When(Method(filesystem, createDirectory)).AlwaysReturn();
+    When(Method(filesystem, directoryExists)).Return(true);
+    When(Method(filesystem, writeFile)).AlwaysReturn();
+    When(Method(filesystem, readFile))
+            .Return("{\"name\":\"cest\",\"user_name\":\"user\",\"version\":\"1.1\"}");
+    When(Method(filesystem, listDirectories)).Return(list<string>{"1.0"});
+
+    repository.add(cest_bit);
+
+    search_results = repository.search(BitSearchQuery{"cest"});
+
+    ASSERT_EQUAL(1, search_results.size());
+    ASSERT_STRING("cest", search_results.front().name);
+}

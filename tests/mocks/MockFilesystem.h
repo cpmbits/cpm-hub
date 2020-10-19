@@ -26,7 +26,10 @@
 class MockFilesystem: public Filesystem {
 public:
     void writeFile(std::string file_name, std::string contents) {
-        mock().actualCall("Filesystem.writeFile");
+        mock().actualCall("Filesystem.writeFile")
+              .withParameter("file_name", file_name.c_str())
+              .withParameter("contents", contents.c_str())
+              .returnStringValue();
     }
 
     std::string readFile(std::string file_name) {
@@ -36,7 +39,8 @@ public:
     }
 
     void createDirectory(std::string path) {
-        mock().actualCall("Filesystem.createDirectory");
+        mock().actualCall("Filesystem.createDirectory")
+              .withParameter("path", path.c_str());
     }
 
     std::list<std::string> listDirectories(std::string path) {
