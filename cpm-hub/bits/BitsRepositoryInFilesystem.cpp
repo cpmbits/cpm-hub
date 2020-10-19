@@ -100,7 +100,7 @@ Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name)
         return bit;
     }
 
-    bit_directory = latestVersionDirectory(this->directory + "/" + index_directory.value());
+    bit_directory = latestVersionDirectory(bitBaseDirectory(index_directory.value()));
     BitMetadata metadata = this->loadMetadata(name, bit_directory);
     string payload = this->loadPayload(name, bit_directory);
     bit = Bit(name, metadata.version, metadata.user_name, payload);
@@ -109,11 +109,23 @@ Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name)
 }
 
 
-string BitsRepositoryInFilesystem::latestVersionDirectory(string base_directory)
+string BitsRepositoryInFilesystem::bitBaseDirectory(const string& bit_name)
 {
-    list<string> versions = filesystem->listDirectories(base_directory);
+    return this->directory + "/" + bit_name;
+}
+
+
+string BitsRepositoryInFilesystem::latestVersionDirectory(const string& base_directory)
+{
+    list<string> versions = allVersionsForBit(base_directory);
     versions.sort();
     return versions.back();
+}
+
+
+list<string> BitsRepositoryInFilesystem::allVersionsForBit(const string &base_directory)
+{
+    return filesystem->listDirectories(base_directory);
 }
 
 
@@ -128,7 +140,7 @@ Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name, string version)
         return bit;
     }
 
-    bit_directory = this->directory + "/" + base_directory.value() + "/" + version;
+    bit_directory = bitBaseDirectory(base_directory.value()) + "/" + version;
     if (!this->filesystem->directoryExists(bit_directory)) {
         return bit;
     }
@@ -161,6 +173,14 @@ BitMetadata BitsRepositoryInFilesystem::loadMetadata(const string& name, string 
 list<Bit> BitsRepositoryInFilesystem::allBits()
 {
     list<Bit> bits;
+    list<BitIndexEntry> indexed_bits;
+
+    for (auto &index_entry: this->index->allIndexedBits()) {
+        for (auto &bit_version: allVersionsForBit(bitBaseDirectory(index_entry.directory))) {
+            bits.push_back(bitBy(index_entry.name, bit_version).value());
+        }
+    }
+
     return bits;
 }
 

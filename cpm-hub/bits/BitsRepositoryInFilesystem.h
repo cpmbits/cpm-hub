@@ -56,5 +56,9 @@ private:
 
     BitMetadata loadMetadata(const std::string& name, std::string bit_directory);
 
-    std::string latestVersionDirectory(std::string base_directory);
+    std::string latestVersionDirectory(const std::string& base_directory);
+
+    std::list<std::string> allVersionsForBit(const std::string &base_directory);
+
+    std::string bitBaseDirectory(const std::string& bit_name);
 };
