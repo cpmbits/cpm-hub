@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
 #include <json/json.hpp>
 #include <base64/base64.h>
 #include <bits/BitsRepositoryInFilesystem.h>
@@ -176,8 +175,10 @@ list<Bit> BitsRepositoryInFilesystem::allBits()
     list<BitIndexEntry> indexed_bits;
 
     for (auto &index_entry: this->index->allIndexedBits()) {
-        for (auto &bit_version: allVersionsForBit(bitBaseDirectory(index_entry.directory))) {
-            bits.push_back(bitBy(index_entry.name, bit_version).value());
+        for (auto &bit_version_directory: allVersionsForBit(bitBaseDirectory(index_entry.directory))) {
+            BitMetadata metadata = this->loadMetadata(index_entry.name, bit_version_directory);
+            string payload = this->loadPayload(index_entry.name, bit_version_directory);
+            bits.push_back(Bit(index_entry.name, metadata.version, metadata.user_name, payload));
         }
     }
 
