@@ -76,7 +76,7 @@ static Bit bitFromSqlRow(SqlRow row)
 
 static BitMetadata bitMetadataFromSqlRow(SqlRow row)
 {
-    return BitMetadata(row["name"],row["version"],row["user_name"]);
+    return BitMetadata(row["name"],row["user_name"], row["version"]);
 }
 
 
