@@ -84,7 +84,7 @@ void BitsRepositoryInSqlite::add(Bit &bit)
 {
     ostringstream string_stream;
 
-    string_stream << "INSERT INTO bits VALUES ("
+    string_stream << "INSERT INTO " << bits_table << " VALUES ("
                   << "'" << bit.metadata.name << "',"
                   << "'" << bit.metadata.version << "',"
                   << "'" << bit.metadata.user_name << "',"

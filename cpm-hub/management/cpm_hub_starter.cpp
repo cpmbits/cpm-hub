@@ -56,6 +56,8 @@ static void migrateBitsRepository(BitsRepository *bits_repository, ProgramOption
     for (auto &bit: all_bits) {
         bits_repository->add(bit);
     }
+
+    INFO("Migrated all bits to SQLite database");
 }
 
 
