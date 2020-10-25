@@ -18,14 +18,14 @@
 #pragma once
 
 #include <bits/BitsRepository.h>
-#include <database/Sqlite3SqlDatabase.h>
+#include <database/SqlDatabaseSqlite3.h>
 
 #include <utility>
 
 
 class BitsRepositoryInSqlite: public BitsRepository {
 public:
-     BitsRepositoryInSqlite(std::string filename);
+     BitsRepositoryInSqlite(SqlDatabaseSqlite3 *database);
 
     void add(Bit &bit);
 
@@ -38,6 +38,12 @@ public:
     std::list<Bit> allBits();
 
 private:
-    Sqlite3SqlDatabase database;
+    SqlDatabaseSqlite3 *database;
+
+    void sanitizeDatabase();
+
+    void createBitsTable();
+
+    void sanitizeBitsTableColumns();
 };
 

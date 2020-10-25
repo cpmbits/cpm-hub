@@ -21,15 +21,17 @@
 #include <database/SqlDatabase.h>
 
 
-class Sqlite3SqlDatabase: public SqlDatabase {
+class SqlDatabaseSqlite3: public SqlDatabase {
 public:
-    Sqlite3SqlDatabase(std::string file);
+    SqlDatabaseSqlite3(std::string file);
 
-    ~Sqlite3SqlDatabase();
+    ~SqlDatabaseSqlite3();
 
     virtual void execute(std::string query);
 
     virtual void createTable(std::string query);
+
+    virtual bool hasColumn(std::string table, std::string column);
 
     virtual void insert(std::string query);
 

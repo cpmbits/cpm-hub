@@ -15,134 +15,180 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <mocks/cpputest.h>
 
 #include <bits/BitsRepositoryInSqlite.h>
 
-using namespace cest;
+
+TEST_GROUP(BitsRepositoryInSqlite)
+{
+};
 
 
-describe("Bits Repository in Memory", []() {
-    it("stores a bit", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit bit("cest");
+TEST_WITH_MOCK(BitsRepositoryInSqlite, stores_a_bit)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit bit("cest");
 
-        repository.add(bit);
-    });
+    repository.add(bit);
+}
 
-    it("lists stored bits", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit bit("cest");
-        std::list<Bit> stored_bits;
 
-        repository.add(bit);
+TEST_WITH_MOCK(BitsRepositoryInSqlite, lists_stored_bits)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit bit("cest");
+    std::list<Bit> stored_bits;
 
-        stored_bits = repository.allBits();
+    repository.add(bit);
 
-        expect(stored_bits.size()).toBe(1);
-    });
+    stored_bits = repository.allBits();
 
-    it("doesn't find a bit when it's not stored", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Optional<Bit> bit;
+    ASSERT_EQUAL(1, stored_bits.size());
+}
 
-        bit = repository.bitBy("cest");
 
-        expect(bit.isPresent()).toBe(false);
-    });
+TEST_WITH_MOCK(BitsRepositoryInSqlite, doesnt_find_a_bit_when_its_not_stored)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Optional<Bit> bit;
 
-    it("finds the bit with the same name when one bit is stored", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit bit("cest");
-        Optional<Bit> stored_bit;
+    bit = repository.bitBy("cest");
 
-        repository.add(bit);
+    ASSERT_FALSE(bit.isPresent());
+}
 
-        stored_bit = repository.bitBy("cest");
 
-        expect(stored_bit.isPresent()).toBe(true);
-        expect(stored_bit.value().metadata.name).toBe(bit.metadata.name);
-    });
+TEST_WITH_MOCK(BitsRepositoryInSqlite, finds_the_bit_with_the_same_name_when_one_bit_is_stored)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit bit("cest");
+    Optional<Bit> stored_bit;
 
-    it("finds the bit with the same name when many bits are stored", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit cest_bit("cest"), fakeit_bit("fakeit");
-        Optional<Bit> stored_bit;
+    repository.add(bit);
 
-        repository.add(cest_bit);
-        repository.add(fakeit_bit);
+    stored_bit = repository.bitBy("cest");
 
-        stored_bit = repository.bitBy("fakeit");
+    ASSERT_TRUE(stored_bit.isPresent());
+    ASSERT_STRING(bit.metadata.name, stored_bit.value().metadata.name);
+}
 
-        expect(stored_bit.value().metadata.name).toBe(fakeit_bit.metadata.name);
-    });
 
-    it("doesn't find a bit given version when it's not stored", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit cest_bit("cest");
-        Optional<Bit> stored_bit;
+TEST_WITH_MOCK(BitsRepositoryInSqlite, finds_the_bit_with_the_same_name_when_many_bits_are_stored)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit cest_bit("cest"), fakeit_bit("fakeit");
+    Optional<Bit> stored_bit;
 
-        cest_bit.metadata.version = "1.0";
-        repository.add(cest_bit);
+    repository.add(cest_bit);
+    repository.add(fakeit_bit);
 
-        stored_bit = repository.bitBy("cest", "1.1");
+    stored_bit = repository.bitBy("fakeit");
 
-        expect(stored_bit.isPresent()).toBe(false);
-    });
+    ASSERT_STRING(fakeit_bit.metadata.name, stored_bit.value().metadata.name);
+}
 
-    it("gets a bit given version when it's stored", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit cest_bit_1_0("cest");
-        Bit cest_bit_1_1("cest");
-        Optional<Bit> stored_bit;
 
-        cest_bit_1_1.metadata.version = "1.1";
-        repository.add(cest_bit_1_1);
-        cest_bit_1_0.metadata.version = "1.0";
-        repository.add(cest_bit_1_0);
+TEST_WITH_MOCK(BitsRepositoryInSqlite, doesnt_find_a_bit_given_version_when_its_not_stored)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit cest_bit("cest");
+    Optional<Bit> stored_bit;
 
-        stored_bit = repository.bitBy("cest", "1.1");
+    cest_bit.metadata.version = "1.0";
+    repository.add(cest_bit);
 
-        expect(stored_bit.isPresent()).toBe(true);
-        expect(stored_bit.value().metadata.version).toBe("1.1");
-    });
+    stored_bit = repository.bitBy("cest", "1.1");
 
-    it("gets the latest version of a bit when many are stored but version is not specified", [&]() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit cest_bit_1_0("cest");
-        Bit cest_bit_1_1("cest");
-        Optional<Bit> stored_bit;
+    ASSERT_FALSE(stored_bit.isPresent());
+}
 
-        cest_bit_1_1.metadata.version = "1.1";
-        repository.add(cest_bit_1_1);
-        cest_bit_1_0.metadata.version = "1.0";
-        repository.add(cest_bit_1_0);
 
-        stored_bit = repository.bitBy("cest");
+TEST_WITH_MOCK(BitsRepositoryInSqlite, gets_a_bit_given_version_when_its_stored)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit cest_bit_1_0("cest");
+    Bit cest_bit_1_1("cest");
+    Optional<Bit> stored_bit;
 
-        expect(stored_bit.isPresent()).toBe(true);
-        expect(stored_bit.value().metadata.version).toBe("1.1");
-    });
+    cest_bit_1_1.metadata.version = "1.1";
+    repository.add(cest_bit_1_1);
+    cest_bit_1_0.metadata.version = "1.0";
+    repository.add(cest_bit_1_0);
 
-    it("returns empty list when searching for bits and repository is empty", []() {
-        BitsRepositoryInSqlite repository(":memory:");
-        BitSearchQuery search_query;
+    stored_bit = repository.bitBy("cest", "1.1");
 
-        expect(repository.search(search_query).size()).toBe(0);
-    });
+    ASSERT_TRUE(stored_bit.isPresent());
+    ASSERT_STRING("1.1", stored_bit.value().metadata.version);
+}
 
-    it("returns list with bit found when searching for bits and repository contains one matching bit", []() {
-        BitsRepositoryInSqlite repository(":memory:");
-        Bit cest_bit("cest");
-        BitSearchQuery search_query;
-        std::list<BitMetadata> found_bits;
 
-        search_query.name = "cest";
-        repository.add(cest_bit);
+TEST_WITH_MOCK(BitsRepositoryInSqlite, gets_the_latest_version_of_a_bit_when_many_are_stored_but_version_is_not_specified)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit cest_bit_1_0("cest");
+    Bit cest_bit_1_1("cest");
+    Optional<Bit> stored_bit;
 
-        found_bits = repository.search(search_query);
+    cest_bit_1_1.metadata.version = "1.1";
+    repository.add(cest_bit_1_1);
+    cest_bit_1_0.metadata.version = "1.0";
+    repository.add(cest_bit_1_0);
 
-        expect(found_bits.size()).toBe(1);
-        expect(found_bits.front().name).toBe("cest");
-    });
-});
+    stored_bit = repository.bitBy("cest");
+
+    ASSERT_TRUE(stored_bit.isPresent());
+    ASSERT_STRING("1.1", stored_bit.value().metadata.version);
+}
+
+
+TEST_WITH_MOCK(BitsRepositoryInSqlite, returns_empty_list_when_searching_for_bits_and_repository_is_empty)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    BitSearchQuery search_query;
+
+    ASSERT_EQUAL(0, repository.search(search_query).size())
+}
+
+
+TEST_WITH_MOCK(BitsRepositoryInSqlite, returns_list_with_bit_found_when_searching_for_bits_and_repository_contains_one_matching_bit)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite repository(&database);
+    Bit cest_bit("cest");
+    BitSearchQuery search_query;
+    std::list<BitMetadata> found_bits;
+
+    search_query.name = "cest";
+    repository.add(cest_bit);
+
+    found_bits = repository.search(search_query);
+
+    ASSERT_EQUAL(1, found_bits.size());
+    ASSERT_STRING("cest", found_bits.front().name);
+}
+
+
+TEST_WITH_MOCK(BitsRepositoryInSqlite, sanitizes_bits_table_when_there_are_missing_columns)
+{
+    SqlDatabaseSqlite3 database(":memory:");
+    BitsRepositoryInSqlite *repository;
+
+    database.execute("CREATE TABLE bits (name varchar(255), version varchar(255), PRIMARY KEY(name, version) )");
+    repository = new BitsRepositoryInSqlite(&database);
+
+    ASSERT_TRUE(database.hasColumn("bits", "version"));
+    ASSERT_TRUE(database.hasColumn("bits", "user_name"));
+    ASSERT_TRUE(database.hasColumn("bits", "payload"));
+
+    delete repository;
+}

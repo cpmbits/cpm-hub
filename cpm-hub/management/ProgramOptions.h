@@ -32,7 +32,14 @@ struct ProgramOptions {
         INFLUXDB,
     };
 
+    enum BitsRepositoryType {
+        BITS_REPOSITORY_FILESYSTEM,
+        BITS_REPOSITORY_SQLITE,
+    };
+
+    BitsRepositoryType bits_repository_type = BITS_REPOSITORY_FILESYSTEM;
     std::string bits_directory = ".";
+    std::string sqlite_database = "bits.db";
     AuthenticatorType authenticator_type = UNAUTHENTICATED;
     std::string access_file = ".access";
     std::string cpm_hub_url = "http://localhost:1234";

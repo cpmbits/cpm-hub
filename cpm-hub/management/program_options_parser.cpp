@@ -33,6 +33,11 @@ map<string, ProgramOptions::KpiSinkType> string_to_kpi_sink = {
         {"influxdb", ProgramOptions::INFLUXDB},
 };
 
+map<string, ProgramOptions::BitsRepositoryType> string_to_bits_repository_type = {
+        {"filesystem", ProgramOptions::BITS_REPOSITORY_FILESYSTEM},
+        {"sqlite", ProgramOptions::BITS_REPOSITORY_SQLITE},
+};
+
 
 static ProgramOptions parseIniFile(string &ini_file)
 {
@@ -40,6 +45,8 @@ static ProgramOptions parseIniFile(string &ini_file)
     INIReader ini_reader(ini_file);
 
     program_options.bits_directory = ini_reader.Get("Service", "bits_directory", ".");
+    program_options.sqlite_database = ini_reader.Get("Service", "sqlite_database", "bits.db");
+    program_options.bits_repository_type = string_to_bits_repository_type[ini_reader.Get("Service", "bits_repository_type", "filesystem")];
     program_options.http_service_ip = ini_reader.Get("Service", "ip_bind", "127.0.0.1");
     program_options.http_service_port = ini_reader.GetInteger("Service", "port", 8000);
     program_options.authenticator_type = string_to_authenticator_type[ini_reader.Get("Service", "authentication", "unauthenticated")];
