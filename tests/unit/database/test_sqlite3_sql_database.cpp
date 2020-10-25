@@ -15,35 +15,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <cest/cest.h>
+#include <mocks/cpputest.h>
 
-#include <database/Sqlite3SqlDatabase.h>
+#include <database/SqlDatabaseSqlite3.h>
 
-using namespace cest;
 using namespace std;
 
 
-describe("Sqlite3 Database", []() {
-    it("finds a sqlite3 database row after insertion", []() {
-        list<SqlRow> selectResult;
-        Sqlite3SqlDatabase database(":memory:");
+TEST_GROUP(SqlDatabaseSqlite3) {
+};
 
-        database.createTable("CREATE TABLE users (name varchar(255), age int)");
-        database.insert("INSERT INTO users VALUES ('fulano', 18)");
-        selectResult = database.select("SELECT * FROM users");
 
-        expect(selectResult.size()).toBe(1);
-        expect(selectResult.front()["name"]).toBe("fulano");
-        expect(selectResult.front()["age"]).toBe("18");
-    });
+TEST_WITH_MOCK(SqlDatabaseSqlite3, finds_a_sqlite3_database_row_after_insertion)
+{
+    list<SqlRow> selectResult;
+    SqlDatabaseSqlite3 database(":memory:");
 
-    it("gets an empty list when select finds zero elements", []() {
-        list<SqlRow> selectResult;
-        Sqlite3SqlDatabase database(":memory:");
+    database.createTable("CREATE TABLE users (name varchar(255), age int)");
+    database.insert("INSERT INTO users VALUES ('fulano', 18)");
+    selectResult = database.select("SELECT * FROM users");
 
-        database.createTable("CREATE TABLE users (name varchar(255), age int)");
-        selectResult = database.select("SELECT * FROM users");
+    ASSERT_EQUAL(1, selectResult.size());
+    ASSERT_STRING("fulano", selectResult.front()["name"]);
+    ASSERT_STRING("18", selectResult.front()["age"]);
+}
 
-        expect(selectResult.size()).toBe(0);
-    });
-});
+
+TEST_WITH_MOCK(SqlDatabaseSqlite3, gets_an_empty_list_when_select_finds_zero_elements)
+{
+    list<SqlRow> selectResult;
+    SqlDatabaseSqlite3 database(":memory:");
+
+    database.createTable("CREATE TABLE users (name varchar(255), age int)");
+    selectResult = database.select("SELECT * FROM users");
+
+    ASSERT_EQUAL(0, selectResult.size());
+}
+
+
+TEST_WITH_MOCK(SqlDatabaseSqlite3, reports_when_a_table_column_exists)
+{
+    list<SqlRow> selectResult;
+    SqlDatabaseSqlite3 database(":memory:");
+
+    database.createTable("CREATE TABLE users (name varchar(255), age int)");
+
+    ASSERT_FALSE(database.hasColumn("usuarios", "columna"));
+    ASSERT_FALSE(database.hasColumn("users", "columna"));
+    ASSERT_TRUE(database.hasColumn("users", "name"));
+}

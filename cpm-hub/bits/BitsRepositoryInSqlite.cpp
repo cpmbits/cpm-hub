@@ -19,17 +19,52 @@
 #include <bits/BitsRepositoryInSqlite.h>
 
 using namespace std;
+static struct SqlColumn database_columns[] = {
+    { "name", "varchar(255)" },
+    { "version", "varchar(255)" },
+    { "user_name", "varchar(255)" },
+    { "payload", "text" },
+};
+static const string bits_table = "bits";
 
 
-BitsRepositoryInSqlite::BitsRepositoryInSqlite(string filename): database(move(filename))
+BitsRepositoryInSqlite::BitsRepositoryInSqlite(SqlDatabaseSqlite3 *database)
 {
-    database.createTable(
-            "CREATE TABLE bits ("
-                                      "name varchar(255), "
-                                      "version varchar(255), "
-                                      "user_name varchar(255), "
-                                      "payload text,"
-                                      "PRIMARY KEY(name, version) )");
+    this->database = database;
+    sanitizeDatabase();
+}
+
+
+void BitsRepositoryInSqlite::sanitizeDatabase()
+{
+    createBitsTable();
+    sanitizeBitsTableColumns();
+
+}
+
+void BitsRepositoryInSqlite::createBitsTable()
+{
+    stringstream create_table_query;
+
+    create_table_query << "CREATE TABLE IF NOT EXISTS " << bits_table << " (";
+    for (auto &column: database_columns) {
+        create_table_query << column.name << " " << column.type << ", ";
+    }
+    create_table_query << "PRIMARY KEY(name, version) )";
+
+    database->createTable(create_table_query.str());
+}
+
+
+void BitsRepositoryInSqlite::sanitizeBitsTableColumns()
+{
+    for (auto &column: database_columns) {
+        if (!database->hasColumn(bits_table, column.name)) {
+            stringstream add_column_query;
+            add_column_query << "ALTER TABLE " << bits_table << " ADD COLUMN " << column.name << " " << column.type;
+            database->execute(add_column_query.str());
+        }
+    }
 }
 
 
@@ -56,7 +91,7 @@ void BitsRepositoryInSqlite::add(Bit &bit)
                   << "'" << bit.payload << "'"
                   << ")";
 
-    database.insert(string_stream.str());
+    database->insert(string_stream.str());
 }
 
 
@@ -69,7 +104,7 @@ Optional<Bit> BitsRepositoryInSqlite::bitBy(string name)
     string_stream << "SELECT * FROM bits WHERE name='" << name << "' "
                   << "ORDER BY version";
 
-    rows = database.select(string_stream.str());
+    rows = database->select(string_stream.str());
     if (rows.size() > 0) {
         bit = bitFromSqlRow(rows.back());
     }
@@ -86,7 +121,7 @@ Optional<Bit> BitsRepositoryInSqlite::bitBy(string name, string version)
 
     string_stream << "SELECT * FROM bits WHERE name='" << name << "' AND version='" << version << "'";
 
-    rows = database.select(string_stream.str());
+    rows = database->select(string_stream.str());
     if (rows.size() > 0) {
         bit = bitFromSqlRow(rows.front());
     }
@@ -102,7 +137,7 @@ list<BitMetadata> BitsRepositoryInSqlite::search(BitSearchQuery search_query)
     list<BitMetadata> bits;
 
     string_stream << "SELECT name, version, user_name FROM bits WHERE name LIKE '" << search_query.name << "'";
-    rows = database.select(string_stream.str());
+    rows = database->select(string_stream.str());
     for (const auto& row: rows) {
         bits.emplace_back(bitMetadataFromSqlRow(row));
     }
@@ -110,13 +145,12 @@ list<BitMetadata> BitsRepositoryInSqlite::search(BitSearchQuery search_query)
     return bits;
 }
 
-
 list<Bit> BitsRepositoryInSqlite::allBits()
 {
     list<SqlRow> rows;
     list<Bit> bits;
 
-    rows = database.select("SELECT * FROM bits");
+    rows = database->select("SELECT * FROM bits");
     for (const auto& row: rows) {
         bits.emplace_back(bitFromSqlRow(row));
     }

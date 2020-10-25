@@ -15,26 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <iostream>
-#include <database/Sqlite3SqlDatabase.h>
+#include <sstream>
+#include <database/SqlDatabaseSqlite3.h>
+#include <cstring>
 
 using namespace std;
 
 
-Sqlite3SqlDatabase::~Sqlite3SqlDatabase()
+SqlDatabaseSqlite3::~SqlDatabaseSqlite3()
 {
     sqlite3_close(this->handle);
 }
 
 
-Sqlite3SqlDatabase::Sqlite3SqlDatabase(string file)
+SqlDatabaseSqlite3::SqlDatabaseSqlite3(string file)
 {
     this->file_path = file;
     sqlite3_open(file.c_str(), &this->handle);
 }
 
 
-void Sqlite3SqlDatabase::execute(string query)
+void SqlDatabaseSqlite3::execute(string query)
 {
     char *error_message = nullptr;
 
@@ -42,7 +43,7 @@ void Sqlite3SqlDatabase::execute(string query)
 }
 
 
-void Sqlite3SqlDatabase::createTable(string query)
+void SqlDatabaseSqlite3::createTable(string query)
 {
     char *error_message = nullptr;
 
@@ -50,13 +51,30 @@ void Sqlite3SqlDatabase::createTable(string query)
 }
 
 
-void Sqlite3SqlDatabase::insert(string query)
+static int hasColumnCallback(void *arg, int num_columns, char **values, char **names)
+{
+    char *column_name = static_cast<char *>(arg);
+    return strcmp(column_name, values[1]) == 0;
+}
+
+
+bool SqlDatabaseSqlite3::hasColumn(std::string table, std::string column)
+{
+    stringstream query;
+    char *error_message = nullptr;
+
+    query << "PRAGMA table_info('" << table << "')";
+
+    return sqlite3_exec(this->handle, query.str().c_str(), hasColumnCallback, (void *)column.c_str(), &error_message) == SQLITE_ABORT;
+}
+
+
+void SqlDatabaseSqlite3::insert(string query)
 {
     char *error_message = nullptr;
 
     sqlite3_exec(this->handle, query.c_str(), nullptr, nullptr, &error_message);
 }
-
 
 static int addRow(void *arg, int num_columns, char **values, char **names)
 {
@@ -71,8 +89,7 @@ static int addRow(void *arg, int num_columns, char **values, char **names)
     return 0;
 }
 
-
-list<SqlRow> Sqlite3SqlDatabase::select(string query)
+list<SqlRow> SqlDatabaseSqlite3::select(string query)
 {
     list<SqlRow> rows;
     char *error_message = nullptr;
@@ -81,5 +98,3 @@ list<SqlRow> Sqlite3SqlDatabase::select(string query)
 
     return rows;
 }
-
-

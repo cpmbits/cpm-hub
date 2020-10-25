@@ -23,6 +23,7 @@
 #include <management/rest_api/ManagementHttpResource.h>
 #include <management/http_routes.h>
 #include <bits/BitsRepositoryInFilesystem.h>
+#include <bits/BitsRepositoryInSqlite.h>
 #include <bits/BitsService.h>
 #include <bits/rest_api/BitsHttpResource.h>
 #include <logging/LoggerInRotatingFile.h>
@@ -42,17 +43,40 @@ static HttpClient cpm_hub_auth_client;
 Logger *logger;
 
 
-void startServiceServer(ProgramOptions &options)
+static void migrateBitsRepository(BitsRepository *bits_repository, ProgramOptions &options)
 {
     BitIndex *bit_index;
+    BitsRepository *old_bits_repository;
+    std::list<Bit> all_bits;
+
+    bit_index = new BitIndex();
+    old_bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
+
+    all_bits = old_bits_repository->allBits();
+    for (auto &bit: all_bits) {
+        bits_repository->add(bit);
+    }
+}
+
+
+void startServiceServer(ProgramOptions &options)
+{
     BitsRepository *bits_repository;
     Authenticator *bits_resource_authenticator;
     BitsService *bits_service;
     UsersService *users_service;
     UsersRepository *users_repository;
+    SqlDatabaseSqlite3 *database;
 
-    bit_index = new BitIndex();
-    bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
+    if (options.bits_repository_type == ProgramOptions::BITS_REPOSITORY_SQLITE) {
+        database = new SqlDatabaseSqlite3(options.sqlite_database);
+        bits_repository = new BitsRepositoryInSqlite(database);
+        migrateBitsRepository(bits_repository, options);
+    } else {
+        BitIndex *index = new BitIndex();
+        bits_repository = new BitsRepositoryInFilesystem(&filesystem, index, options.bits_directory);
+    }
+
     switch (options.authenticator_type) {
     case ProgramOptions::CPM_HUB_AUTHENTICATOR:
         bits_resource_authenticator = new CpmHubAuthenticator(options.cpm_hub_url, cpm_hub_auth_client);
@@ -67,6 +91,7 @@ void startServiceServer(ProgramOptions &options)
         bits_resource_authenticator = new NullAuthenticator();
         break;
     }
+
     bits_service = new BitsService(bits_repository);
     bits_resource = new BitsHttpResource(bits_service, bits_resource_authenticator);
 

@@ -23,8 +23,8 @@
 #include <utility>
 
 struct SqlColumn {
-    std::string type;
     std::string name;
+    std::string type;
 };
 
 struct SqlField {
@@ -48,6 +48,8 @@ public:
     virtual void execute(std::string query) = 0;
 
     virtual void createTable(std::string query) = 0;
+
+    virtual bool hasColumn(std::string table, std::string column) = 0;
 
     virtual void insert(std::string query) = 0;
 
