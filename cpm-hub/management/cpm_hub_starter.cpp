@@ -43,24 +43,6 @@ static HttpClient cpm_hub_auth_client;
 Logger *logger;
 
 
-static void migrateBitsRepository(BitsRepository *bits_repository, ProgramOptions &options)
-{
-    BitIndex *bit_index;
-    BitsRepository *old_bits_repository;
-    std::list<Bit> all_bits;
-
-    bit_index = new BitIndex();
-    old_bits_repository = new BitsRepositoryInFilesystem(&filesystem, bit_index, options.bits_directory);
-
-    all_bits = old_bits_repository->allBits();
-    for (auto &bit: all_bits) {
-        bits_repository->add(bit);
-    }
-
-    INFO("Migrated all bits to SQLite database");
-}
-
-
 void startServiceServer(ProgramOptions &options)
 {
     BitsRepository *bits_repository;
@@ -73,7 +55,6 @@ void startServiceServer(ProgramOptions &options)
     if (options.bits_repository_type == ProgramOptions::BITS_REPOSITORY_SQLITE) {
         database = new SqlDatabaseSqlite3(options.sqlite_database);
         bits_repository = new BitsRepositoryInSqlite(database);
-        migrateBitsRepository(bits_repository, options);
     } else {
         BitIndex *index = new BitIndex();
         bits_repository = new BitsRepositoryInFilesystem(&filesystem, index, options.bits_directory);
