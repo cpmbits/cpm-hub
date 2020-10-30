@@ -39,6 +39,8 @@ BitsHttpResource::BitsHttpResource(BitsService *bits_service, Authenticator *aut
 {
     this->bits_service = bits_service;
     this->authenticator = authenticator;
+    this->allow_origin = "*";
+    this->allow_methods = "GET";
 }
 
 
