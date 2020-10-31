@@ -168,7 +168,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, returns_list_with_bit_found_when_searchin
     BitSearchQuery search_query;
     std::list<BitMetadata> found_bits;
 
-    search_query.name = "cest";
+    search_query.name = "ces";
     repository.add(cest_bit);
 
     found_bits = repository.search(search_query);
