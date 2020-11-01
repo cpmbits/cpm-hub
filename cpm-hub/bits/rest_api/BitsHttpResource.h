@@ -42,4 +42,6 @@ private:
     HttpResponse searchForBit(HttpRequest &request);
 
     HttpResponse getBit(HttpRequest &request);
+
+    bool isValidPublicationData(BitPublicationData &publication_data);
 };

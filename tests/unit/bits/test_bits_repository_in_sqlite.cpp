@@ -165,13 +165,11 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, returns_list_with_bit_found_when_searchin
     SqlDatabaseSqlite3 database(":memory:");
     BitsRepositoryInSqlite repository(&database);
     Bit cest_bit("cest");
-    BitSearchQuery search_query;
     std::list<BitMetadata> found_bits;
 
-    search_query.name = "ces";
     repository.add(cest_bit);
 
-    found_bits = repository.search(search_query);
+    found_bits = repository.search(BitSearchQuery{"es"});
 
     ASSERT_EQUAL(1, found_bits.size());
     ASSERT_STRING("cest", found_bits.front().name);
