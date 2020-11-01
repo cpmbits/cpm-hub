@@ -5,4 +5,10 @@
 
 #include <string>
 
-bool validBitName(std::string bit_name);
+bool validBitName(const std::string& bit_name);
+
+bool validBitVersion(const std::string& version);
+
+bool validBitUsername(const std::string& username);
+
+bool validPayload(const std::string& payload);

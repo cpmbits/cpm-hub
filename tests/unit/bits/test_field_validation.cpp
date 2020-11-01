@@ -11,7 +11,7 @@ TEST_GROUP(field_validation)
 };
 
 
-TEST_WITH_MOCK(field_validation, validate_bit_name_field)
+TEST_WITH_MOCK(field_validation, validate_bit_name)
 {
     ASSERT_TRUE(validBitName("bitname"));
     ASSERT_TRUE(validBitName("bit_name"));
@@ -21,4 +21,40 @@ TEST_WITH_MOCK(field_validation, validate_bit_name_field)
     ASSERT_FALSE(validBitName("09bit_name27"));
     ASSERT_FALSE(validBitName("09bit name27"));
     ASSERT_FALSE(validBitName("09bit \";name27"));
+}
+
+
+TEST_WITH_MOCK(field_validation, validate_bit_version)
+{
+    ASSERT_TRUE(validBitVersion("1"));
+    ASSERT_TRUE(validBitVersion("12"));
+    ASSERT_TRUE(validBitVersion("1.35"));
+    ASSERT_TRUE(validBitVersion("1.35.16"));
+    ASSERT_FALSE(validBitVersion("latest"));
+    ASSERT_FALSE(validBitVersion("1."));
+    ASSERT_FALSE(validBitVersion("1.-rc14 \";name27"));
+}
+
+
+TEST_WITH_MOCK(field_validation, validate_username)
+{
+    ASSERT_TRUE(validBitUsername("johndoe"));
+    ASSERT_TRUE(validBitUsername("JohnDoe"));
+    ASSERT_TRUE(validBitUsername("JohnDoe27"));
+    ASSERT_TRUE(validBitUsername("John_Doe27"));
+    ASSERT_TRUE(validBitUsername("John-Doe27"));
+    ASSERT_TRUE(validBitUsername("John.Doe27"));
+    ASSERT_FALSE(validBitUsername("John\"Doe27"));
+    ASSERT_FALSE(validBitUsername(" John Doe27 "));
+    ASSERT_FALSE(validBitUsername("27John\"Doe27"));
+    ASSERT_FALSE(validBitUsername("27John;()Doe27"));
+}
+
+
+TEST_WITH_MOCK(field_validation, validate_payload)
+{
+    ASSERT_TRUE(validPayload("Yml0IHBheWxvYWQ="));
+    ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=\n"));
+    ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=\""));
+    ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=;"));
 }
