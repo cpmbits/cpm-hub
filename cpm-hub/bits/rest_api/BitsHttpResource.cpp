@@ -17,6 +17,7 @@
  */
 #include <json/json.hpp>
 #include <bits/rest_api/BitsHttpResource.h>
+#include <bits/rest_api/field_validation.h>
 #include <bits/BitsService.h>
 #include <authentication/UserCredentials.h>
 
@@ -48,7 +49,7 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
 {
     auto json = json::parse(request.body);
     Optional<string> user;
-    struct BitPublicationData publication_data;
+    BitPublicationData publication_data;
     UserCredentials credentials = {json.at("username"),json.at("password")};
 
     if (!this->authenticator->validCredentials(credentials)) {
@@ -60,6 +61,10 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
     publication_data.user_name = json.at("username");
     publication_data.payload = json.at("payload");
 
+    if (!isValidPublicationData(publication_data)) {
+        return HttpResponse::badRequest();
+    }
+
     if (this->bits_service->bitBy(publication_data.bit_name, publication_data.version).isPresent()) {
         return HttpResponse::conflict();
     }
@@ -67,6 +72,15 @@ HttpResponse BitsHttpResource::post(HttpRequest &request)
     bits_service->publishBit(publication_data);
 
     return HttpResponse::ok("");
+}
+
+
+bool BitsHttpResource::isValidPublicationData(BitPublicationData &publication_data)
+{
+    return validBitName(publication_data.bit_name) &&
+           validBitUsername(publication_data.user_name) &&
+           validBitVersion(publication_data.version) &&
+           validPayload(publication_data.payload);
 }
 
 
@@ -140,7 +154,6 @@ static string bitSearchResultsAsJson(list<BitMetadata> &bits_found)
 
     return json_bits.dump();
 }
-
 
 HttpResponse BitsHttpResource::searchForBit(HttpRequest &request)
 {

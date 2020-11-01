@@ -136,7 +136,7 @@ list<BitMetadata> BitsRepositoryInSqlite::search(BitSearchQuery search_query)
     list<SqlRow> rows;
     list<BitMetadata> bits;
 
-    string_stream << "SELECT name, version, user_name FROM bits WHERE name LIKE '" << search_query.name << "'";
+    string_stream << "SELECT name, version, user_name FROM bits WHERE name LIKE '%" << search_query.name << "%'";
     rows = database->select(string_stream.str());
     for (const auto& row: rows) {
         bits.emplace_back(bitMetadataFromSqlRow(row));

@@ -32,7 +32,7 @@ public:
 
     Bit(std::string name, std::string payload) {
         this->metadata.name = name;
-        this->metadata.user_name = "";
+        this->metadata.user_name = "";  // FIXME: Unify naming convention with "username" without underscore
         this->metadata.version = "";
         this->payload = payload;
     }

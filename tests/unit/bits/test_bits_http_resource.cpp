@@ -15,17 +15,52 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <list>
-
 #include <cest/cest.h>
 #include <fakeit/fakeit.hpp>
 
+#include <list>
 #include <bits/rest_api/BitsHttpResource.h>
 #include <bits/BitsService.h>
 
 using namespace cest;
 using namespace fakeit;
 using namespace std;
+
+HttpRequest post_request_with_invalid_bit_name(
+"{"
+    "\"bit_name\": \"cest'; DELETE * from bits;\","
+    "\"version\": \"1.0\","
+    "\"payload\": \"ABCD\","
+    "\"username\": \"johndoe\","
+    "\"password\": \"pass\""
+"}");
+
+HttpRequest post_request_with_invalid_version(
+"{"
+    "\"bit_name\": \"cest\","
+    "\"version\": \"dd 1.0\","
+    "\"payload\": \"ABCD\","
+    "\"username\": \"johndoe\","
+    "\"password\": \"pass\""
+"}");
+
+HttpRequest post_request_with_invalid_username(
+"{"
+    "\"bit_name\": \"cest'; DELETE * from bits;\","
+    "\"version\": \"dd 1.0\","
+    "\"payload\": \"ABCD\","
+    "\"username\": \"john} doe\","
+    "\"password\": \"pass\""
+"}");
+
+HttpRequest post_request_with_invalid_payload(
+"{"
+    "\"bit_name\": \"cest'; DELETE * from bits;\","
+    "\"version\": \"dd 1.0\","
+    "\"payload\": \"ABCD !;Eabcde\","
+    "\"username\": \"john} doe\","
+    "\"password\": \"pass\""
+"}");
 
 
 describe("Bits API", []() {
@@ -55,6 +90,18 @@ describe("Bits API", []() {
                    data.user_name == "john_doe" &&
                    data.payload == "ABCDEabcde";
         }));
+    });
+
+    it("returns status code 400 when request contains invalid fields", [&]() {
+        HttpResponse response;
+        Bit bit("");
+        Mock<BitsService> mock_service;
+        BitsHttpResource api(&mock_service.get());
+
+        expect(api.post(post_request_with_invalid_bit_name).status_code).toBe(400);
+        expect(api.post(post_request_with_invalid_version).status_code).toBe(400);
+        expect(api.post(post_request_with_invalid_username).status_code).toBe(400);
+        expect(api.post(post_request_with_invalid_payload).status_code).toBe(400);
     });
 
     it("returns error 401 when publishing a bit and authentication fails", [&]() {
