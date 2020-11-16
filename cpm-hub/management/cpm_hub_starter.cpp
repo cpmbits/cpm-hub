@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <wait.h>
 #include <authentication/AccessFileAuthenticator.h>
 #include <authentication/CpmHubAuthenticator.h>
 #include <http/HttpServer.h>
@@ -84,7 +85,7 @@ void startServiceServer(ProgramOptions &options)
 
     installServiceRoutes(service_http_server, bits_resource, users_resource);
     service_http_server.configureSecurity(options.security_options);
-    service_http_server.startAsync(options.http_service_ip, options.http_service_port);
+    service_http_server.start(options.http_service_ip, options.http_service_port);
 }
 
 
@@ -103,19 +104,34 @@ void startManagementServer(ProgramOptions &options, std::vector<std::string> com
 }
 
 
+static void start(ProgramOptions &program_options, std::vector<std::string> command_line)
+{
+    if (program_options.kpi_sink == ProgramOptions::INFLUXDB) {
+        configureKpiSink(new KpiSinkInfluxDb(program_options.influxdb_url, program_options.influxdb_db));
+    }
+
+    startServiceServer(program_options);
+}
+
+
 void startCpmHub(ProgramOptions &program_options, std::vector<std::string> command_line)
 {
+    pid_t pid;
+    int wstatus;
+
     if (!program_options.logger_file.empty()) {
         logger = new LoggerInRotatingFile(program_options.logger_file, program_options.logger_max_file_size, program_options.logger_max_files);
     } else {
         logger = new LoggerInConsole();
     }
 
-    if (program_options.kpi_sink == ProgramOptions::INFLUXDB) {
-        configureKpiSink(new KpiSinkInfluxDb(program_options.influxdb_url, program_options.influxdb_db));
-    }
-
-    startServiceServer(program_options);
-
-    startManagementServer(program_options, command_line);
+    do {
+        pid = fork();
+        if (pid == 0) {
+            start(program_options, command_line);
+        } else {
+            waitpid(pid, &wstatus, 0);
+            logger->error("cpm-hub restarted");
+        }
+    } while(true);
 }
