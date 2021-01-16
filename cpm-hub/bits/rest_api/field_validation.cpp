@@ -9,7 +9,6 @@ using namespace std;
 static const regex valid_bit_name_regex(string("[a-zA-Z][a-zA-Z0-9_]+"));
 static const regex valid_bit_version_regex(string("\\d+(\\.\\d+){0,2}"));
 static const regex valid_username_regex(string("[a-zA-Z][a-zA-Z0-9-_\\.]{1,20}"));
-static const regex valid_payload_regex(string("[a-zA-Z0-9=/+]+"));
 
 
 bool validBitName(const string& bit_name)
@@ -35,6 +34,21 @@ bool validBitUsername(const std::string& username)
 
 bool validPayload(const std::string& payload)
 {
-    smatch base_match;
-    return regex_match(payload, base_match, valid_payload_regex);
+    for (char const &c: payload) {
+        if (c >= 'a' && c <= 'z') {
+            continue;
+        }
+        if (c >= 'A' && c <= 'Z') {
+            continue;
+        }
+        if (c >= '0' && c <= '9') {
+            continue;
+        }
+        if (string("=/+").find(c) != std::string::npos) {
+            continue;
+        }
+        return false;
+    }
+
+    return true;
 }

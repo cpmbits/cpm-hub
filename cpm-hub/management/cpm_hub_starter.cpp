@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <wait.h>
+#include <sys/prctl.h>
 #include <authentication/AccessFileAuthenticator.h>
 #include <authentication/CpmHubAuthenticator.h>
 #include <http/HttpServer.h>
@@ -125,9 +126,11 @@ void startCpmHub(ProgramOptions &program_options, std::vector<std::string> comma
         logger = new LoggerInConsole();
     }
 
+
     do {
         pid = fork();
         if (pid == 0) {
+            prctl(PR_SET_PDEATHSIG, SIGTERM);
             start(program_options, command_line);
         } else {
             waitpid(pid, &wstatus, 0);
