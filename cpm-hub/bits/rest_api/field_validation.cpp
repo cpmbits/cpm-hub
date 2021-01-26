@@ -6,9 +6,9 @@
 
 using namespace std;
 
-static const regex valid_bit_name_regex(string("[a-zA-Z][a-zA-Z0-9_]+"));
+static const regex valid_bit_name_regex(string("[a-zA-Z][a-zA-Z0-9_\\-]+"));
 static const regex valid_bit_version_regex(string("\\d+(\\.\\d+){0,2}"));
-static const regex valid_username_regex(string("[a-zA-Z][a-zA-Z0-9-_\\.]{1,20}"));
+static const regex valid_username_regex(string("[a-zA-Z][a-zA-Z0-9-_\\.]{3,20}"));
 
 
 bool validBitName(const string& bit_name)
