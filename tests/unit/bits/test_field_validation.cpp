@@ -15,6 +15,7 @@ TEST_WITH_MOCK(field_validation, validate_bit_name)
 {
     ASSERT_TRUE(validBitName("bitname"));
     ASSERT_TRUE(validBitName("bit_name"));
+    ASSERT_TRUE(validBitName("bit-name"));
     ASSERT_TRUE(validBitName("bit_name27"));
     ASSERT_TRUE(validBitName("BitName2"));
     ASSERT_FALSE(validBitName("_bit_name27"));
@@ -54,6 +55,7 @@ TEST_WITH_MOCK(field_validation, validate_username)
 TEST_WITH_MOCK(field_validation, validate_payload)
 {
     ASSERT_TRUE(validPayload("Yml0IHBheWxvYWQ="));
+    ASSERT_TRUE(validPayload("Yml0I//HBheWxvYWQ=+"));
     ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=\n"));
     ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=\""));
     ASSERT_FALSE(validPayload("Yml0IHBheWxvYWQ=;"));
