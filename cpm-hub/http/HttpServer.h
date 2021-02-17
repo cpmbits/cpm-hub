@@ -40,9 +40,9 @@ public:
 
     void configureSecurity(struct HttpSecurityOptions &options);
 
-    void startAsync(std::string address, int port);
-
     void start(std::string address, int port);
+
+    void startAsync(std::string address, int port);
 
     void stop();
 

@@ -21,7 +21,6 @@
 
 
 struct UserRegistrationData {
-    std::string invitation_token;
     std::string username;
     std::string password;
     std::string email;

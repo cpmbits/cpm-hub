@@ -34,27 +34,8 @@ describe("Users HTTP Resource", []() {
         expect(users_resource.allow_origin).toBe("*");
     });
 
-    it("returns bad request when invitation token is not provided", []() {
+    it("uses the users service to register a user", []() {
         HttpRequest request("{"
-            "\"username\": \"juancho\","
-            "\"password\": \"123456\","
-            "\"email\": \"juancho@encho.com\""
-        "}");
-        HttpResponse response;
-        UserRegistrationData registration_data;
-        User user("mengano");
-        Mock<UsersService> mock_service;
-        TrivialAuthenticator authenticator;
-        UsersHttpResource users_resource(&mock_service.get());
-
-        response = users_resource.post(request);
-
-        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
-    });
-
-    it("uses the users service to register a user when provided api key is valid", []() {
-        HttpRequest request("{"
-            "\"invitation_token\": \"cafecafe\","
             "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
@@ -74,7 +55,6 @@ describe("Users HTTP Resource", []() {
         response = users_resource.post(request);
 
         expect(response.status_code).toBe(HttpStatus::OK);
-        expect(registration_data.invitation_token).toBe("cafecafe");
         expect(registration_data.username).toBe("juancho");
         expect(registration_data.password).toBe("123456");
         expect(registration_data.email).toBe("juancho@encho.com");
@@ -82,7 +62,6 @@ describe("Users HTTP Resource", []() {
 
     it("returns unauthenticated when register user raises invalid invitation token", []() {
         HttpRequest request("{"
-            "\"invitation_token\": \"cafecafe\","
             "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""
@@ -106,7 +85,6 @@ describe("Users HTTP Resource", []() {
 
     it("returns conflict when register user raises username already taken", []() {
         HttpRequest request("{"
-            "\"invitation_token\": \"cafecafe\","
             "\"username\": \"juancho\","
             "\"password\": \"123456\","
             "\"email\": \"juancho@encho.com\""

@@ -33,7 +33,7 @@ describe("Users Service", []() {
         Mock<CpmHubAuthenticator> user_authenticator;
         UsersService users_service(&mock_repository.get(), &user_authenticator.get());
         struct UserRegistrationData registration_data = {
-            "invitation_token", "sotano", "654321", "sotano@example.com"
+            "sotano", "654321", "sotano@example.com"
         };
         User stored_user("");
 
@@ -41,13 +41,13 @@ describe("Users Service", []() {
         When(Method(mock_repository, add)).AlwaysDo([&](User &user) {
             stored_user = user;
         });
-        When(Method(user_authenticator, addUserWithInvitation)).Return();
+        When(Method(user_authenticator, addUser)).Return();
 
         users_service.registerUser(registration_data);
 
         expect(stored_user.name).toBe("sotano");
         Verify(Method(mock_repository, add));
-        Verify(Method(user_authenticator, addUserWithInvitation));
+        Verify(Method(user_authenticator, addUser));
     });
 
     it("throws an exception when registering a user whose user name is taken", [&]() {
