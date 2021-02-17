@@ -38,7 +38,6 @@ HttpResponse UsersHttpResource::post(HttpRequest &request)
     Optional<string> username;
 
     try {
-        registration_data.invitation_token = json.at("invitation_token");
         registration_data.username = json.at("username");
         registration_data.password = json.at("password");
         registration_data.email = json.at("email");

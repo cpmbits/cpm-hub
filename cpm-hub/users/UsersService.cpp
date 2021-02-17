@@ -28,13 +28,17 @@ UsersService::UsersService(UsersRepository *users_repository, Authenticator *aut
 User UsersService::registerUser(UserRegistrationData &registration_data)
 {
     User user(registration_data.username);
-    UserCredentials credentials = {registration_data.username, registration_data.password};
+    UserCredentials credentials = {
+        registration_data.username,
+        registration_data.password,
+        registration_data.email,
+    };
 
     if (this->users_repository->exists(registration_data.username)) {
         throw UsernameAlreadyTaken(registration_data.username);
     }
 
-    this->authenticator->addUserWithInvitation(credentials, registration_data.invitation_token);
+    this->authenticator->addUser(credentials);
     this->users_repository->add(user);
 
     return user;
