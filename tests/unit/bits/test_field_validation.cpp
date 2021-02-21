@@ -31,6 +31,11 @@ TEST_WITH_MOCK(field_validation, validate_bit_version)
     ASSERT_TRUE(validBitVersion("12"));
     ASSERT_TRUE(validBitVersion("1.35"));
     ASSERT_TRUE(validBitVersion("1.35.16"));
+    ASSERT_TRUE(validBitVersion("1.35.16-p1"));
+    ASSERT_TRUE(validBitVersion("1.35.16-rc14"));
+    ASSERT_TRUE(validBitVersion("1.35.16-final"));
+    ASSERT_FALSE(validBitVersion("1.35.16-toolongprefixforthebitversion"));
+    ASSERT_FALSE(validBitVersion("1.35.16-prefix;with\"invaliðchar$"));
     ASSERT_FALSE(validBitVersion("latest"));
     ASSERT_FALSE(validBitVersion("1."));
     ASSERT_FALSE(validBitVersion("1.-rc14 \";name27"));
