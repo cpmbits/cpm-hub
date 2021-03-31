@@ -17,26 +17,30 @@
  */
 #pragma once
 
-#include <map>
-#include <list>
-#include <string>
-#include <bits/BitsRepository.h>
+#include <authentication/Authenticator.h>
+#include <templates/TemplatesService.h>
+#include <authentication/UserCredentials.h>
+#include <http/HttpResource.h>
 
-
-class BitsRepositoryInMemory: public BitsRepository {
+class TemplatesHttpResource: public HttpResource {
 public:
-    virtual void add(Bit &bit);
+    TemplatesHttpResource(TemplatesService *templates_service);
 
-    virtual Maybe<Bit> bitBy(std::string name);
+    TemplatesHttpResource(TemplatesService *templates_service, Authenticator *authenticator);
 
-    virtual Maybe<Bit> bitBy(std::string name, std::string version);
+    HttpResponse post(HttpRequest &request);
 
-    virtual std::list<Bit> allBits();
+    HttpResponse get(HttpRequest &request);
 
-    virtual std::list<BitMetadata> search(BitSearchQuery search_query);
+    HttpResponse listBits(HttpRequest &request);
 
 private:
-    std::map<std::string, std::list<Bit>> bits;
+    TemplatesService *templates_service;
 
-    bool bitExists(const Bit &bit) const;
+    Authenticator *authenticator;
+
+    HttpResponse searchForTemplate(HttpRequest &request);
+
+    HttpResponse getTemplate(HttpRequest &request);
+
 };

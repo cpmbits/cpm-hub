@@ -20,7 +20,7 @@
 #include <string>
 #include <list>
 
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 #include <bits/BitPublicationData.h>
 #include <bits/BitSearchQuery.h>
 #include <bits/BitsRepository.h>
@@ -34,9 +34,9 @@ public:
 
     virtual std::list<Bit> allBits();
     
-    virtual Optional<Bit> bitBy(std::string bit_name);
+    virtual Maybe<Bit> bitBy(std::string bit_name);
 
-    virtual Optional<Bit> bitBy(std::string bit_name, std::string version);
+    virtual Maybe<Bit> bitBy(std::string bit_name, std::string version);
 
     virtual std::list<BitMetadata> search(BitSearchQuery search_query);
 

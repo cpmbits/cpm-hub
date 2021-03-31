@@ -67,7 +67,7 @@ TEST_WITH_MOCK(BitIndex, indexes_many_bits)
 TEST_WITH_MOCK(BitIndex, fails_to_find_a_bit_when_it_is_not_indexed)
 {
     BitIndex bit_index;
-    Optional<string> directory;
+    Maybe<string> directory;
 
     directory = bit_index.find("cest");
 
@@ -78,7 +78,7 @@ TEST_WITH_MOCK(BitIndex, fails_to_find_a_bit_when_it_is_not_indexed)
 TEST_WITH_MOCK(BitIndex, finds_an_indexed_bit)
 {
     BitIndex bit_index;
-    Optional<string> directory;
+    Maybe<string> directory;
 
     bit_index.indexBit("cest", std::string(), "user/cest/1.0");
     bit_index.indexBit("fakeit", std::string(), "user/fakeit/3.1");

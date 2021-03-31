@@ -46,7 +46,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_ke
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")
@@ -63,7 +63,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_ke
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")
@@ -80,7 +80,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")
@@ -98,7 +98,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")
@@ -116,7 +116,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_username_when_authenticating_api
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")
@@ -135,7 +135,7 @@ TEST_WITH_MOCK(AccessFileAuthenticator, returns_empty_when_authenticating_api_ke
 {
     MockFilesystem filesystem;
     AccessFileAuthenticator access_file_authenticator(&filesystem);
-    Optional<string> username;
+    Maybe<string> username;
 
     access_file_authenticator.setAccessFile(".access");
     filesystem.expect("readFile")

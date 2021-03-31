@@ -54,7 +54,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, doesnt_find_a_bit_when_its_not_stored)
 {
     SqlDatabaseSqlite3 database(":memory:");
     BitsRepositoryInSqlite repository(&database);
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     bit = repository.bitBy("cest");
 
@@ -67,7 +67,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, finds_the_bit_with_the_same_name_when_one
     SqlDatabaseSqlite3 database(":memory:");
     BitsRepositoryInSqlite repository(&database);
     Bit bit("cest");
-    Optional<Bit> stored_bit;
+    Maybe<Bit> stored_bit;
 
     repository.add(bit);
 
@@ -83,7 +83,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, finds_the_bit_with_the_same_name_when_man
     SqlDatabaseSqlite3 database(":memory:");
     BitsRepositoryInSqlite repository(&database);
     Bit cest_bit("cest"), fakeit_bit("fakeit");
-    Optional<Bit> stored_bit;
+    Maybe<Bit> stored_bit;
 
     repository.add(cest_bit);
     repository.add(fakeit_bit);
@@ -99,7 +99,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, doesnt_find_a_bit_given_version_when_its_
     SqlDatabaseSqlite3 database(":memory:");
     BitsRepositoryInSqlite repository(&database);
     Bit cest_bit("cest");
-    Optional<Bit> stored_bit;
+    Maybe<Bit> stored_bit;
 
     cest_bit.metadata.version = "1.0";
     repository.add(cest_bit);
@@ -116,7 +116,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, gets_a_bit_given_version_when_its_stored)
     BitsRepositoryInSqlite repository(&database);
     Bit cest_bit_1_0("cest");
     Bit cest_bit_1_1("cest");
-    Optional<Bit> stored_bit;
+    Maybe<Bit> stored_bit;
 
     cest_bit_1_1.metadata.version = "1.1";
     repository.add(cest_bit_1_1);
@@ -136,7 +136,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, gets_the_latest_version_of_a_bit_when_man
     BitsRepositoryInSqlite repository(&database);
     Bit cest_bit_1_0("cest");
     Bit cest_bit_1_1("cest");
-    Optional<Bit> stored_bit;
+    Maybe<Bit> stored_bit;
 
     cest_bit_1_1.metadata.version = "1.1";
     repository.add(cest_bit_1_1);
@@ -156,7 +156,7 @@ TEST_WITH_MOCK(BitsRepositoryInSqlite, returns_empty_list_when_searching_for_bit
     BitsRepositoryInSqlite repository(&database);
     BitSearchQuery search_query;
 
-    ASSERT_EQUAL(0, repository.search(search_query).size())
+    ASSERT_EQUAL(0, repository.search(search_query).size());
 }
 
 

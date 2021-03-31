@@ -35,7 +35,7 @@ HttpResponse UsersHttpResource::post(HttpRequest &request)
     HttpResponse response(200, "");
     auto json = json::parse(request.body);
     struct UserRegistrationData registration_data;
-    Optional<string> username;
+    Maybe<string> username;
 
     try {
         registration_data.username = json.at("username");

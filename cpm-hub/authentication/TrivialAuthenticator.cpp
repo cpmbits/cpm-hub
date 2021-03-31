@@ -16,15 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <authentication/TrivialAuthenticator.h>
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 
 using namespace std;
 
 
-Optional<std::string> TrivialAuthenticator::authenticate(const char *key)
+Maybe<std::string> TrivialAuthenticator::authenticate(const char *key)
 {
     auto iter = this->credentials.find(key);
-    Optional<string> username;
+    Maybe<string> username;
 
     if (iter == this->credentials.end()) {
         return username;

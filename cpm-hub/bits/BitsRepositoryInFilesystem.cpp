@@ -88,10 +88,10 @@ void BitsRepositoryInFilesystem::saveMetadata(const string& name, const string& 
 }
 
 
-Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name)
+Maybe<Bit> BitsRepositoryInFilesystem::bitBy(string name)
 {
-    Optional<Bit> bit;
-    Optional<string> index_directory;
+    Maybe<Bit> bit;
+    Maybe<string> index_directory;
     string bit_directory;
 
     index_directory = this->index->find(name);
@@ -128,10 +128,10 @@ list<string> BitsRepositoryInFilesystem::allVersionsForBit(const string &base_di
 }
 
 
-Optional<Bit> BitsRepositoryInFilesystem::bitBy(string name, string version)
+Maybe<Bit> BitsRepositoryInFilesystem::bitBy(string name, string version)
 {
-    Optional<Bit> bit;
-    Optional<string> base_directory;
+    Maybe<Bit> bit;
+    Maybe<string> base_directory;
     string bit_directory;
 
     base_directory = this->index->find(name);

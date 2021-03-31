@@ -55,7 +55,7 @@ describe("Deploy Service", []() {
         vector<string> command_line {"cpm-hub", "-i", "cpmhub.ini"};
         string access_file("access_file.txt");
 
-        When(Method(mock_authenticator, authenticate)).Return(Optional<string>());
+        When(Method(mock_authenticator, authenticate)).Return(Maybe<string>());
         deploy_service.setCommandLine(command_line);
         deploy_service.configureAuthenticator(&mock_authenticator.get());
 

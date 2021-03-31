@@ -95,11 +95,11 @@ void BitsRepositoryInSqlite::add(Bit &bit)
 }
 
 
-Optional<Bit> BitsRepositoryInSqlite::bitBy(string name)
+Maybe<Bit> BitsRepositoryInSqlite::bitBy(string name)
 {
     ostringstream string_stream;
     list<SqlRow> rows;
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     string_stream << "SELECT * FROM bits WHERE name='" << name << "' "
                   << "ORDER BY version";
@@ -113,11 +113,11 @@ Optional<Bit> BitsRepositoryInSqlite::bitBy(string name)
 }
 
 
-Optional<Bit> BitsRepositoryInSqlite::bitBy(string name, string version)
+Maybe<Bit> BitsRepositoryInSqlite::bitBy(string name, string version)
 {
     ostringstream string_stream;
     list<SqlRow> rows;
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     string_stream << "SELECT * FROM bits WHERE name='" << name << "' AND version='" << version << "'";
 

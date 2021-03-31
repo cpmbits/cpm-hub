@@ -22,7 +22,7 @@
 #include <string>
 #include <vector>
 
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 #include <http/HttpParameterMap.h>
 
 
@@ -30,7 +30,7 @@ class Endpoint {
 public:
     Endpoint(std::string path);
 
-    Optional<struct HttpParameterMap> match(std::string path);
+    Maybe<struct HttpParameterMap> match(std::string path);
 
     bool operator <(const class Endpoint& rhs) const;
 

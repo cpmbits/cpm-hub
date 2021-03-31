@@ -18,7 +18,7 @@
 #pragma once
 
 #include <users/User.h>
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 
 
 class UsersRepository {
@@ -27,5 +27,5 @@ public:
 
     virtual bool exists(std::string user_name) = 0;
 
-    virtual Optional<User> find(std::string user_name) = 0;
+    virtual Maybe<User> find(std::string user_name) = 0;
 };

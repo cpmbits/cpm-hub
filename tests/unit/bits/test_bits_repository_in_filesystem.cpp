@@ -88,7 +88,7 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, does_not_find_a_non_existent_bit)
     Mock<Filesystem> filesystem;
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     bit = repository.bitBy("cest");
 
@@ -102,7 +102,7 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit)
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
     Bit cest_bit("cest", "1.0", "user", "Yml0IHBheWxvYWQ=");
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     When(Method(filesystem, createDirectory)).AlwaysReturn();
     When(Method(filesystem, writeFile)).AlwaysReturn();
@@ -128,8 +128,8 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, does_not_restore_index_when_repositor
     Mock<Filesystem> filesystem;
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
-    Optional<Bit> bit;
-    Optional<string> directory;
+    Maybe<Bit> bit;
+    Maybe<string> directory;
 
     When(Method(filesystem, fileExists)).Return(false);
 
@@ -142,8 +142,8 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit_after_index_was_
     Mock<Filesystem> filesystem;
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
-    Optional<Bit> bit;
-    Optional<string> directory;
+    Maybe<Bit> bit;
+    Maybe<string> directory;
 
     When(Method(filesystem, fileExists)).Return(true);
     When(Method(filesystem, readFile))
@@ -167,7 +167,7 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_an_indexed_bit_after_index_was_
     Mock<Filesystem> filesystem;
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     When(Method(filesystem, fileExists)).Return(true);
     When(Method(filesystem, readFile))
@@ -192,7 +192,7 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, finds_given_version_of_an_indexed_bit
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
     Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     When(Method(filesystem, createDirectory)).AlwaysReturn();
     When(Method(filesystem, directoryExists)).Return(true);
@@ -220,7 +220,7 @@ TEST_WITH_MOCK(BitsRepositoryInFilesystem, fails_to_find_non_existent_version_of
     BitIndex bit_index;
     BitsRepositoryInFilesystem repository(&filesystem.get(), &bit_index);
     Bit cest_bit("cest", "1.1", "user", "Yml0IHBheWxvYWQ=");
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     When(Method(filesystem, createDirectory)).AlwaysReturn();
     When(Method(filesystem, directoryExists)).Return(false);

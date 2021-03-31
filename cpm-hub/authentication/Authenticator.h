@@ -18,13 +18,13 @@
 #pragma once
 
 #include <string>
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 #include <authentication/UserCredentials.h>
 
 
 class Authenticator {
 public:
-    virtual Optional<std::string> authenticate(const char *key) = 0;
+    virtual Maybe<std::string> authenticate(const char *key) = 0;
 
     virtual bool validCredentials(UserCredentials &credentials) = 0;
 
@@ -36,8 +36,8 @@ public:
 
 class NullAuthenticator: public Authenticator {
 public:
-    Optional <std::string> authenticate(const char *key) {
-        return Optional<std::string>("john_doe");
+    Maybe <std::string> authenticate(const char *key) {
+        return Maybe<std::string>("john_doe");
     }
 
     bool validCredentials(UserCredentials &credentials) {

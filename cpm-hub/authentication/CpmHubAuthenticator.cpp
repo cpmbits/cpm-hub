@@ -76,9 +76,9 @@ bool CpmHubAuthenticator::validCredentials(UserCredentials &credentials)
 }
 
 
-Optional<string> CpmHubAuthenticator::authenticate(const char *key)
+Maybe<string> CpmHubAuthenticator::authenticate(const char *key)
 {
-    return Optional<string>();
+    return Maybe<string>();
 }
 
 

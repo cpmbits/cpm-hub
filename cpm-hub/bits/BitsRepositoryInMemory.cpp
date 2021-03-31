@@ -43,9 +43,9 @@ bool BitsRepositoryInMemory::bitExists(const Bit &bit) const
 }
 
 
-Optional<Bit> BitsRepositoryInMemory::bitBy(string name)
+Maybe<Bit> BitsRepositoryInMemory::bitBy(string name)
 {
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     if (!bitExists(name)) {
         return bit;
@@ -57,9 +57,9 @@ Optional<Bit> BitsRepositoryInMemory::bitBy(string name)
 }
 
 
-Optional<Bit> BitsRepositoryInMemory::bitBy(string name, string version)
+Maybe<Bit> BitsRepositoryInMemory::bitBy(string name, string version)
 {
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     if (!bitExists(name)) {
         return bit;

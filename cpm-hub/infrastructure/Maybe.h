@@ -17,26 +17,40 @@
  */
 #pragma once
 
-#include <map>
-#include <list>
-#include <string>
-#include <bits/BitsRepository.h>
 
-
-class BitsRepositoryInMemory: public BitsRepository {
+template<class T> class Maybe {
 public:
-    virtual void add(Bit &bit);
+    Maybe<T>() {
+        this->contains_value = false;
+    }
 
-    virtual Maybe<Bit> bitBy(std::string name);
+    Maybe<T>(T value) {
+        this->contains_value = true;
+        this->stored_value = value;
+    }
 
-    virtual Maybe<Bit> bitBy(std::string name, std::string version);
+    bool isPresent() {
+        return this->contains_value;
+    }
 
-    virtual std::list<Bit> allBits();
+    T& value() {
+        if (!this->contains_value) {
+            throw "Optional has no value";
+        }
+        return this->stored_value;
+    }
 
-    virtual std::list<BitMetadata> search(BitSearchQuery search_query);
+    Maybe<T>& operator =(const T &value) {
+        this->stored_value = value;
+        this->contains_value = true;
+        return *this;
+    }
+
+    operator bool() const {
+        return isPresent();
+    }
 
 private:
-    std::map<std::string, std::list<Bit>> bits;
-
-    bool bitExists(const Bit &bit) const;
+    bool contains_value;
+    T stored_value;
 };

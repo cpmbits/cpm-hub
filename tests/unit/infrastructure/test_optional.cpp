@@ -17,18 +17,18 @@
  */
 #include <cest/cest.h>
 
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 
 
 describe("Optional", []() {
     it("doesn't have value after creation", []() {
-        Optional<int> optional;
+        Maybe<int> optional;
 
         expect(optional.isPresent()).toBe(false);
     });
 
     it("has value after assigning one", []() {
-        Optional<int> optional;
+        Maybe<int> optional;
 
         optional = 32;
 
@@ -37,7 +37,7 @@ describe("Optional", []() {
     });
 
     it("throws an exception when requesting non stored value", []() {
-        Optional<int> optional;
+        Maybe<int> optional;
 
         try {
             optional.value();

@@ -28,7 +28,7 @@ public:
     
     virtual bool exists(std::string user_name);
 
-    virtual Optional<User> find(std::string user_name);
+    virtual Maybe<User> find(std::string user_name);
 
 private:
     std::map<std::string, User> users;

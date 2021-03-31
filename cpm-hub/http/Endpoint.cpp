@@ -29,9 +29,9 @@ Endpoint::Endpoint(string path)
 }
 
 
-Optional<struct HttpParameterMap> Endpoint::match(string path)
+Maybe<struct HttpParameterMap> Endpoint::match(string path)
 {
-    Optional<struct HttpParameterMap> match;
+    Maybe<struct HttpParameterMap> match;
     smatch base_match;
 
     if (regex_match(path, base_match, this->matching_regex)) {

@@ -6,6 +6,7 @@ build:
     cpm-hub/infrastructure:
     cpm-hub/management:
     cpm-hub/bits:
+    cpm-hub/templates:
     cpm-hub/users:
     cpm-hub/authentication:
     cpm-hub/logging:
@@ -31,5 +32,3 @@ test:
 targets:
   default:
     main: 'main.cpp'
-actions:
-  docker: 'docker run -it -v $(pwd):/project -w /project jorsanpe/cpm'

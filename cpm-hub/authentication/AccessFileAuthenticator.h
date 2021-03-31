@@ -20,7 +20,7 @@
 #include <string>
 #include <infrastructure/Filesystem.h>
 #include <authentication/Authenticator.h>
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 
 
 class AccessFileAuthenticator: public Authenticator {
@@ -31,7 +31,7 @@ public:
 
     void setAccessFile(std::string filename);
 
-    Optional<std::string> authenticate(const char *key);
+    Maybe<std::string> authenticate(const char *key);
 
     bool validCredentials(UserCredentials &credentials);
 

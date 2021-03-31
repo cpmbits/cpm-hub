@@ -21,7 +21,7 @@
 #include <list>
 #include <string>
 
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 #include <infrastructure/Filesystem.h>
 #include <bits/BitMetadata.h>
 #include <bits/BitSearchQuery.h>
@@ -38,7 +38,7 @@ class BitIndex {
 public:
     virtual void indexBit(std::string name, std::string username, std::string directory);
 
-    virtual Optional<std::string> find(std::string name);
+    virtual Maybe<std::string> find(std::string name);
 
     virtual std::string serialize();
 
