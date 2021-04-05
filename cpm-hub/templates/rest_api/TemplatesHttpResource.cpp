@@ -49,23 +49,25 @@ TemplatesHttpResource::TemplatesHttpResource(TemplatesService *templates_service
 HttpResponse TemplatesHttpResource::post(HttpRequest &request)
 {
     auto json = json::parse(request.body);
-    Result<TemplatePublicationData> publication_data;
+    Result<TemplatePublicationData> result;
+    UserCredentials credentials;
 
-    publication_data = TemplatesContract::parsePost(request.body);
+    result = TemplatesContract::parsePost(request.body);
 
-//  if (!this->authenticator->validCredentials(credentials)) {
-//      return HttpResponse::unauthorized();
-//  }
-
-    if (publication_data.failure()) {
+    if (result.failure()) {
         return HttpResponse::badRequest();
     }
 
-    if (this->templates_service->templateBy(publication_data.value().template_name, publication_data.value().version).isPresent()) {
+    credentials = UserCredentials {result.value().username, result.value().password };
+    if (!this->authenticator->validCredentials(credentials)) {
+        return HttpResponse::unauthorized();
+    }
+
+    if (this->templates_service->templateBy(result.value().template_name, result.value().version).isPresent()) {
         return HttpResponse::conflict();
     }
 
-    templates_service->publishTemplate(publication_data.value());
+    templates_service->publishTemplate(result.value());
 
     return HttpResponse::ok("");
 }

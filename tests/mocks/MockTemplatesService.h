@@ -15,16 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#pragma once
+
 #include <templates/TemplatesService.h>
 
-
-Template TemplatesService::publishTemplate(struct TemplatePublicationData &publication_data)
-{
-    return Template();
-}
+#include <CppUTest/TestHarness.h>
+#include <CppUTestExt/MockSupport.h>
 
 
-Maybe<Template> TemplatesService::templateBy(std::string template_name, std::string version)
-{
-    return Maybe<Template>();
-}
+class MockTemplatesService: public TemplatesService {
+public:
+    Template publishTemplate(TemplatePublicationData &publication_data) {
+        last_publication_data = publication_data;
+        return *(Template *)mock().actualCall("TemplatesService.publishTemplate")
+            .returnPointerValue();
+
+    }
+
+    Maybe<Template> templateBy(std::string template_name, std::string version) {
+        return Maybe<Template>();
+    }
+
+    MockExpectedCall &expect(const std::string& call) {
+        std::string full_call = std::string("TemplatesService.") + call;
+        return mock().expectOneCall(full_call.c_str());
+    }
+
+    TemplatePublicationData last_publication_data;
+};

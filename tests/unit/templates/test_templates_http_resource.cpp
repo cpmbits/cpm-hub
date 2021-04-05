@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <mocks/cpputest.h>
 #include <fakeit/fakeit.hpp>
+#include <mocks/cpputest.h>
+#include <mocks/MockTemplatesService.h>
 
 #include <list>
 #include <templates/rest_api/TemplatesHttpResource.h>
@@ -25,37 +26,37 @@
 using namespace fakeit;
 using namespace std;
 
-HttpRequest post_request_with_invalid_name(
+static HttpRequest post_request_with_invalid_name(
 "{"
     "\"template_name\": \"cest'; DELETE * from bits;\","
+    "\"version\": \"1.0.0\","
+    "\"payload\": \"ABCD\","
+    "\"username\": \"johndoe\","
+    "\"password\": \"pass\""
+"}");
+
+static HttpRequest post_request_with_invalid_version(
+"{"
+    "\"template_name\": \"cest\","
     "\"version\": \"1.0\","
     "\"payload\": \"ABCD\","
     "\"username\": \"johndoe\","
     "\"password\": \"pass\""
 "}");
 
-HttpRequest post_request_with_invalid_version(
-"{"
-    "\"template_name\": \"cest\","
-    "\"version\": \"dd 1.0\","
-    "\"payload\": \"ABCD\","
-    "\"username\": \"johndoe\","
-    "\"password\": \"pass\""
-"}");
-
-HttpRequest post_request_with_invalid_username(
+static HttpRequest post_request_with_invalid_username(
 "{"
     "\"template_name\": \"cest'; DELETE * from bits;\","
-    "\"version\": \"dd 1.0\","
+    "\"version\": \"1.0.0\","
     "\"payload\": \"ABCD\","
     "\"username\": \"john} doe\","
     "\"password\": \"pass\""
 "}");
 
-HttpRequest post_request_with_invalid_payload(
+static HttpRequest post_request_with_invalid_payload(
 "{"
     "\"template_name\": \"cest'; DELETE * from bits;\","
-    "\"version\": \"dd 1.0\","
+    "\"version\": \"1.0.0\","
     "\"payload\": \"ABCD !;Eabcde\","
     "\"username\": \"john} doe\","
     "\"password\": \"pass\""
@@ -67,87 +68,78 @@ TEST_GROUP(TemplatesHttpResource)
 };
 
 
-TEST(TemplatesHttpResource, uses_the_templates_service_to_publish_a_template)
+TEST_WITH_MOCK(TemplatesHttpResource, uses_the_templates_service_to_publish_a_template)
 {
     HttpRequest request("{"
         "\"template_name\": \"cest\","
-        "\"version\": \"1.0\","
+        "\"version\": \"1.0.0\","
         "\"payload\": \"ABCDEabcde\","
         "\"username\": \"john_doe\","
         "\"password\": \"pass\""
     "}");
     HttpResponse response;
     Template temp;
-    Mock<TemplatesService> mock_service;
-    TemplatesHttpResource api(&mock_service.get());
+    MockTemplatesService mock_service;
+    TemplatesHttpResource api(&mock_service);
+    Template templt;
 
-    When(Method(mock_service, publishTemplate)).Return(temp);
-    When(OverloadedMethod(mock_service, templateBy, Maybe<Template>(string, string))).Return(Maybe<Template>());
+    mock_service.expect("publishTemplate")
+        .ignoreOtherParameters()
+        .andReturnValue(&templt);
 
     response = api.post(request);
 
-    ASSERT_EQUAL(200, response.status_code);
+    ASSERT_EQUAL(HttpStatus::OK, response.status_code);
     ASSERT_STRING("", response.body);
-    Verify(Method(mock_service, publishTemplate).Matching([](struct TemplatePublicationData data) {
-        return data.template_name == "cest" &&
-               data.version == "1.0" &&
-               data.user_name == "john_doe" &&
-               data.payload == "ABCDEabcde";
-    }));
+    ASSERT_STRING("cest", mock_service.last_publication_data.template_name);
+    ASSERT_STRING("1.0.0", mock_service.last_publication_data.version);
+    ASSERT_STRING("john_doe", mock_service.last_publication_data.username);
+    ASSERT_STRING("ABCDEabcde", mock_service.last_publication_data.payload);
+    ASSERT_STRING("pass", mock_service.last_publication_data.password);
 }
 
-TEST(TemplatesHttpResource, returns_status_code_400_when_request_contains_invalid_fields)
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_status_code_400_when_request_contains_invalid_fields)
 {
     HttpResponse response;
     Template bit("");
-    Mock<TemplatesService> mock_service;
-    TemplatesHttpResource api(&mock_service.get());
+    MockTemplatesService mock_service;
+    TemplatesHttpResource api(&mock_service);
 
-    ASSERT_EQUAL(400, api.post(post_request_with_invalid_name).status_code);
-    ASSERT_EQUAL(400, api.post(post_request_with_invalid_version).status_code);
-    ASSERT_EQUAL(400, api.post(post_request_with_invalid_username).status_code);
-    ASSERT_EQUAL(400, api.post(post_request_with_invalid_payload).status_code);
+    ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_name).status_code);
+    ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_version).status_code);
+    ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_username).status_code);
+    ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_payload).status_code);
 }
 
 
-//describe("Templates API", []() {
-//
-//    it("returns status code 400 when request contains invalid fields", [&]() {
-//        HttpResponse response;
-//        Template bit("");
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//
-//        expect(api.post(post_request_with_invalid_template_name).status_code).toBe(400);
-//        expect(api.post(post_request_with_invalid_version).status_code).toBe(400);
-//        expect(api.post(post_request_with_invalid_username).status_code).toBe(400);
-//        expect(api.post(post_request_with_invalid_payload).status_code).toBe(400);
-//    });
-//
-//    it("returns error 401 when publishing a bit and authentication fails", [&]() {
-//        HttpRequest request("{"
-//            "\"template_name\": \"cest\","
-//            "\"version\": \"1.0\","
-//            "\"payload\": \"ABCDEabcde\","
-//            "\"username\": \"john_doe\","
-//            "\"password\": \"pass\""
-//        "}");
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        Mock<Authenticator> mock_authenticator;
-//        TemplatesHttpResource api(&mock_service.get(), &mock_authenticator.get());
-//
-//        When(Method(mock_authenticator, validCredentials)).Return(false);
-//
-//        response = api.post(request);
-//
-//        expect(response.status_code).toBe(HttpStatus::UNAUTHORIZED);
-//    });
+TEST_WITH_MOCK(TemplatesHttpResource, returns_error_401_when_publishing_a_bit_and_authentication_fails)
+{
+    HttpRequest request("{"
+        "\"template_name\": \"cest\","
+        "\"version\": \"1.0.0\","
+        "\"payload\": \"ABCDEabcde\","
+        "\"username\": \"john_doe\","
+        "\"password\": \"pass\""
+    "}");
+    HttpResponse response;
+    MockTemplatesService mock_service;
+    Mock<Authenticator> mock_authenticator;
+    TemplatesHttpResource api(&mock_service, &mock_authenticator.get());
+
+    When(Method(mock_authenticator, validCredentials)).Return(false);
+
+    response = api.post(request);
+
+    Verify(Method(mock_authenticator, validCredentials));
+    ASSERT_EQUAL(HttpStatus::UNAUTHORIZED, response.status_code);
+}
+
 //
 //    it("returns error 409 when publishing a bit and version already exists", [&]() {
 //        HttpRequest request("{"
 //                            "\"template_name\": \"cest\","
-//                            "\"version\": \"1.0\","
+//                            "\"version\": \"1.0.0\","
 //                            "\"payload\": \"ABCDEabcde\","
 //                            "\"username\": \"john_doe\","
 //                            "\"password\": \"pass\""
@@ -203,7 +195,7 @@ TEST(TemplatesHttpResource, returns_status_code_400_when_request_contains_invali
 //        expect(response.body).toBe("{"
 //            "\"template_name\":\"cest\","
 //            "\"payload\":\"ABCDEabcde\","
-//            "\"version\":\"1.0\""
+//            "\"version\":\"1.0.0\""
 //        "}");
 //    });
 //

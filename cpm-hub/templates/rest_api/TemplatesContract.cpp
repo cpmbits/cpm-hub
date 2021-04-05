@@ -24,13 +24,14 @@ using namespace std;
 
 
 static const regex valid_template_name_regex(string("[a-zA-Z][a-zA-Z0-9_\\-]+"));
-static const regex valid_template_version_regex(string(R"(\d+(\.\d+){0,2}(-?[a-zA-Z0-9]{0,15})?)"));
+static const regex valid_template_version_regex(string(R"(\d+(\.\d+){2}(-?[a-zA-Z0-9]{0,15})?)"));
 static const regex valid_username_regex(string("[a-zA-Z][a-zA-Z0-9-_\\.]{3,20}"));
 
 static JsonContract post_contract({
+    {JsonContract::FieldPresence::Required, "username", "string"},
+    {JsonContract::FieldPresence::Required, "password", "string"},
     {JsonContract::FieldPresence::Required, "template_name", "string"},
     {JsonContract::FieldPresence::Required, "version", "string"},
-    {JsonContract::FieldPresence::Required, "username", "string"},
     {JsonContract::FieldPresence::Required, "payload", "string"},
 });
 
@@ -81,7 +82,7 @@ static bool validPayload(const std::string& payload)
 static bool isValidPublicationData(TemplatePublicationData &publication_data)
 {
     return validTemplateName(publication_data.template_name) &&
-           validTemplateUsername(publication_data.user_name) &&
+           validTemplateUsername(publication_data.username) &&
            validTemplateVersion(publication_data.version) &&
            validPayload(publication_data.payload);
 }
@@ -97,9 +98,10 @@ Result<TemplatePublicationData> TemplatesContract::parsePost(const string &reque
         return Result<TemplatePublicationData>();
     }
 
+    publication_data.username = validated_contract.stringAt("username");
+    publication_data.password = validated_contract.stringAt("password");
     publication_data.template_name = validated_contract.stringAt("template_name");
     publication_data.version = validated_contract.stringAt("version");
-    publication_data.user_name = validated_contract.stringAt("username");
     publication_data.payload = validated_contract.stringAt("payload");
 
     if (!isValidPublicationData(publication_data)) {

@@ -24,7 +24,7 @@
 
 class TemplatesService {
 public:
-    virtual Template publishTemplate(struct TemplatePublicationData publication_data);
+    virtual Template publishTemplate(struct TemplatePublicationData &publication_data);
 
     virtual Maybe<Template> templateBy(std::string template_name, std::string version);
 };

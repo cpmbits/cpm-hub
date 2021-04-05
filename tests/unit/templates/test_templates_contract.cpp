@@ -19,6 +19,7 @@
 
 #include <templates/rest_api/TemplatesContract.h>
 
+
 TEST_GROUP(TemplatesContract)
 {
 };
@@ -38,6 +39,7 @@ TEST_WITH_MOCK(TemplatesContract, returns_publication_data_when_request_is_valid
                                                     "\"template_name\":\"template_name\","
                                                     "\"version\":\"1.0.0\","
                                                     "\"username\":\"username\","
+                                                    "\"password\":\"password\","
                                                     "\"payload\":\"payload\""
                                                     "}");
     ASSERT_TRUE(publication_data.success());
@@ -52,6 +54,19 @@ TEST_WITH_MOCK(TemplatesContract, returns_empty_data_when_request_is_invalid)
                                                     "\"template_name\":\"template_name\","
                                                     "\"version\":\"1·f*0.0\","
                                                     "\"username\":\"27John;()Doe27\","
+                                                    "\"payload\":\"Yml0IHBheWxvYWQ=;\""
+                                                    "}");
+    ASSERT_FALSE(publication_data.success());
+}
+
+
+TEST_WITH_MOCK(TemplatesContract, returns_empty_data_when_credentials_are_missing)
+{
+    Result<TemplatePublicationData> publication_data;
+
+    publication_data = TemplatesContract::parsePost("{"
+                                                    "\"template_name\":\"template_name\","
+                                                    "\"version\":\"1·f*0.0\","
                                                     "\"payload\":\"Yml0IHBheWxvYWQ=;\""
                                                     "}");
     ASSERT_FALSE(publication_data.success());

@@ -28,7 +28,7 @@ test:
   bits:
     fakeit: '2.0.5'
     cest: '1.0'
-  libraries: [ 'CppUTest', 'CppUTestExt' ]
+    cpputest: 'latest'
 targets:
   default:
     main: 'main.cpp'
