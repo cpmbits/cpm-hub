@@ -17,8 +17,6 @@
  */
 #pragma once
 
-#define CPPUTEST_MEM_LEAK_DETECTION_DISABLED
-
 #include <list>
 #include <regex>
 #include <vector>

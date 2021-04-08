@@ -26,6 +26,8 @@ class TemplatesService {
 public:
     virtual Template publishTemplate(struct TemplatePublicationData &publication_data);
 
+    virtual bool exists(std::string template_name, std::string version);
+
     virtual Maybe<Template> templateBy(std::string template_name, std::string version);
 };
 

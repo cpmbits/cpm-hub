@@ -27,13 +27,24 @@ class MockTemplatesService: public TemplatesService {
 public:
     Template publishTemplate(TemplatePublicationData &publication_data) {
         last_publication_data = publication_data;
-        return *(Template *)mock().actualCall("TemplatesService.publishTemplate")
+        return *(Template *)mock()
+            .actualCall("TemplatesService.publishTemplate")
             .returnPointerValue();
 
     }
 
+    bool exists(std::string template_name, std::string version) {
+        return mock()
+            .actualCall("TemplatesService.exists")
+            .returnBoolValueOrDefault(false);
+    }
+
     Maybe<Template> templateBy(std::string template_name, std::string version) {
-        return Maybe<Template>();
+        return *(Maybe<Template> *)mock()
+                .actualCall("TemplatesService.templateBy")
+                .withStringParameter("template_name", template_name.c_str())
+                .withStringParameter("version", version.c_str())
+                .returnPointerValue();
     }
 
     MockExpectedCall &expect(const std::string& call) {

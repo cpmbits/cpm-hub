@@ -22,9 +22,22 @@ public:
     Template() : Template("") {
     }
 
-    Template(std::string name) {
+    Template(const std::string &name) {
         this->name = name;
+        this->version = "";
+        this->username = "";
+        this->payload = "";
+    }
+
+    Template(const std::string &name, const std::string &version) {
+        this->name = name;
+        this->version = version;
+        this->username = "";
+        this->payload = "";
     }
 
     std::string name;
+    std::string version;
+    std::string username;
+    std::string payload;
 };

@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <mocks/cpputest.h>
 #include <fakeit/fakeit.hpp>
+#include <mocks/cpputest.h>
 
 #include <base64/base64.h>
 #include <bits/BitIndex.h>

@@ -28,3 +28,9 @@ Maybe<Template> TemplatesService::templateBy(std::string template_name, std::str
 {
     return Maybe<Template>();
 }
+
+
+bool TemplatesService::exists(std::string template_name, std::string version)
+{
+    return false;
+}

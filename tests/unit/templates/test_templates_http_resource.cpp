@@ -28,7 +28,7 @@ using namespace std;
 
 static HttpRequest post_request_with_invalid_name(
 "{"
-    "\"template_name\": \"cest'; DELETE * from bits;\","
+    "\"template_name\": \"arduino'; DELETE * from templates;\","
     "\"version\": \"1.0.0\","
     "\"payload\": \"ABCD\","
     "\"username\": \"johndoe\","
@@ -37,7 +37,7 @@ static HttpRequest post_request_with_invalid_name(
 
 static HttpRequest post_request_with_invalid_version(
 "{"
-    "\"template_name\": \"cest\","
+    "\"template_name\": \"arduino\","
     "\"version\": \"1.0\","
     "\"payload\": \"ABCD\","
     "\"username\": \"johndoe\","
@@ -46,7 +46,7 @@ static HttpRequest post_request_with_invalid_version(
 
 static HttpRequest post_request_with_invalid_username(
 "{"
-    "\"template_name\": \"cest'; DELETE * from bits;\","
+    "\"template_name\": \"arduino'; DELETE * from templates;\","
     "\"version\": \"1.0.0\","
     "\"payload\": \"ABCD\","
     "\"username\": \"john} doe\","
@@ -55,7 +55,7 @@ static HttpRequest post_request_with_invalid_username(
 
 static HttpRequest post_request_with_invalid_payload(
 "{"
-    "\"template_name\": \"cest'; DELETE * from bits;\","
+    "\"template_name\": \"arduino'; DELETE * from templates;\","
     "\"version\": \"1.0.0\","
     "\"payload\": \"ABCD !;Eabcde\","
     "\"username\": \"john} doe\","
@@ -71,7 +71,7 @@ TEST_GROUP(TemplatesHttpResource)
 TEST_WITH_MOCK(TemplatesHttpResource, uses_the_templates_service_to_publish_a_template)
 {
     HttpRequest request("{"
-        "\"template_name\": \"cest\","
+        "\"template_name\": \"arduino\","
         "\"version\": \"1.0.0\","
         "\"payload\": \"ABCDEabcde\","
         "\"username\": \"john_doe\","
@@ -79,32 +79,30 @@ TEST_WITH_MOCK(TemplatesHttpResource, uses_the_templates_service_to_publish_a_te
     "}");
     HttpResponse response;
     Template temp;
-    MockTemplatesService mock_service;
-    TemplatesHttpResource api(&mock_service);
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
     Template templt;
 
-    mock_service.expect("publishTemplate")
-        .ignoreOtherParameters()
-        .andReturnValue(&templt);
+    service_mock.expect("exists").andReturnValue(false);
+    service_mock.expect("publishTemplate").ignoreOtherParameters().andReturnValue(&templt);
 
     response = api.post(request);
 
     ASSERT_EQUAL(HttpStatus::OK, response.status_code);
     ASSERT_STRING("", response.body);
-    ASSERT_STRING("cest", mock_service.last_publication_data.template_name);
-    ASSERT_STRING("1.0.0", mock_service.last_publication_data.version);
-    ASSERT_STRING("john_doe", mock_service.last_publication_data.username);
-    ASSERT_STRING("ABCDEabcde", mock_service.last_publication_data.payload);
-    ASSERT_STRING("pass", mock_service.last_publication_data.password);
+    ASSERT_STRING("arduino", service_mock.last_publication_data.template_name);
+    ASSERT_STRING("1.0.0", service_mock.last_publication_data.version);
+    ASSERT_STRING("john_doe", service_mock.last_publication_data.username);
+    ASSERT_STRING("ABCDEabcde", service_mock.last_publication_data.payload);
+    ASSERT_STRING("pass", service_mock.last_publication_data.password);
 }
 
 
 TEST_WITH_MOCK(TemplatesHttpResource, returns_status_code_400_when_request_contains_invalid_fields)
 {
     HttpResponse response;
-    Template bit("");
-    MockTemplatesService mock_service;
-    TemplatesHttpResource api(&mock_service);
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
 
     ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_name).status_code);
     ASSERT_EQUAL(HttpStatus::BAD_REQUEST, api.post(post_request_with_invalid_version).status_code);
@@ -113,19 +111,19 @@ TEST_WITH_MOCK(TemplatesHttpResource, returns_status_code_400_when_request_conta
 }
 
 
-TEST_WITH_MOCK(TemplatesHttpResource, returns_error_401_when_publishing_a_bit_and_authentication_fails)
+TEST_WITH_MOCK(TemplatesHttpResource, returns_error_401_when_publishing_a_template_and_authentication_fails)
 {
     HttpRequest request("{"
-        "\"template_name\": \"cest\","
+        "\"template_name\": \"arduino\","
         "\"version\": \"1.0.0\","
         "\"payload\": \"ABCDEabcde\","
         "\"username\": \"john_doe\","
         "\"password\": \"pass\""
     "}");
     HttpResponse response;
-    MockTemplatesService mock_service;
+    MockTemplatesService service_mock;
     Mock<Authenticator> mock_authenticator;
-    TemplatesHttpResource api(&mock_service, &mock_authenticator.get());
+    TemplatesHttpResource api(&service_mock, &mock_authenticator.get());
 
     When(Method(mock_authenticator, validCredentials)).Return(false);
 
@@ -135,134 +133,89 @@ TEST_WITH_MOCK(TemplatesHttpResource, returns_error_401_when_publishing_a_bit_an
     ASSERT_EQUAL(HttpStatus::UNAUTHORIZED, response.status_code);
 }
 
-//
-//    it("returns error 409 when publishing a bit and version already exists", [&]() {
-//        HttpRequest request("{"
-//                            "\"template_name\": \"cest\","
-//                            "\"version\": \"1.0.0\","
-//                            "\"payload\": \"ABCDEabcde\","
-//                            "\"username\": \"john_doe\","
-//                            "\"password\": \"pass\""
-//                            "}");
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        Mock<Authenticator> mock_authenticator;
-//        TemplatesHttpResource api(&mock_service.get(), &mock_authenticator.get());
-//        Optional<Template> cest_bit;
-//
-//        request.parameters.set("bitName", "cest");
-//        cest_bit = Template("cest", "1.0", "user", "ABCDEabcde");
-//
-//        When(Method(mock_authenticator, validCredentials)).Return(true);
-//        When(OverloadedMethod(mock_service, bitBy, Optional<Template>(string, string))).Return(cest_bit);
-//
-//        response = api.post(request);
-//
-//        expect(response.status_code).toBe(HttpStatus::CONFLICT);
-//    });
-//
-//    it("returns error 404 when downloading a bit that is not found", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//        Optional<Template> no_bit;
-//
-//        request.parameters.set("bitName", "cest");
-//        When(OverloadedMethod(mock_service, bitBy, Optional<Template>(string))).Return(no_bit);
-//
-//        response = api.get(request);
-//
-//        Verify(OverloadedMethod(mock_service, bitBy, Optional<Template>(string)).Using("cest"));
-//        expect(response.status_code).toBe(404);
-//    });
-//
-//    it("returns latest bit version when downloading an existing bit", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//        Optional<Template> cest_bit;
-//
-//        request.parameters.set("bitName", "cest");
-//        cest_bit = Template("cest", "1.0", "user", "ABCDEabcde");
-//        When(OverloadedMethod(mock_service, bitBy, Optional<Template>(string))).Return(cest_bit);
-//
-//        response = api.get(request);
-//
-//        Verify(OverloadedMethod(mock_service, bitBy, Optional<Template>(string)).Using("cest"));
-//        expect(response.status_code).toBe(200);
-//        expect(response.body).toBe("{"
-//            "\"template_name\":\"cest\","
-//            "\"payload\":\"ABCDEabcde\","
-//            "\"version\":\"1.0.0\""
-//        "}");
-//    });
-//
-//    it("returns specific bit version when downloading an existing bit", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//        Optional<Template> cest_bit;
-//
-//        request.parameters.set("bitName", "cest");
-//        request.parameters.set("bitVersion", "1.1");
-//        cest_bit = Template("cest", "1.1", "user", "ABCDEabcde");
-//        When(OverloadedMethod(mock_service, bitBy, Optional<Template>(string, string))).Return(cest_bit);
-//
-//        response = api.get(request);
-//
-//        Verify(OverloadedMethod(mock_service, bitBy, Optional<Template>(string, string)).Using("cest", "1.1"));
-//        expect(response.status_code).toBe(200);
-//        expect(response.body).toBe("{"
-//           "\"template_name\":\"cest\","
-//           "\"payload\":\"ABCDEabcde\","
-//           "\"version\":\"1.1\""
-//        "}");
-//    });
-//
-//    it("uses the bit service to search for bits based on given criteria", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//        std::list<TemplateMetadata> one_bit_found = {
-//            TemplateMetadata("cest", "pepe", "1.0"),
-//        };
-//
-//        request.query_parameters.set("name", "cest");
-//        When(Method(mock_service, search)).Return(one_bit_found);
-//
-//        response = api.get(request);
-//
-//        expect(response.status_code).toBe(HttpStatus::OK);
-//        Verify(Method(mock_service, search).Matching([](TemplateSearchQuery search_query) {
-//            return search_query.name == "cest";
-//        }));
-//        expect(response.body).toBe("[{\"author\":\"pepe\",\"name\":\"cest\"}]");
-//    });
-//
-//    it("returns bad request when search query does not contain 'name' parameter", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//
-//        response = api.get(request);
-//
-//        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
-//    });
-//
-//    it("returns bad request when 'name' parameter in search query is empty", [&]() {
-//        HttpRequest request;
-//        HttpResponse response;
-//        Mock<TemplatesService> mock_service;
-//        TemplatesHttpResource api(&mock_service.get());
-//
-//        request.query_parameters.set("name", "");
-//        response = api.get(request);
-//
-//        expect(response.status_code).toBe(HttpStatus::BAD_REQUEST);
-//    });
-//});
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_error_409_when_publishing_a_template_and_version_already_exists)
+{
+    HttpRequest request("{"
+                        "\"template_name\": \"arduino\","
+                        "\"version\": \"1.0.0\","
+                        "\"payload\": \"ABCDEabcde\","
+                        "\"username\": \"john_doe\","
+                        "\"password\": \"pass\""
+                        "}");
+    HttpResponse response;
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
+
+    service_mock.expect("exists").andReturnValue(true);
+
+    response = api.post(request);
+
+    ASSERT_EQUAL(HttpStatus::CONFLICT, response.status_code);
+}
+
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_error_404_when_downloading_a_template_that_is_not_found)
+{
+    HttpRequest request;
+    HttpResponse response;
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
+    Maybe<Template> arduino_template;
+
+    request.parameters.set("templateName", "arduino");
+    service_mock.expect("templateBy").ignoreOtherParameters().andReturnValue(&arduino_template);
+
+    response = api.get(request);
+
+    ASSERT_EQUAL(HttpStatus::NOT_FOUND, response.status_code);
+}
+
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_latest_template_version_when_downloading_an_existing_template)
+{
+    HttpRequest request;
+    HttpResponse response;
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
+    Maybe<Template> arduino_template = Template("arduino", "latest");
+
+    request.parameters.set("templateName", "arduino");
+    service_mock.expect("templateBy")
+        .withStringParameter("template_name", "arduino")
+        .withStringParameter("version", "latest")
+        .andReturnValue(&arduino_template);
+
+    response = api.get(request);
+
+    ASSERT_EQUAL(HttpStatus::OK, response.status_code);
+    ASSERT_STRING("{"
+                 "\"template_name\":\"arduino\","
+                 "\"version\":\"latest\""
+                 "}", response.body);
+}
+
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_specific_template_version_when_downloading_an_existing_template)
+{
+    HttpRequest request;
+    HttpResponse response;
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
+    Maybe<Template> arduino_template = Template("arduino", "1.1.0");
+
+    request.parameters.set("templateName", "arduino");
+    request.parameters.set("version", "1.1.0");
+    service_mock.expect("templateBy")
+        .withStringParameter("template_name", "arduino")
+        .withStringParameter("version", "1.1.0")
+        .andReturnValue(&arduino_template);
+
+    response = api.get(request);
+
+    ASSERT_EQUAL(HttpStatus::OK, response.status_code);
+    ASSERT_STRING("{"
+                 "\"template_name\":\"arduino\","
+                 "\"version\":\"1.1.0\""
+                 "}", response.body);
+}

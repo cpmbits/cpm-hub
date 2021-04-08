@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <mocks/MockHttpClient.h>
 #include <mocks/cpputest.h>
+#include <mocks/MockHttpClient.h>
 
 #include <authentication/CpmHubAuthenticator.h>
 

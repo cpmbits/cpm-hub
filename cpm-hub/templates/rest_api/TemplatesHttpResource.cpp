@@ -59,11 +59,11 @@ HttpResponse TemplatesHttpResource::post(HttpRequest &request)
     }
 
     credentials = UserCredentials {result.value().username, result.value().password };
-    if (!this->authenticator->validCredentials(credentials)) {
+    if (!authenticator->validCredentials(credentials)) {
         return HttpResponse::unauthorized();
     }
 
-    if (this->templates_service->templateBy(result.value().template_name, result.value().version).isPresent()) {
+    if (templates_service->exists(result.value().template_name, result.value().version)) {
         return HttpResponse::conflict();
     }
 
@@ -73,19 +73,27 @@ HttpResponse TemplatesHttpResource::post(HttpRequest &request)
 }
 
 
-HttpResponse TemplatesHttpResource::get(HttpRequest &request)
+static string templateAsJson(Template &temp)
 {
-    return HttpResponse::ok("");
+    json json_bit = {
+        {"template_name", temp.name},
+        {"version", temp.version},
+    };
+    return json_bit.dump();
 }
 
-//
-//static string bitAsJson(Template &bit)
-//{
-//    json json_bit = {
-//            {"bit_name", bit.metadata.name},
-//            {"version", bit.metadata.version},
-//            {"payload", bit.payload}
-//    };
-//    return json_bit.dump();
-//}
+
+HttpResponse TemplatesHttpResource::get(HttpRequest &request)
+{
+    string version;
+    Maybe<Template> read_template;
+
+    version = request.parameters.has("version") ? request.parameters.get("version") : "latest";
+    read_template = templates_service->templateBy(request.parameters.get("templateName"), version);
+    if (!read_template.isPresent()) {
+        return HttpResponse::notFound();
+    }
+
+    return HttpResponse::ok(templateAsJson(read_template.value()));
+}
 
