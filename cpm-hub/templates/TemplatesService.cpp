@@ -17,20 +17,37 @@
  */
 #include <templates/TemplatesService.h>
 
+using namespace std;
 
-Template TemplatesService::publishTemplate(struct TemplatePublicationData &publication_data)
+
+TemplatesService::TemplatesService(TemplatesRepository *repository)
 {
-    return Template();
+    this->repository = repository;
 }
 
 
-Maybe<Template> TemplatesService::templateBy(std::string template_name, std::string version)
+Template TemplatesService::publishTemplate(TemplatePublicationData &publication_data)
 {
-    return Maybe<Template>();
+    Template templat(
+        publication_data.template_name,
+        publication_data.version,
+        publication_data.username,
+        publication_data.payload
+    );
+
+    repository->add(templat);
+
+    return templat;
 }
 
 
-bool TemplatesService::exists(std::string template_name, std::string version)
+Maybe<Template> TemplatesService::templateBy(const string &template_name, const string &version)
 {
-    return false;
+    return repository->templateBy(template_name, version);
+}
+
+
+bool TemplatesService::exists(const string &template_name, const string &version)
+{
+    return repository->templateBy(template_name, version).isPresent();
 }

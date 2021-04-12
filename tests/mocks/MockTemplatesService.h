@@ -25,6 +25,9 @@
 
 class MockTemplatesService: public TemplatesService {
 public:
+    MockTemplatesService() : TemplatesService(nullptr) {
+    }
+
     Template publishTemplate(TemplatePublicationData &publication_data) {
         last_publication_data = publication_data;
         return *(Template *)mock()
@@ -33,13 +36,13 @@ public:
 
     }
 
-    bool exists(std::string template_name, std::string version) {
+    bool exists(const std::string &template_name, const std::string &version) {
         return mock()
             .actualCall("TemplatesService.exists")
             .returnBoolValueOrDefault(false);
     }
 
-    Maybe<Template> templateBy(std::string template_name, std::string version) {
+    Maybe<Template> templateBy(const std::string &template_name, const std::string &version) {
         return *(Maybe<Template> *)mock()
                 .actualCall("TemplatesService.templateBy")
                 .withStringParameter("template_name", template_name.c_str())

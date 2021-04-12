@@ -219,3 +219,16 @@ TEST_WITH_MOCK(TemplatesHttpResource, returns_specific_template_version_when_dow
                  "\"version\":\"1.1.0\""
                  "}", response.body);
 }
+
+
+TEST_WITH_MOCK(TemplatesHttpResource, returns_invalid_request_when_getting_template_without_specifying_the_name)
+{
+    HttpRequest request;
+    HttpResponse response;
+    MockTemplatesService service_mock;
+    TemplatesHttpResource api(&service_mock);
+
+    response = api.get(request);
+
+    ASSERT_EQUAL(HttpStatus::BAD_REQUEST, response.status_code);
+}

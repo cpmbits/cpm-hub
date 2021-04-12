@@ -88,8 +88,13 @@ HttpResponse TemplatesHttpResource::get(HttpRequest &request)
     string version;
     Maybe<Template> read_template;
 
+    if (!request.parameters.has("templateName")) {
+        return HttpResponse::badRequest();
+    }
+
     version = request.parameters.has("version") ? request.parameters.get("version") : "latest";
     read_template = templates_service->templateBy(request.parameters.get("templateName"), version);
+
     if (!read_template.isPresent()) {
         return HttpResponse::notFound();
     }

@@ -17,33 +17,15 @@
  */
 #pragma once
 
-#include <utility>
+#include <string>
 
-#include <database/SqlDatabaseSqlite3.h>
-#include <bits/BitsRepository.h>
+#include <infrastructure/Maybe.h>
+#include <templates/Template.h>
 
 
-class BitsRepositoryInSqlite: public BitsRepository {
+class TemplatesRepository {
 public:
-     BitsRepositoryInSqlite(SqlDatabaseSqlite3 *database);
+    virtual void add(Template &templat) = 0;
 
-    void add(Bit &bit);
-
-    Maybe<Bit> bitBy(std::string name);
-
-    Maybe<Bit> bitBy(std::string name, std::string version);
-
-    std::list<BitMetadata> search(BitSearchQuery search_query);
-
-    std::list<Bit> allBits();
-
-private:
-    SqlDatabaseSqlite3 *database;
-
-    void sanitizeDatabase();
-
-    void createBitsTable();
-
-    void sanitizeBitsTableColumns();
+    virtual Maybe<Template> templateBy(std::string name, std::string version) = 0;
 };
-

@@ -36,6 +36,13 @@ public:
         this->payload = "";
     }
 
+    Template(const std::string &name, const std::string &version, const std::string &username, const std::string &payload) {
+        this->name = name;
+        this->version = version;
+        this->username = username;
+        this->payload = payload;
+    }
+
     std::string name;
     std::string version;
     std::string username;

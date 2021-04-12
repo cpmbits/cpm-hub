@@ -18,16 +18,22 @@
 #pragma once
 
 #include <infrastructure/Maybe.h>
+#include <templates/TemplatesRepository.h>
 #include <templates/TemplatePublicationData.h>
 #include <templates/Template.h>
 
 
 class TemplatesService {
 public:
+    TemplatesService(TemplatesRepository *repository);
+
     virtual Template publishTemplate(struct TemplatePublicationData &publication_data);
 
-    virtual bool exists(std::string template_name, std::string version);
+    virtual bool exists(const std::string &template_name, const std::string &version);
 
-    virtual Maybe<Template> templateBy(std::string template_name, std::string version);
+    virtual Maybe<Template> templateBy(const std::string &template_name, const std::string &version);
+
+private:
+    TemplatesRepository *repository;
 };
 
