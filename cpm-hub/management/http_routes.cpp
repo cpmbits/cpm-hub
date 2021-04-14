@@ -22,15 +22,16 @@
 using namespace std;
 
 
-void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resource, UsersHttpResource *users_resource)
+void installServiceRoutes(
+        HttpServer &http_server,
+        BitsHttpResource *bits_resource,
+        UsersHttpResource *users_resource,
+        TemplatesHttpResource *templates_resource)
 {
     http_server.addResource(Endpoint("/bits"), bits_resource);
     http_server.addResource(Endpoint("/bits/:bitName"), bits_resource);
     http_server.addResource(Endpoint("/bits/:bitName/:bitVersion"), bits_resource);
     http_server.addResource(Endpoint("/users"), users_resource);
-}
-
-
-void installManagementRoutes(HttpServer &http_server, ManagementHttpResource *management_resource)
-{
+    http_server.addResource(Endpoint("/templates"), templates_resource);
+    http_server.addResource(Endpoint("/templates/:templateName/:version"), templates_resource);
 }

@@ -190,6 +190,7 @@ TEST_WITH_MOCK(TemplatesHttpResource, returns_latest_template_version_when_downl
 
     ASSERT_EQUAL(HttpStatus::OK, response.status_code);
     ASSERT_STRING("{"
+                 "\"payload\":\"\","
                  "\"template_name\":\"arduino\","
                  "\"version\":\"latest\""
                  "}", response.body);
@@ -215,6 +216,7 @@ TEST_WITH_MOCK(TemplatesHttpResource, returns_specific_template_version_when_dow
 
     ASSERT_EQUAL(HttpStatus::OK, response.status_code);
     ASSERT_STRING("{"
+                 "\"payload\":\"\","
                  "\"template_name\":\"arduino\","
                  "\"version\":\"1.1.0\""
                  "}", response.body);
