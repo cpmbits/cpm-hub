@@ -31,10 +31,10 @@ void BitIndex::indexBit(string name, string username, string directory)
 }
 
 
-Optional<string> BitIndex::find(string name)
+Maybe<string> BitIndex::find(string name)
 {
     auto iter = this->bits.find(name);
-    Optional<string> directory;
+    Maybe<string> directory;
 
     if (iter == this->bits.end()) {
         return directory;

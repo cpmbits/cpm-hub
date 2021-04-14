@@ -45,13 +45,13 @@ list<Bit> BitsService::allBits()
 }
 
 
-Optional<Bit> BitsService::bitBy(std::string bit_name)
+Maybe<Bit> BitsService::bitBy(std::string bit_name)
 {
     return bits_repository->bitBy(bit_name);
 }
 
 
-Optional<Bit> BitsService::bitBy(std::string bit_name, std::string version)
+Maybe<Bit> BitsService::bitBy(std::string bit_name, std::string version)
 {
     return bits_repository->bitBy(bit_name, version);
 }

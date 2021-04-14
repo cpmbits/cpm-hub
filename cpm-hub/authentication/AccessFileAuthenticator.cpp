@@ -18,7 +18,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include <authentication/AccessFileAuthenticator.h>
-#include <infrastructure/Optional.h>
+#include <infrastructure/Maybe.h>
 
 using namespace std;
 
@@ -47,12 +47,12 @@ static vector<string> split(string contents, const char *delims)
 }
 
 
-Optional<string> AccessFileAuthenticator::authenticate(const char *key)
+Maybe<string> AccessFileAuthenticator::authenticate(const char *key)
 {
     string contents;
     vector<string> lines;
     vector<string> tokens;
-    Optional<string> user;
+    Maybe<string> user;
 
     contents = filesystem->readFile(access_file);
     lines = split(contents, "\n");

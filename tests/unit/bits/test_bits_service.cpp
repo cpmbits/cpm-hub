@@ -60,10 +60,10 @@ describe("Bits Service", []() {
     it("uses the repository to find a bit by name", [&]() {
         Mock<BitsRepository> mock_repository;
         BitsService bits_service(&mock_repository.get());
-        Optional<Bit> bit;
+        Maybe<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Maybe<Bit>(string))).Return(bit);
 
         auto found_bit = bits_service.bitBy("cest");
 
@@ -73,10 +73,10 @@ describe("Bits Service", []() {
     it("uses the repository to find a bit by name and version", [&]() {
         Mock<BitsRepository> mock_repository;
         BitsService bits_service(&mock_repository.get());
-        Optional<Bit> bit;
+        Maybe<Bit> bit;
 
         bit = Bit("cest");
-        When(OverloadedMethod(mock_repository, bitBy, Optional<Bit>(string, string))).Return(bit);
+        When(OverloadedMethod(mock_repository, bitBy, Maybe<Bit>(string, string))).Return(bit);
 
         auto found_bit = bits_service.bitBy("cest", "1.1");
 

@@ -17,24 +17,24 @@
  */
 #pragma once
 
-#include <string>
+#include <database/SqlDatabaseSqlite3.h>
+#include <templates/TemplatesRepository.h>
 
-#include <http/HttpResource.h>
-#include <logging/Logger.h>
-#include <management/DeployService.h>
 
-class ManagementHttpResource: public HttpResource {
+class TemplatesRepositoryInSqlite: public TemplatesRepository {
 public:
-    ManagementHttpResource(DeployService *deploy_service);
+    TemplatesRepositoryInSqlite(SqlDatabaseSqlite3 *database);
 
-    ManagementHttpResource(DeployService *deploy_service, Authenticator *authenticator);
+    void add(Template &templat);
 
-    HttpResponse post(HttpRequest &request);
+    Maybe<Template> templateBy(std::string name, std::string version);
 
 private:
-    DeployService *deploy_service;
-    Logger *logger;
-    Authenticator *authenticator;
+    SqlDatabaseSqlite3 *database;
 
-    bool isAuthorized(HttpRequest &request);
+    void sanitizeDatabase();
+
+    void createTemplatesTable();
+
+    void sanitizeTemplatesTableColumns();
 };

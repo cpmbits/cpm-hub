@@ -48,7 +48,7 @@ BitsHttpResource::BitsHttpResource(BitsService *bits_service, Authenticator *aut
 HttpResponse BitsHttpResource::post(HttpRequest &request)
 {
     auto json = json::parse(request.body);
-    Optional<string> user;
+    Maybe<string> user;
     BitPublicationData publication_data;
     UserCredentials credentials = {json.at("username"),json.at("password")};
 
@@ -121,7 +121,7 @@ static string bitAsJson(Bit &bit)
 
 HttpResponse BitsHttpResource::getBit(HttpRequest &request)
 {
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
     if (!request.parameters.has("bitVersion")) {
         bit = this->bits_service->bitBy(request.parameters.get("bitName"));

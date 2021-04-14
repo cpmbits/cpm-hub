@@ -95,13 +95,13 @@ void BitsRepositoryInSqlite::add(Bit &bit)
 }
 
 
-Optional<Bit> BitsRepositoryInSqlite::bitBy(string name)
+Maybe<Bit> BitsRepositoryInSqlite::bitBy(string name)
 {
     ostringstream string_stream;
     list<SqlRow> rows;
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
-    string_stream << "SELECT * FROM bits WHERE name='" << name << "' "
+    string_stream << "SELECT * FROM " << bits_table << " WHERE name='" << name << "' "
                   << "ORDER BY version";
 
     rows = database->select(string_stream.str());
@@ -113,16 +113,16 @@ Optional<Bit> BitsRepositoryInSqlite::bitBy(string name)
 }
 
 
-Optional<Bit> BitsRepositoryInSqlite::bitBy(string name, string version)
+Maybe<Bit> BitsRepositoryInSqlite::bitBy(string name, string version)
 {
     ostringstream string_stream;
     list<SqlRow> rows;
-    Optional<Bit> bit;
+    Maybe<Bit> bit;
 
-    string_stream << "SELECT * FROM bits WHERE name='" << name << "' AND version='" << version << "'";
+    string_stream << "SELECT * FROM " << bits_table << " WHERE name='" << name << "' AND version='" << version << "'";
 
     rows = database->select(string_stream.str());
-    if (rows.size() > 0) {
+    if (!rows.empty()) {
         bit = bitFromSqlRow(rows.front());
     }
 
@@ -136,7 +136,7 @@ list<BitMetadata> BitsRepositoryInSqlite::search(BitSearchQuery search_query)
     list<SqlRow> rows;
     list<BitMetadata> bits;
 
-    string_stream << "SELECT name, version, user_name FROM bits WHERE name LIKE '%" << search_query.name << "%'";
+    string_stream << "SELECT name, version, user_name FROM " << bits_table << " WHERE name LIKE '%" << search_query.name << "%'";
     rows = database->select(string_stream.str());
     for (const auto& row: rows) {
         bits.emplace_back(bitMetadataFromSqlRow(row));
@@ -150,7 +150,7 @@ list<Bit> BitsRepositoryInSqlite::allBits()
     list<SqlRow> rows;
     list<Bit> bits;
 
-    rows = database->select("SELECT * FROM bits");
+    rows = database->select("SELECT * FROM " + bits_table);
     for (const auto& row: rows) {
         bits.emplace_back(bitFromSqlRow(row));
     }

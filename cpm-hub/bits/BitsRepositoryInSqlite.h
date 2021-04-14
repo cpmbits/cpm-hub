@@ -17,10 +17,10 @@
  */
 #pragma once
 
-#include <bits/BitsRepository.h>
-#include <database/SqlDatabaseSqlite3.h>
-
 #include <utility>
+
+#include <database/SqlDatabaseSqlite3.h>
+#include <bits/BitsRepository.h>
 
 
 class BitsRepositoryInSqlite: public BitsRepository {
@@ -29,9 +29,9 @@ public:
 
     void add(Bit &bit);
 
-    Optional<Bit> bitBy(std::string name);
+    Maybe<Bit> bitBy(std::string name);
 
-    Optional<Bit> bitBy(std::string name, std::string version);
+    Maybe<Bit> bitBy(std::string name, std::string version);
 
     std::list<BitMetadata> search(BitSearchQuery search_query);
 

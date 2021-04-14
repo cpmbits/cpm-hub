@@ -17,11 +17,13 @@
  */
 #pragma once
 
-#define CPPUTEST_MEM_LEAK_DETECTION_DISABLED
+#include <list>
+#include <regex>
+#include <vector>
 
-#include "CppUTest/CommandLineTestRunner.h"
-#include "CppUTest/TestHarness.h"
-#include "CppUTestExt/MockSupport.h"
+#include <CppUTest/CommandLineTestRunner.h>
+#include <CppUTest/TestHarness.h>
+#include <CppUTestExt/MockSupport.h>
 
 #define ASSERT_TRUE(condition)                          CHECK(condition)
 #define ASSERT_FALSE(condition)                         CHECK_FALSE(condition)

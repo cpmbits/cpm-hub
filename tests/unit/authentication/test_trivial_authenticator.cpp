@@ -44,6 +44,6 @@ describe("TrivialAuthenticator", []() {
 
         authenticator.addUser(credentials);
 
-        expect(authenticator.validCredentials(credentials)).toBe(false);
+        expect(authenticator.validCredentials(credentials)).toBe(true);
     });
 });

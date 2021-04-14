@@ -44,7 +44,7 @@ describe("Bits Repository in Memory", []() {
 
     it("doesn't find a bit when it's not stored", [&]() {
         BitsRepositoryInMemory repository;
-        Optional<Bit> bit;
+        Maybe<Bit> bit;
 
         bit = repository.bitBy("cest");
 
@@ -54,7 +54,7 @@ describe("Bits Repository in Memory", []() {
     it("finds the bit with the same name when one bit is stored", [&]() {
         BitsRepositoryInMemory repository;
         Bit bit("cest");
-        Optional<Bit> stored_bit;
+        Maybe<Bit> stored_bit;
 
         repository.add(bit);
 
@@ -66,7 +66,7 @@ describe("Bits Repository in Memory", []() {
     it("finds the bit with the same name when many bits are stored", [&]() {
         BitsRepositoryInMemory repository;
         Bit cest_bit("cest"), fakeit_bit("fakeit");
-        Optional<Bit> stored_bit;
+        Maybe<Bit> stored_bit;
 
         repository.add(cest_bit);
         repository.add(fakeit_bit);
@@ -79,7 +79,7 @@ describe("Bits Repository in Memory", []() {
     it("doesn't find a bit given version when it's not stored", [&]() {
         BitsRepositoryInMemory repository;
         Bit cest_bit("cest");
-        Optional<Bit> stored_bit;
+        Maybe<Bit> stored_bit;
 
         cest_bit.metadata.version = "1.0";
         repository.add(cest_bit);
@@ -93,7 +93,7 @@ describe("Bits Repository in Memory", []() {
         BitsRepositoryInMemory repository;
         Bit cest_bit_1_0("cest");
         Bit cest_bit_1_1("cest");
-        Optional<Bit> stored_bit;
+        Maybe<Bit> stored_bit;
 
         cest_bit_1_1.metadata.version = "1.1";
         repository.add(cest_bit_1_1);
@@ -110,7 +110,7 @@ describe("Bits Repository in Memory", []() {
         BitsRepositoryInMemory repository;
         Bit cest_bit_1_0("cest");
         Bit cest_bit_1_1("cest");
-        Optional<Bit> stored_bit;
+        Maybe<Bit> stored_bit;
 
         cest_bit_1_1.metadata.version = "1.1";
         repository.add(cest_bit_1_1);

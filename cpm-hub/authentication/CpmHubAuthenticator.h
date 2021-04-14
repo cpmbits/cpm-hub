@@ -27,7 +27,7 @@ class CpmHubAuthenticator : public Authenticator {
 public:
     CpmHubAuthenticator(const std::string &auth_service_url, HttpClient &client);
 
-    virtual Optional<std::string> authenticate(const char *key) override;
+    virtual Maybe<std::string> authenticate(const char *key) override;
 
     virtual bool validCredentials(UserCredentials &credentials) override;
 

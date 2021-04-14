@@ -22,10 +22,8 @@
 
 #include <http/HttpServer.h>
 #include <bits/rest_api/BitsHttpResource.h>
-#include <management/rest_api/ManagementHttpResource.h>
 #include <users/rest_api/UsersHttpResource.h>
+#include <templates/rest_api/TemplatesHttpResource.h>
 
 
-void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resource, UsersHttpResource *users_resource);
-
-void installManagementRoutes(HttpServer &http_server, ManagementHttpResource *management_resource);
+void installServiceRoutes(HttpServer &http_server, BitsHttpResource *bits_resource, UsersHttpResource *users_resource, TemplatesHttpResource *templates_resource);

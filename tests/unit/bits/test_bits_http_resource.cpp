@@ -78,7 +78,7 @@ describe("Bits API", []() {
         BitsHttpResource api(&mock_service.get());
 
         When(Method(mock_service, publishBit)).Return(bit);
-        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(Optional<Bit>());
+        When(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string, string))).Return(Maybe<Bit>());
 
         response = api.post(request);
 
@@ -136,13 +136,13 @@ describe("Bits API", []() {
         Mock<BitsService> mock_service;
         Mock<Authenticator> mock_authenticator;
         BitsHttpResource api(&mock_service.get(), &mock_authenticator.get());
-        Optional<Bit> cest_bit;
+        Maybe<Bit> cest_bit;
 
         request.parameters.set("bitName", "cest");
         cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
 
         When(Method(mock_authenticator, validCredentials)).Return(true);
-        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string, string))).Return(cest_bit);
 
         response = api.post(request);
 
@@ -154,14 +154,14 @@ describe("Bits API", []() {
         HttpResponse response;
         Mock<BitsService> mock_service;
         BitsHttpResource api(&mock_service.get());
-        Optional<Bit> no_bit;
+        Maybe<Bit> no_bit;
 
         request.parameters.set("bitName", "cest");
-        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string))).Return(no_bit);
+        When(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string))).Return(no_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(404);
     });
             
@@ -170,15 +170,15 @@ describe("Bits API", []() {
         HttpResponse response;
         Mock<BitsService> mock_service;
         BitsHttpResource api(&mock_service.get());
-        Optional<Bit> cest_bit;
+        Maybe<Bit> cest_bit;
 
         request.parameters.set("bitName", "cest");
         cest_bit = Bit("cest", "1.0", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string))).Return(cest_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string)).Using("cest"));
+        Verify(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string)).Using("cest"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
             "\"bit_name\":\"cest\","
@@ -192,16 +192,16 @@ describe("Bits API", []() {
         HttpResponse response;
         Mock<BitsService> mock_service;
         BitsHttpResource api(&mock_service.get());
-        Optional<Bit> cest_bit;
+        Maybe<Bit> cest_bit;
 
         request.parameters.set("bitName", "cest");
         request.parameters.set("bitVersion", "1.1");
         cest_bit = Bit("cest", "1.1", "user", "ABCDEabcde");
-        When(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string))).Return(cest_bit);
+        When(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string, string))).Return(cest_bit);
 
         response = api.get(request);
 
-        Verify(OverloadedMethod(mock_service, bitBy, Optional<Bit>(string, string)).Using("cest", "1.1"));
+        Verify(OverloadedMethod(mock_service, bitBy, Maybe<Bit>(string, string)).Using("cest", "1.1"));
         expect(response.status_code).toBe(200);
         expect(response.body).toBe("{"
            "\"bit_name\":\"cest\","

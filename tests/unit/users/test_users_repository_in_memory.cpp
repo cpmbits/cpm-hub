@@ -47,7 +47,7 @@ describe("Users repository in memory", []() {
 
     it("doesn't find a user when it's not stored", []() {
         UsersRepositoryInMemory repository;
-        Optional<User> user;
+        Maybe<User> user;
 
         user = repository.find("pepito");
 
@@ -57,7 +57,7 @@ describe("Users repository in memory", []() {
     it("finds a user after it has been stored stored", []() {
         UsersRepositoryInMemory repository;
         User user("pepito");
-        Optional<User> user_found;
+        Maybe<User> user_found;
 
         repository.add(user);
 

@@ -112,7 +112,7 @@ HttpResponse HttpServer::dispatchRequest(HttpRequest &request)
     HttpResponse response;
 
     for (pair<Endpoint, HttpResource *> iter: this->resources) {
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
         match = iter.first.match(request.path);
         if (match.isPresent()) {
             resource = iter.second;

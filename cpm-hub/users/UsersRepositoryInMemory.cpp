@@ -30,10 +30,10 @@ bool UsersRepositoryInMemory::exists(std::string user_name)
 }
 
 
-Optional<User> UsersRepositoryInMemory::find(std::string user_name)
+Maybe<User> UsersRepositoryInMemory::find(std::string user_name)
 {
     auto iter = this->users.find(user_name);
-    Optional<User> user;
+    Maybe<User> user;
 
     if (iter == this->users.end()) {
         return user;

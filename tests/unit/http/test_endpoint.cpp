@@ -28,7 +28,7 @@ describe("Endpoint", []() {
 
     it("returns empty match when plain path doesn't match", []() {
         Endpoint endpoint("/plain_path");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/non_matching");
 
@@ -37,7 +37,7 @@ describe("Endpoint", []() {
 
     it("returns match when path matches plain path", []() {
         Endpoint endpoint("/plain_path");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/plain_path");
 
@@ -50,7 +50,7 @@ describe("Endpoint", []() {
 
     it("returns empty match when path with parameters doesn't match", []() {
         Endpoint endpoint("/plain_path/:parameter");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/plain_pa/parameter");
 
@@ -59,7 +59,7 @@ describe("Endpoint", []() {
 
     it("returns match when path with one parameter match", []() {
         Endpoint endpoint("/plain_path/:parameter");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/plain_path/value");
 
@@ -69,7 +69,7 @@ describe("Endpoint", []() {
 
     it("returns match when path with one parameter match alphanumeric", []() {
         Endpoint endpoint("/plain_path/:parameter");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/plain_path/3.7.3");
 
@@ -79,7 +79,7 @@ describe("Endpoint", []() {
 
     it("returns match when path with many parameter matches", []() {
         Endpoint endpoint("/leve1/:parameter1/:parameter2");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/leve1/value1/3.7.3");
 
@@ -90,7 +90,7 @@ describe("Endpoint", []() {
 
     it("returns empty match when matching partial path with many parameter", []() {
         Endpoint endpoint("/leve1/:parameter1/:parameter2");
-        Optional<struct HttpParameterMap> match;
+        Maybe<struct HttpParameterMap> match;
 
         match = endpoint.match("/leve1/value1");
 
