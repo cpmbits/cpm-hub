@@ -23,10 +23,10 @@ using namespace std;
 
 Maybe<std::string> TrivialAuthenticator::authenticate(const char *key)
 {
-    auto iter = this->credentials.find(key);
+    auto iter = this->users_by_key.find(key);
     Maybe<string> username;
 
-    if (iter == this->credentials.end()) {
+    if (iter == this->users_by_key.end()) {
         return username;
     }
 
@@ -38,13 +38,21 @@ Maybe<std::string> TrivialAuthenticator::authenticate(const char *key)
 
 void TrivialAuthenticator::addUser(UserCredentials &credentials)
 {
-    this->credentials.insert(make_pair(credentials.password, credentials.username));
+    users_by_key.insert(make_pair(credentials.password, credentials.username));
+    users[credentials.username] = credentials.password;
 }
 
 
 bool TrivialAuthenticator::validCredentials(UserCredentials &credentials)
 {
-    return false;
+    auto iter = users.find(credentials.username);
+
+    if (iter == users.end()) {
+        return false;
+    }
+
+
+    return iter->second == credentials.password;
 }
 
 

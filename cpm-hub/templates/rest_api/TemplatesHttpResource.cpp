@@ -73,11 +73,12 @@ HttpResponse TemplatesHttpResource::post(HttpRequest &request)
 }
 
 
-static string templateAsJson(Template &temp)
+static string templateAsJson(Template &templat)
 {
     json json_bit = {
-        {"template_name", temp.name},
-        {"version", temp.version},
+        {"template_name", templat.name},
+        {"version",       templat.version},
+        {"payload",       templat.payload}
     };
     return json_bit.dump();
 }

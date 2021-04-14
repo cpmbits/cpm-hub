@@ -34,5 +34,6 @@ public:
     bool validCredentials(UserCredentials &credentials);
 
 private:
-    std::map<std::string, std::string> credentials;
+    std::map<std::string, std::string> users;
+    std::map<std::string, std::string> users_by_key;
 };
