@@ -70,11 +70,61 @@ static ProgramOptions parseIniFile(string &ini_file)
 }
 
 
+static const char *envString(const char *variable, const char *default_value)
+{
+    char *value = getenv(variable);
+    return value != NULL ? value : default_value;
+}
+
+
+static int envInt(const char *variable, int default_value)
+{
+    char *value = getenv(variable);
+    return value != NULL ? atoi(value) : default_value;
+}
+
+
+static bool envBool(const char *variable, bool default_value)
+{
+    char *value = getenv(variable);
+    return value != NULL ? atoi(value) : default_value;
+}
+
+
+static ProgramOptions parseEnvironmentVariables()
+{
+    ProgramOptions program_options;
+
+    program_options.bits_directory = envString("BITS_DIRECTORY", ".");
+    program_options.sqlite_database = envString("SQLITE_DATABASE", "cpmhub.db");
+    program_options.bits_repository_type = string_to_bits_repository_type[envString("BITS_REPOSITORY_TYPE", "sqlite")];
+    program_options.http_service_ip = envString("SERVICE_IP_BIND", "127.0.0.1");
+    program_options.http_service_port = envInt("SERVICE_PORT", 8000);
+    program_options.authenticator_type = string_to_authenticator_type[envString("AUTHENTICATION", "unauthenticated")];
+    program_options.cpm_hub_url = envString("AUTHENTICATION_URL", "http://localhost:1234");
+    program_options.http_management_ip = envString("MANAGEMENT_IP_BIND", "127.0.0.1");
+    program_options.http_management_port = envInt("MANAGEMENT_PORT", 8001);
+    program_options.security_options.security_enabled = envBool("SECURITY_ENABLED", false);
+    program_options.security_options.certificate_file = envString("CERTIFICATE_FILE", "certificate.pem");
+    program_options.security_options.key_file = envString("KEY_FILE", "key.pem");
+    program_options.access_file = envString("ACCESS_FILE", ".access");
+
+    program_options.logger_file = envString("LOGGER_FILE", "cpmhub.log");
+    program_options.logger_max_file_size = envInt("LOGGER_MAX_FILE_SIZE", 1024 * 1024);
+    program_options.logger_max_files = envInt("LOGGER_MAX_FILES", 10);
+
+    program_options.kpi_sink = string_to_kpi_sink[envString("SINK", "none")];
+    program_options.influxdb_url = envString("INFLUXDB_URL", "http://localhost:1234");
+    program_options.influxdb_db = envString("INFLUXDB_DB", "mydb");
+
+    return program_options;
+}
+
+
 ProgramOptions parseProgramOptions(int argc, char *argv[])
 {
     options_description cmdline_options("CPM Hub options");
     variables_map args;
-    string ini_file;
 
     cmdline_options.add_options()
             ("ini,i", value<string>()->default_value("cpmhub.ini"), "ini file with cpm-hub configuration");
@@ -82,7 +132,10 @@ ProgramOptions parseProgramOptions(int argc, char *argv[])
     store(parse_command_line(argc, argv, cmdline_options), args);
     notify(args);
 
-    ini_file = args["ini"].as<string>();
-
-    return parseIniFile(ini_file);
+    if (args.count("ini")) {
+        string ini_file = args["ini"].as<string>();
+        return parseIniFile(ini_file);
+    } else {
+        return parseEnvironmentVariables();
+    }
 }

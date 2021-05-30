@@ -20,6 +20,7 @@ jobs:
           pip3 install --upgrade cpm-cli
           pip3 install pyyaml
           pip3 install requests
+          pip3 install six
           sudo apt install -yq ninja-build g++ libboost-all-dev cpputest
           cpm install
       - name: Test with CPM
