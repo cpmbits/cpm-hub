@@ -32,3 +32,6 @@ test:
 targets:
   default:
     main: 'main.cpp'
+  ubuntu.20.04:
+    main: 'main.cpp'
+    dockerfile: 'ubuntu.20.04.Dockerfile'
