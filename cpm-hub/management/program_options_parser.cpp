@@ -127,7 +127,7 @@ ProgramOptions parseProgramOptions(int argc, char *argv[])
     variables_map args;
 
     cmdline_options.add_options()
-            ("ini,i", value<string>()->default_value("cpmhub.ini"), "ini file with cpm-hub configuration");
+            ("ini,i", value<string>(), "ini file with cpm-hub configuration");
 
     store(parse_command_line(argc, argv, cmdline_options), args);
     notify(args);
