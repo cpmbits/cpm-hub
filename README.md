@@ -1,16 +1,11 @@
-# CPM Hub Plugin Repository ![C/C++ CI](https://github.com/jorsanpe/cpm-hub/workflows/C/C++%20CI/badge.svg?branch=master)
+# CPM Hub ![C/C++ CI](https://github.com/jorsanpe/cpm-hub/workflows/C/C++%20CI/badge.svg?branch=master)
 
-CPM is a generic manager for C and C++ projects. The CPM plugin repository contains the package index 
-used by CPM. 
-
-## Custom CPM Hub installations
-You can download and create your own installation of the CPM Hub Plugin Repository for keeping your
-proprietary plugins.
+The cpm-hub service is the reference backend used by cpm to deliver dependencies. 
 
 ### Compilation
-CPM Hub depends on CPM for building its sources. Install CPM using pip:
+cpm Hub depends on cpm for building its sources. Install cpm using pip:
 
-`pip install cpm-cli`
+`pip install --upgrade cpm-cli`
 
 Then you can simply build the project:
 

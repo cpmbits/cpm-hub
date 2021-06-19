@@ -12,14 +12,15 @@ build:
     cpm-hub/logging:
     cpm-hub/kpi:
     cpm-hub/database:
-  cflags: [ '-std=c++11', '-g' ]
   bits:
     mongoose: '6.16'
     json: '3.7.3'
     base64: '1.0'
     blake3: '1.0'
     inih: '1.0'
-    spdlog: '1.6.1'
+    spdlog:
+      version: '1.6.1'
+      cppflags: ['-DSPDLOG_COMPILED_LIB']
     sqlite3: '3.32.3'
   libraries: [ 'boost_filesystem', 'boost_system', 'boost_program_options', 'pthread', 'ssl', 'crypto' ]
 test:
@@ -32,6 +33,10 @@ test:
 targets:
   default:
     main: 'main.cpp'
+    build:
+      cppflags: [ '-std=c++11', '-g' ]
   ubuntu.20.04:
     main: 'main.cpp'
     dockerfile: 'ubuntu.20.04.Dockerfile'
+    build:
+      cppflags: ['-std=c++11', '-g', '-O2']
