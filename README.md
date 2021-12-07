@@ -1,6 +1,6 @@
 # CPM Hub ![C/C++ CI](https://github.com/jorsanpe/cpm-hub/workflows/C/C++%20CI/badge.svg?branch=master)
 
-The cpm-hub service is the reference backend used by cpm to deliver dependencies. 
+The cpm-hub service is the reference backend used by cpm to deliver dependencies.
 
 ### Compilation
 cpm Hub depends on cpm for building its sources. Install cpm using pip:
